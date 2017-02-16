@@ -9,7 +9,7 @@ class TestClass {
 	public void someFunction(int argA, float argB) {
 		fooBar();
 		
-		if ( (a == b) && (c == d) ) {
+		if ( (a != b) && (c == d) ) {
 			System.out.println("Some text.");
 			a = c;
 			b = d
