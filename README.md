@@ -1,6 +1,6 @@
 # OGPasteroids
 OGP project: Asteroids
-
+<center><img src=http://userpages.umbc.edu/~sohisa1/images/artwork/cosmoknights/backgrounds/asteroid.png></center>
 ##Style guidelines
 All code must be written conform to the style guidelines used in Eric Steegmans's 'Object Oriented Programming with Java'. Most basic guidelines can be deducted from the following examples:
 ```java
