@@ -21,9 +21,9 @@ class TestClass {
 }
 ```
 Some guidelines to explicitly point out:
-1. Pascal Case is used for class objects
-2. CamelCase is used for both variable and method names.
-3. Each indented block of code containing more than one statement of code is preceded by a curly bracket, which is not on a seperate line.
-4. If possible, curly brackets are not used (e.g the implication consists of only one statement)
-5. Adequate whitespace is used in conditional phrases (see example)
-6. One line of whitespace is used between blocks of code.
+* Pascal Case is used for class objects
+* CamelCase is used for both variable and method names.
+* Each indented block of code containing more than one statement of code is preceded by a curly bracket, which is not on a seperate line.
+* If possible, curly brackets are not used (e.g the implication consists of only one statement)
+* Adequate whitespace is used in conditional phrases (see example)
+* One line of whitespace is used between blocks of code.
