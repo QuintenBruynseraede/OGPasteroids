@@ -1,7 +1,8 @@
 # OGPasteroids
 OGP project: Asteroids
+
 Quinten Bruynseraede & Tom de Backer
-<center><img src="asteroid.png" width="100px" height="100px" style="align: center" align="center"></center>
+<img src="asteroid.png" width="100px" height="100px"  align="middle">
 ##Style guidelines
 All code must be written conform to the style guidelines used in Eric Steegmans's 'Object Oriented Programming with Java'. Most basic guidelines can be deducted from the following examples:
 ```java
