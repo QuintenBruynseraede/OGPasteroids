@@ -16,18 +16,35 @@ public class Ship {
 	 * 
 	 * Initialize a new ship with given x and y coordinate.
 	 * 
-	 * @param 	xCoordinate
+	 * @param 	xCoordinate 
 	 * 			The X coordinate for this new ship.
 	 * @param 	yCoordinate
 	 * 			The Y coordinate for this new ship.
+	 * @pre		
 	 * @post   	The X coordinate of this new ship is equal to the given X coordinate.
 	 *       	| new.getXCoordinate() == xCoordinate
 	 * @post   	The Y coordinate of this new ship is equal to the given Y coordinate.
 	 *       	| new.getYCoordinate() == yCoordinate
+	 * @throws	IllegalArgumentException
+	 * 			The given x coordinate is not a valid coordinate for a ship.
+	 * 			| x < Double.MIN_VALUE || x >  Double.MAX_VALUE
+	 * @throws	IllegalArgumentException
+	 * 			The given y coordinate is not a valid coordinate for a ship.
+	 * 			| y < Double.MIN_VALUE || y >  Double.MAX_VALUE
+	 * @throws	IllegalArgumentException
+	 * 			The given radius is not a valid radius for this ship.
+	 * 			| ! isValidRadius(radius)
 	 */
-	public Ship (double x, double y, double xVelocity, double yVelocity, double radius, double orientation){
-		this.x = x;
-		this.y = y;
+	public Ship (double x, double y, double xVelocity, double yVelocity, double radius, double orientation) throws IllegalArgumentException {
+		setXCoordinate(x);
+		setYCoordinate(y);
+		setXVelocity(xVelocity);
+		setYVelocity(yVelocity);
+		setOrientation(orientation);
+		if (! isValidRadius(radius)) 
+			throw new IllegalArgumentException("Non-valid radius");
+		else
+			this.radius = radius;
 	}
 	
 	
@@ -46,7 +63,7 @@ public class Ship {
 	 * Return the X coordinate of this ship.
 	 */
 	@Basic
-	public double getXCoordinate(){
+	public double getXCoordinate() {
 		return this.x;
 	}
 	
@@ -54,7 +71,7 @@ public class Ship {
 	 * Return the Y coordinate of this ship.
 	 */
 	@Basic
-	public double getYCoordinate(){
+	public double getYCoordinate() {
 		return this.y;
 	}
 	
@@ -63,10 +80,15 @@ public class Ship {
 	 * @param 	xCoordinate
 	 * 			The new X coordinate for this ship.
 	 * @post	The X coordinate of this ship is equal to the given X coordinate.
-	 * 
+	 * @throws	IllegalArgumentException
+	 * 			The given x coordinate is not a valid coordinate for a ship.
+	 * 			| x < Double.MIN_VALUE || x >  Double.MAX_VALUE
 	 */
-	private void setXcoordinate(double x){
-		this.x = x;
+	private void setXCoordinate(double x) throws IllegalArgumentException {
+		if (x < Double.MIN_VALUE || x >  Double.MAX_VALUE)
+			throw new IllegalArgumentException("Non-valid X coordinate");
+		else
+			this.x = x;
 	}
 	
 	/**
@@ -74,10 +96,16 @@ public class Ship {
 	 * @param 	yCoordinate
 	 * 			The new Y coordinate for this ship.
 	 * @post	The Y coordinate of this ship is equal to the given X coordinate.
-	 * 
+	 * @throws	IllegalArgumentException
+	 * 			The given y coordinate is not a valid coordinate for
+	 * 		   	a ship.
+	 * 			| y < Double.MIN_VALUE || y >  Double.MAX_VALUE
 	 */
-	private void setYCoordinate(double y){
-		this.y = y;
+	private void setYCoordinate(double y) throws IllegalArgumentException {
+		if (y < Double.MIN_VALUE || y >  Double.MAX_VALUE)
+			throw new IllegalArgumentException("Non-valid Y coordinate");
+		else
+			this.y = y;
 	}
 	
 	/**
@@ -91,7 +119,7 @@ public class Ship {
 	private double yVelocity;
 	
 	/**
-	 * Return the X velocity of this ship.
+	 * Returns the X velocity of this ship.
 	 */
 	@Basic
 	public double getXVelocity(){
@@ -99,7 +127,7 @@ public class Ship {
 	}
 	
 	/**
-	 * Return the Y velocity of this ship.
+	 * Returns the Y velocity of this ship.
 	 */
 	@Basic
 	public double getYVelocity(){
@@ -125,7 +153,12 @@ public class Ship {
 	 * 
 	 */
 	private void setXVelocity(double xVelocity){
-		this.xVelocity = xVelocity;
+		if (! isValidVelocity(xVelocity) && xVelocity < velocityLowerBound)
+			this.xVelocity = velocityLowerBound;
+		else if(! isValidVelocity(xVelocity) && xVelocity > velocityUpperBound)
+			 this.xVelocity = velocityUpperBound;
+		else
+			this.xVelocity = xVelocity;
 	}
 	
 	/**
@@ -147,7 +180,12 @@ public class Ship {
 	 * 
 	 */
 	private void setYVelocity(double yVelocity){
-		this.yVelocity = yVelocity;
+		if (! isValidVelocity(yVelocity) && yVelocity < velocityLowerBound)
+			this.yVelocity = velocityLowerBound;
+		else if(! isValidVelocity(yVelocity) && yVelocity > velocityUpperBound)
+			 this.yVelocity = velocityUpperBound;
+		else
+			this.yVelocity = yVelocity;
 	}
 	
 	private final double velocityLowerBound = 0;
@@ -162,6 +200,66 @@ public class Ship {
 	 */
 	private boolean isValidVelocity(double velocity) {
 		return ( velocity > this.velocityLowerBound && velocity < this.velocityUpperBound );
+	}
+	
+	/**
+	 * Variable registering the orientation of this ship expressed in radians.
+	 */
+	private double orientation;
+	
+	/**
+	 * 
+	 * @param 	orientation
+	 * 			The given orientation to check
+	 * @return	True if and only if the orientation is greater than or equal to 0 and lower than pi.
+	 * 			| result == orientation >= 0 && orientation < Math.PI
+	 */
+	public boolean isValidOrientation(double orientation) {
+		return (orientation >= 0 && orientation < Math.PI);
+	}
+	
+	/**
+	 * 
+	 * @param 	orientation
+	 * 			The new orientation for this ship.
+	 * @pre		The orientation must be a valid angle in radians.
+	 * 			| isValidOrientation(orientation)
+	 * @post	The new orientation of the ship is equal to the given argument orientation.
+	 * 			| new.orientation = orientation
+	 */
+	private void setOrientation(double orientation) {
+		assert isValidOrientation(orientation);
+		this.orientation = orientation;
+	}
+	
+	/**
+	 * This method returns the orientation of this ship.
+	 */
+	@Basic
+	public double getOrientation() {
+		return this.orientation;
+	}
+	
+	private final double radius;
+	private final double radiusLowerBound = 10;
+	
+	/**
+	 * 
+	 * @param 	radius
+	 * 			The given radius to check.
+	 * @return	True if and only if the velocity is greater than the minimum value specified for a ship's radius.
+	 * 			| result == radius > this.radiusLowerBound
+	 */
+	private boolean isValidRadius(double radius) {
+		return ( radius >= this.radiusLowerBound );
+	}
+	
+	/**
+	 * This method returns the radius of this ship.
+	 */
+	@Basic
+	private double getRadius() {
+		return this.radius;
 	}
 	
 }
