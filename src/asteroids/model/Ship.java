@@ -287,7 +287,8 @@ public class Ship {
 	
 	/**
 	 * Add a given angle to the ship's orientation.
-	 * @pre		The ship must be able to turn the given angle whilst ensuring the ship's new orientation is still a valid orientation.
+	 * @pre		The ship must be able to turn the given angle whilst ensuring the ship's new orientation is still 
+	 * 			a valid orientation.
 	 * 			isValidOrientation(this.orientation + angle)
 	 * @param 	angle
 	 * 			The given angle to turn.
@@ -295,6 +296,35 @@ public class Ship {
 	public void turn(double angle) {
 		assert isValidOrientation(this.orientation + angle);
 		this.orientation += angle;
+	}
+	/**
+	 * Change the ship's velocity based on the current velocity and a specified amount of thrust.
+	 * @param 	amount	
+	 * 			The amount of thrust the ship generates.
+	 * @post 	If the specified amount to thrust is an illegal value, that is a negative number, no thrust is generated
+	 * 			| if ( amount < 0 )
+	 *  		| 		this.thrust(0)
+	 * @post 	If the specified amount of thrust would result in a speed greater than allowed for this spaceship,
+	 * 			an adjusted amount of thrust is generated to ensure the ship's x and y velocity are maximised yet still valid.
+	 * 			| ==========================================
+	 * 
+	 * @post	If a valid amount of thrust is specified, the ship's x and y velocity are updated accordingly
+	 * 			| new.xVelocity = this.xVelocity + amount * Math.cos(this.orientation)
+	 * 			| new.yVelocity = this.yVelocity + amount * Math.sin(this.orientation)
+	 * 
+	 * 
+	 */
+	public void thrust(double amount) {
+		if ( amount < 0 )
+			return;
+		else if ( 1 == 1) {
+			//Case: velocity would be too large
+		}
+		else {
+			this.xVelocity = this.xVelocity + amount * Math.cos(this.orientation);
+			this.yVelocity = this.yVelocity + amount * Math.cos(this.orientation);
+		}
+			
 	}
 	
 }
