@@ -212,10 +212,10 @@ public class Ship {
 	 * @param 	orientation
 	 * 			The given orientation to check
 	 * @return	True if and only if the orientation is greater than or equal to 0 and lower than pi.
-	 * 			| result == orientation >= 0 && orientation < Math.PI
+	 * 			| result == orientation >= 0 && orientation < 2 * Math.PI
 	 */
 	public boolean isValidOrientation(double orientation) {
-		return (orientation >= 0 && orientation < Math.PI);
+		return (orientation >= 0 && orientation < 2 * Math.PI);
 	}
 	
 	/**
@@ -260,6 +260,41 @@ public class Ship {
 	@Basic
 	private double getRadius() {
 		return this.radius;
+	}
+	
+	/**
+	 * Move the ship depending on ship's position, velocity and a given time duration.
+	 * @param 	time
+	 * 			The given time to move.
+	 * @post	The X and Y coordinates are updated according to the ship's respective xVelocity and yVelocity.
+	 * 			| for (int t = 0; t < time; t++) 
+	 * 			| 	this.x += xVelocity;
+	 * 			| 	this.y += yVelocity;
+	 * @throws 	IllegalArgumentException
+	 * 			The given time is not positive.
+	 * 			| time < 0
+	 */
+	public void move(double time) throws IllegalArgumentException {
+		if (time < 0)
+			throw new IllegalArgumentException("Argument time must be positive");
+		else {
+			for (int t = 0; t < time; t++) {
+				this.x += xVelocity;
+				this.y += yVelocity;
+			}
+		}
+	}
+	
+	/**
+	 * Add a given angle to the ship's orientation.
+	 * @pre		The ship must be able to turn the given angle whilst ensuring the ship's new orientation is still a valid orientation.
+	 * 			isValidOrientation(this.orientation + angle)
+	 * @param 	angle
+	 * 			The given angle to turn.
+	 */
+	public void turn(double angle) {
+		assert isValidOrientation(this.orientation + angle);
+		this.orientation += angle;
 	}
 	
 }
