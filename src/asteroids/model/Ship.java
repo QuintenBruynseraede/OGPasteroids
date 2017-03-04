@@ -9,6 +9,7 @@ import be.kuleuven.cs.som.annotate.Basic;
  */
 // TO DO List
 // @Effect lezen voor setXVelocity en setYVelocity
+// "replacing a by zero"? in functie thrust
 
 public class Ship {
 	
@@ -156,7 +157,7 @@ public class Ship {
 		if (! isValidVelocity(xVelocity) && xVelocity < velocityLowerBound)
 			this.xVelocity = velocityLowerBound;
 		else if(! isValidVelocity(xVelocity) && xVelocity > velocityUpperBound)
-			 this.xVelocity = velocityUpperBound;
+			this.xVelocity = velocityUpperBound;
 		else
 			this.xVelocity = xVelocity;
 	}
@@ -183,7 +184,7 @@ public class Ship {
 		if (! isValidVelocity(yVelocity) && yVelocity < velocityLowerBound)
 			this.yVelocity = velocityLowerBound;
 		else if(! isValidVelocity(yVelocity) && yVelocity > velocityUpperBound)
-			 this.yVelocity = velocityUpperBound;
+			this.yVelocity = velocityUpperBound;
 		else
 			this.yVelocity = yVelocity;
 	}
@@ -200,6 +201,29 @@ public class Ship {
 	 */
 	private boolean isValidVelocity(double velocity) {
 		return ( velocity > this.velocityLowerBound && velocity < this.velocityUpperBound );
+	}
+	
+	/**
+	 * Variable registering the velocity of this ship.
+	 */
+	private double velocity;
+
+	/**
+	 * @post	If velocity is not a valid velocity for this ship and velocity is lower than velocityLowerBound, then the velocity of this ship is equal to velocityLowerBound.
+	 * 			| if(! isValidVelocity(velocity) && velocity < velocityLowerBound)
+	 * 			| 	new.velocity = velocityLowerBound
+	 * 
+	 * @post	If yVelocity is not a valid velocity for this ship and yVelocity is higher than velocityUpperBound, then the velocity Y of this ship is equal to velocityUpperBound.
+	 * 			| if(! isValidVelocity(velocity) && velocity > velocityUpperBound)
+	 * 			| 	new.velocity = velocityUpperBound
+	 */
+	public void velocity() {
+		this.velocity = Math.sqrt(Math.pow(this.xVelocity, 2) + Math.pow(this.yVelocity, 2));
+		
+		if (! isValidVelocity(velocity) && velocity < velocityLowerBound)
+			this.velocity = velocityLowerBound;
+		else if(! isValidVelocity(velocity) && velocity > velocityUpperBound)
+			this.velocity = velocityUpperBound;
 	}
 	
 	/**
@@ -240,7 +264,14 @@ public class Ship {
 		return this.orientation;
 	}
 	
+	/**
+	 * Variable registering the radius of this ship.
+	 */
 	private final double radius;
+	
+	/**
+	 * Variable registering the radius lower bound of this ship.
+	 */
 	private final double radiusLowerBound = 10;
 	
 	/**
@@ -316,15 +347,45 @@ public class Ship {
 	 */
 	public void thrust(double amount) {
 		if ( amount < 0 )
-			return;
-		else if ( 1 == 1) {
+			return; 
+		else if (this.velocity > velocityUpperBound) {
 			//Case: velocity would be too large
+			this.velocity = velocityUpperBound;
 		}
 		else {
 			this.xVelocity = this.xVelocity + amount * Math.cos(this.orientation);
-			this.yVelocity = this.yVelocity + amount * Math.cos(this.orientation);
+			this.yVelocity = this.yVelocity + amount * Math.sin(this.orientation);
 		}
 			
 	}
 	
+	/**
+	 * This method returns the distance between two ships.
+	 * @param 	ship1
+	 * 			A given ship to check the distance between the ship and ship2
+	 * @param 	ship2
+	 * 			A given ship to check the distance between the ship and ship1
+	 * @return
+	 * 			
+	 */
+	public double getDistanceBetween(Ship ship1, Ship ship2) {
+		return -1;
+	}
+	
+	/**
+	 * This method checks whether two ships overlap.
+	 * @param 	ship1
+	 * 			A given ship to check whether ship1 and ship2 overlap.
+	 * @param 	ship2
+	 * 			A given ship to check whether ship1 and ship2 overlap.
+	 * @post	
+	 * @return	True if and only if the distance between ship1 and ship2 is greater than 0.
+	 * 			| result == getDistanceBetween(ship1, ship2) < 0
+	 */
+	public boolean overlap(Ship ship1, Ship ship2) {
+		if (getDistanceBetween(ship1, ship2) <= 0 )
+			return true;
+		else
+			return false;
+	}
 }
