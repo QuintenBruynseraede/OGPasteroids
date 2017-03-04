@@ -9,7 +9,7 @@ import be.kuleuven.cs.som.annotate.Basic;
  */
 // TO DO List
 // @Effect lezen voor setXVelocity en setYVelocity
-// "replacing a by zero"? in functie thrust
+// Thrust aanpassen fout
 
 public class Ship {
 	
@@ -204,26 +204,16 @@ public class Ship {
 	}
 	
 	/**
-	 * Variable registering the velocity of this ship.
+	 * Return the total velocity as a function of a velocity in the X and Y direction
+	 * @param 	xVelocity
+	 * 		  	The velocity in the X direction.
+	 * @param 	yVelocity
+	 * 	      	The velocity in the Y direction
+	 * @return  The total velocity of the ship 
+	 * 			sqrt(xVelocity * xVelocity + yVelocity * yVelocity)
 	 */
-	private double velocity;
-
-	/**
-	 * @post	If velocity is not a valid velocity for this ship and velocity is lower than velocityLowerBound, then the velocity of this ship is equal to velocityLowerBound.
-	 * 			| if(! isValidVelocity(velocity) && velocity < velocityLowerBound)
-	 * 			| 	new.velocity = velocityLowerBound
-	 * 
-	 * @post	If yVelocity is not a valid velocity for this ship and yVelocity is higher than velocityUpperBound, then the velocity Y of this ship is equal to velocityUpperBound.
-	 * 			| if(! isValidVelocity(velocity) && velocity > velocityUpperBound)
-	 * 			| 	new.velocity = velocityUpperBound
-	 */
-	public void velocity() {
-		this.velocity = Math.sqrt(Math.pow(this.xVelocity, 2) + Math.pow(this.yVelocity, 2));
-		
-		if (! isValidVelocity(velocity) && velocity < velocityLowerBound)
-			this.velocity = velocityLowerBound;
-		else if(! isValidVelocity(velocity) && velocity > velocityUpperBound)
-			this.velocity = velocityUpperBound;
+	public double getVelocity(double xVelocity, double yVelocity) {
+		return Math.sqrt(xVelocity * xVelocity + yVelocity * yVelocity);
 	}
 	
 	/**
@@ -346,31 +336,52 @@ public class Ship {
 	 * 
 	 */
 	public void thrust(double amount) {
-		if ( amount < 0 )
+		if ( amount <= 0 )
 			return; 
-		else if (this.velocity > velocityUpperBound) {
-			//Case: velocity would be too large
-			this.velocity = velocityUpperBound;
+		else if (getVelocity(this.getXVelocity() + amount * Math.cos(this.orientation), this.getYVelocity() + amount * Math.cos(this.orientation)) > velocityUpperBound) {
+			//NOT CORRECT
+			this.xVelocity = this.xVelocity + amount * Math.cos(this.orientation);
+			this.yVelocity = this.yVelocity + amount * Math.sin(this.orientation);
+			
+			final double factor = ( this.velocityUpperBound * this.velocityUpperBound) / (this.xVelocity * this.xVelocity + this.yVelocity * this.yVelocity);
+			this.xVelocity *= factor;
+			this.yVelocity *= factor;
+			
 		}
 		else {
 			this.xVelocity = this.xVelocity + amount * Math.cos(this.orientation);
 			this.yVelocity = this.yVelocity + amount * Math.sin(this.orientation);
 		}
-			
+	
 	}
 	
 	/**
-	 * This method returns the distance between two ships.
+	 * 			Checks the distance in km between two ships.
 	 * @param 	ship1
-	 * 			A given ship to check the distance between the ship and ship2
+	 * 			The ship from which this method checks the distance.
 	 * @param 	ship2
-	 * 			A given ship to check the distance between the ship and ship1
-	 * @return
-	 * 			
+	 * 			The ship to which this method checks the distance.
+	 * @return  The distance between the two ships provided as arguments.
+	 * 			| result == sqrt( (ship1.getXCoordinate()-ship2.getXCoordinate())^2 + (ship1.getYCoordinate()-ship2.getYCoordinate())^2 ) - (ship1.getRadius() + ship2.getRadius());
+	 * @return  If the method checks the distance between two ships represented by the same object, it returns 0.
+	 * 			| if ( ship1 == ship2 )
+	 * 			| 	return 0; 
+	 * @note	As a result of the provided formula, the distance between two overlapping ships shall be negative.
+	 * @note	To make getDistanceBetween a more distinct class specific method, getDistanceBetween is an overloaded function.
+	 * 			When only one ship is provided as an argument, the distance between the ship that calls this method and the ship that is
+	 * 			provided as an argument is returned.
+	 * @return	The distance between the prime object (an instance of the class Ship) and the ship provided as an argument.
+	 * 			| result == getDistanceBetween(this, otherShip);
 	 */
 	public double getDistanceBetween(Ship ship1, Ship ship2) {
-		return -1;
+		if ( ship1 == ship2 )
+			return 0;
+		return Math.sqrt( Math.pow(ship1.getXCoordinate()-ship2.getXCoordinate(), 2) + Math.pow(ship1.getYCoordinate()-ship2.getYCoordinate(), 2) ) - (ship1.getRadius() + ship2.getRadius());
 	}
+	
+	public double getDistanceBetween(Ship otherShip) {
+		return getDistanceBetween(this, otherShip);
+	}	
 	
 	/**
 	 * This method checks whether two ships overlap.
@@ -378,14 +389,17 @@ public class Ship {
 	 * 			A given ship to check whether ship1 and ship2 overlap.
 	 * @param 	ship2
 	 * 			A given ship to check whether ship1 and ship2 overlap.
-	 * @post	
 	 * @return	True if and only if the distance between ship1 and ship2 is greater than 0.
 	 * 			| result == getDistanceBetween(ship1, ship2) < 0
 	 */
 	public boolean overlap(Ship ship1, Ship ship2) {
-		if (getDistanceBetween(ship1, ship2) <= 0 )
+		if ( getDistanceBetween(ship1, ship2) <= 0 )
 			return true;
 		else
 			return false;
+	}
+	
+	public double getTimeToCollision(Ship ship1, Ship ship2) {
+		return;
 	}
 }
