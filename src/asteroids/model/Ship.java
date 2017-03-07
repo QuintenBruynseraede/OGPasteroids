@@ -7,9 +7,11 @@ import be.kuleuven.cs.som.annotate.Basic;
  * @author Tom De Backer and Quinten Bruynseraede
  *
  */
-// TO DO List
-// @Effect lezen voor setXVelocity en setYVelocity
-// Thrust aanpassen fout
+// TODO @Effect lezen voor setXVelocity en setYVelocity
+// TODO Documentation thrust
+// TODO Documentation getTimeToCollision
+
+
 
 public class Ship {
 	
@@ -206,9 +208,9 @@ public class Ship {
 	/**
 	 * Return the total velocity as a function of a velocity in the X and Y direction
 	 * @param 	xVelocity
-	 * 		  	The velocity in the X direction.
+	 * 			The velocity in the X direction.
 	 * @param 	yVelocity
-	 * 	      	The velocity in the Y direction
+	 * 			The velocity in the Y direction
 	 * @return  The total velocity of the ship 
 	 * 			sqrt(xVelocity * xVelocity + yVelocity * yVelocity)
 	 */
@@ -339,14 +341,10 @@ public class Ship {
 		if ( amount <= 0 )
 			return; 
 		else if (getVelocity(this.getXVelocity() + amount * Math.cos(this.orientation), this.getYVelocity() + amount * Math.cos(this.orientation)) > velocityUpperBound) {
-			//NOT CORRECT
-			this.xVelocity = this.xVelocity + amount * Math.cos(this.orientation);
-			this.yVelocity = this.yVelocity + amount * Math.sin(this.orientation);
+			double velocityRatio = this.getXVelocity()/this.getYVelocity();
 			
-			final double factor = ( this.velocityUpperBound * this.velocityUpperBound) / (this.xVelocity * this.xVelocity + this.yVelocity * this.yVelocity);
-			this.xVelocity *= factor;
-			this.yVelocity *= factor;
-			
+			this.setYVelocity( Math.sqrt( (this.velocityUpperBound*this.velocityUpperBound) / (velocityRatio * velocityRatio + 1)));
+			this.setXVelocity( velocityRatio * this.getYVelocity());
 		}
 		else {
 			this.xVelocity = this.xVelocity + amount * Math.cos(this.orientation);
@@ -357,49 +355,121 @@ public class Ship {
 	
 	/**
 	 * 			Checks the distance in km between two ships.
-	 * @param 	ship1
-	 * 			The ship from which this method checks the distance.
-	 * @param 	ship2
+	 * @param 	otherShip
 	 * 			The ship to which this method checks the distance.
 	 * @return  The distance between the two ships provided as arguments.
-	 * 			| result == sqrt( (ship1.getXCoordinate()-ship2.getXCoordinate())^2 + (ship1.getYCoordinate()-ship2.getYCoordinate())^2 ) - (ship1.getRadius() + ship2.getRadius());
+	 * 			| result == sqrt( (this.getXCoordinate()-otherShip.getXCoordinate())^2 + (this.getYCoordinate()-otherShip.getYCoordinate())^2 ) - (this.getRadius() + otherShip.getRadius());
 	 * @return  If the method checks the distance between two ships represented by the same object, it returns 0.
-	 * 			| if ( ship1 == ship2 )
-	 * 			| 	return 0; 
+	 * 			| if ( otherShip == this )
+	 * 			| 	result == 0; 
+	 * @throws	IllegalArgumentException 
+	 * 			The ship to check a collision against is a null object.
 	 * @note	As a result of the provided formula, the distance between two overlapping ships shall be negative.
-	 * @note	To make getDistanceBetween a more distinct class specific method, getDistanceBetween is an overloaded function.
-	 * 			When only one ship is provided as an argument, the distance between the ship that calls this method and the ship that is
-	 * 			provided as an argument is returned.
-	 * @return	The distance between the prime object (an instance of the class Ship) and the ship provided as an argument.
-	 * 			| result == getDistanceBetween(this, otherShip);
 	 */
-	public double getDistanceBetween(Ship ship1, Ship ship2) {
-		if ( ship1 == ship2 )
+	public double getDistanceBetween(Ship otherShip) throws IllegalArgumentException {
+		if (otherShip == null) 
+			throw new IllegalArgumentException("Invalid argument object (null).");
+		
+		if ( otherShip == this )
 			return 0;
-		return Math.sqrt( Math.pow(ship1.getXCoordinate()-ship2.getXCoordinate(), 2) + Math.pow(ship1.getYCoordinate()-ship2.getYCoordinate(), 2) ) - (ship1.getRadius() + ship2.getRadius());
+		return Math.sqrt( Math.pow(this.getXCoordinate()-otherShip.getXCoordinate(), 2) + Math.pow(this.getYCoordinate()-otherShip.getYCoordinate(), 2) ) - (this.getRadius() + otherShip.getRadius());
 	}
 	
-	public double getDistanceBetween(Ship otherShip) {
-		return getDistanceBetween(this, otherShip);
-	}	
 	
 	/**
 	 * This method checks whether two ships overlap.
-	 * @param 	ship1
-	 * 			A given ship to check whether ship1 and ship2 overlap.
-	 * @param 	ship2
-	 * 			A given ship to check whether ship1 and ship2 overlap.
+	 * @param 	otherShip
+	 * 			A Ship to check against whether the object invoking the method and the argument Ship overlap.
 	 * @return	True if and only if the distance between ship1 and ship2 is greater than 0.
-	 * 			| result == getDistanceBetween(ship1, ship2) < 0
+	 * 			| result == thisgetDistanceBetween(otherShip) < 0
+	 * @throws 	IllegalArgumentException
+	 * 			The ship to check an overlap against is a null object.
 	 */
-	public boolean overlap(Ship ship1, Ship ship2) {
-		if ( getDistanceBetween(ship1, ship2) <= 0 )
+	public boolean overlap(Ship otherShip) throws IllegalArgumentException {
+		if (otherShip == null) 
+			throw new IllegalArgumentException("Invalid argument object (null).");
+		
+		if ( this.getDistanceBetween(otherShip) <= 0 )
 			return true;
 		else
 			return false;
 	}
-	
-	public double getTimeToCollision(Ship ship1, Ship ship2) {
-		return;
+	/**
+	 * Returns the time to a collision between the ship invoking the method and another ship.
+	 * @param 	otherShip
+	 * 			
+	 * @return
+	 * @throws 	IllegalArgumentException
+	 * 			The ship to check a collision against is a null object.
+	 */
+	public double getTimeToCollision(Ship otherShip) throws IllegalArgumentException {
+		if (otherShip == null) 
+			throw new IllegalArgumentException("Invalid argument object (null).");
+		
+		double deltaVX = this.getXVelocity() - otherShip.getXVelocity();
+		double deltaVY = this.getYVelocity() - otherShip.getYVelocity();
+		double deltaX = this.getXCoordinate() - otherShip.getXCoordinate();
+		double deltaY = this.getYCoordinate() - otherShip.getYCoordinate();
+		
+		if ((deltaVX * deltaX) + (deltaVY * deltaY) >= 0)
+			return Double.POSITIVE_INFINITY;
+		
+		double radius1 = this.getRadius();
+		double radius2 = otherShip.getRadius();
+			
+		double part1 = deltaVX * deltaX + deltaVY * deltaY;
+		double part2 = deltaVX * deltaVX + deltaVY * deltaVY;
+		double part3 = deltaX * deltaX + deltaY * deltaY - (radius1 + radius2) * (radius1 + radius2);
+		double d = part1 * part1 - part2 * part3;
+			
+		if (d <= 0)
+			return Double.POSITIVE_INFINITY;
+		return -( (part1 + Math.sqrt(d)) / (part2) );
+		
 	}
+	
+	/**
+	 * 			Returns the position of a possible collision between the ship itself (prime object) and another ship.
+	 * @param 	otherShip
+	 * 			The ship used to calculate the position of a collision with.
+	 * @return	If the two ships never collide, returns null.
+	 * 			| if getTimeToCollision(otherShip) == Double.POSITIVE_INFINITY
+	 * 			| 		result == null;
+	 * @return	If (based on the ships' current position, velocity and orientation), there will be a collision, returns
+	 * 			the position of this collision.
+	 * 			| 	result == [ this.getXCoordinate() + this.getTimeToCollision(otherShip) * this.getXVelocity(), this.getYCoordinate() + this.getTimeToCollision(otherShip) * this.getYVelocity()]
+	 * @throws 	IllegalArgumentException
+	 * 			The two ships overlap already.
+	 * 			| this.overlap(otherShip)
+	 * @throws 	IllegalArgumentException
+	 * 			The ship to check a collision against is a null object.
+	 * @note 	The position of a collision is returned from the viewpoint of the Ship object calling the function.
+	 * 			The position returned represents the centerpoint of the Ship at the moment of impact.
+	 * 			Therefore, calling a.getCollisionPosition(b) is not equal to b.getCollisionPosition(b)
+	 */
+	public double[] getCollisionPosition(Ship otherShip) throws IllegalArgumentException {
+		if (otherShip == null) 
+			throw new IllegalArgumentException("Invalid argument object (null).");
+		
+		if ( this.overlap(otherShip) )
+			throw new IllegalArgumentException("No collision position specified between two overlapping ships.");
+		
+		if ( this.getTimeToCollision(otherShip) == Double.POSITIVE_INFINITY)
+			return null;
+		
+		double collisionX = this.getXCoordinate() + this.getTimeToCollision(otherShip) * this.getXVelocity();
+		double collisionY = this.getYCoordinate() + this.getTimeToCollision(otherShip) * this.getYVelocity();
+		
+		double[] collision = {collisionX, collisionY};
+		return collision;
+		}
 }
+
+
+
+
+
+
+
+
+
