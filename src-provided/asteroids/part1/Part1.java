@@ -1,5 +1,6 @@
 package asteroids.part1;
 
+import asteroids.model.Ship;
 import asteroids.part1.facade.IFacade;
 import asteroids.part1.internal.AsteroidsFrame;
 
