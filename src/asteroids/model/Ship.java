@@ -7,11 +7,8 @@ import be.kuleuven.cs.som.annotate.Basic;
  * @author Tom De Backer and Quinten Bruynseraede
  *
  */
-// TODO @Effect lezen voor setXVelocity en setYVelocity
 // TODO Documentation thrust
 // TODO Documentation getTimeToCollision
-
-
 
 public class Ship {
 	
@@ -191,8 +188,8 @@ public class Ship {
 			this.yVelocity = yVelocity;
 	}
 	
-	private final double velocityLowerBound = 0;
-	private final double velocityUpperBound = 300000;
+	private final static double velocityLowerBound = 0;
+	private final static double velocityUpperBound = 300000;
 	
 	/**
 	 * 
@@ -203,6 +200,22 @@ public class Ship {
 	 */
 	private boolean isValidVelocity(double velocity) {
 		return ( velocity > this.velocityLowerBound && velocity < this.velocityUpperBound );
+	}
+	
+	/**
+	 * This method returns the minimum velocity for this ship.
+	 */
+	@Basic
+	public static double getVelocityLowerBound() {
+		return velocityLowerBound;
+	}
+	
+	/**
+	 * This method returns the minimum velocity for this ship.
+	 */
+	@Basic
+	public static double getVelocityUpperBound() {
+		return velocityUpperBound;
 	}
 	
 	/**
@@ -264,7 +277,7 @@ public class Ship {
 	/**
 	 * Variable registering the radius lower bound of this ship.
 	 */
-	private final double radiusLowerBound = 10;
+	private final static double radiusLowerBound = 10;
 	
 	/**
 	 * 
@@ -274,15 +287,23 @@ public class Ship {
 	 * 			| result == radius > this.radiusLowerBound
 	 */
 	private boolean isValidRadius(double radius) {
-		return ( radius >= this.radiusLowerBound );
+		return ( radius >= Ship.radiusLowerBound );
 	}
 	
 	/**
 	 * This method returns the radius of this ship.
 	 */
 	@Basic
-	private double getRadius() {
+	public double getRadius() {
 		return this.radius;
+	}
+	
+	/**
+	 * This method returns the minimum value for this ship's radius.
+	 */
+	@Basic
+	public static double getRadiusLowerBound() {
+		return radiusLowerBound;
 	}
 	
 	/**
@@ -290,9 +311,9 @@ public class Ship {
 	 * @param 	time
 	 * 			The given time to move.
 	 * @post	The X and Y coordinates are updated according to the ship's respective xVelocity and yVelocity.
-	 * 			| for (int t = 0; t < time; t++) 
-	 * 			| 	this.x += xVelocity;
-	 * 			| 	this.y += yVelocity;
+	 * 			| for (int t = 0; t < time; t++)
+				|		this.setXCoordinate(this.getXCoordinate() + this.getXVelocity());
+				| 		this.setYCoordinate(this.getYCoordinate() + this.getYVelocity());
 	 * @throws 	IllegalArgumentException
 	 * 			The given time is not positive.
 	 * 			| time < 0
@@ -302,8 +323,8 @@ public class Ship {
 			throw new IllegalArgumentException("Argument time must be positive");
 		else {
 			for (int t = 0; t < time; t++) {
-				this.x += xVelocity;
-				this.y += yVelocity;
+				this.setXCoordinate(this.getXCoordinate() + this.getXVelocity());
+				this.setYCoordinate(this.getYCoordinate() + this.getYVelocity());
 			}
 		}
 	}
@@ -329,7 +350,12 @@ public class Ship {
 	 *  		| 		this.thrust(0)
 	 * @post 	If the specified amount of thrust would result in a speed greater than allowed for this spaceship,
 	 * 			an adjusted amount of thrust is generated to ensure the ship's x and y velocity are maximised yet still valid.
-	 * 			| ==========================================
+	 * 			| if (totalVelocity > velocityUpperBound)
+	 * 			|		new.xVelocity = this.xVelocity + amount * Math.cos(this.orientation)
+	 * 			| 		new.yVelocity = this.yVelocity + amount * Math.sin(this.orientation)
+	 * 			| 		double velocityRatio = this.getXVelocity()/this.getYVelocity()
+	 *			| 		this.setYVelocity( Math.sqrt( (this.velocityUpperBound*this.velocityUpperBound) / (velocityRatio * velocityRatio + 1)))
+	 *			| 		this.setXVelocity( velocityRatio * this.getYVelocity())
 	 * 
 	 * @post	If a valid amount of thrust is specified, the ship's x and y velocity are updated accordingly
 	 * 			| new.xVelocity = this.xVelocity + amount * Math.cos(this.orientation)
@@ -341,6 +367,9 @@ public class Ship {
 		if ( amount <= 0 )
 			return; 
 		else if (getVelocity(this.getXVelocity() + amount * Math.cos(this.orientation), this.getYVelocity() + amount * Math.cos(this.orientation)) > velocityUpperBound) {
+			this.xVelocity = this.xVelocity + amount * Math.cos(this.orientation);
+			this.yVelocity = this.yVelocity + amount * Math.sin(this.orientation);
+			
 			double velocityRatio = this.getXVelocity()/this.getYVelocity();
 			
 			this.setYVelocity( Math.sqrt( (this.velocityUpperBound*this.velocityUpperBound) / (velocityRatio * velocityRatio + 1)));
@@ -421,7 +450,10 @@ public class Ship {
 		double part2 = deltaVX * deltaVX + deltaVY * deltaVY;
 		double part3 = deltaX * deltaX + deltaY * deltaY - (radius1 + radius2) * (radius1 + radius2);
 		double d = part1 * part1 - part2 * part3;
-			
+		
+		if (part2 == 0) {
+			return Double.POSITIVE_INFINITY;
+		}
 		if (d <= 0)
 			return Double.POSITIVE_INFINITY;
 		return -( (part1 + Math.sqrt(d)) / (part2) );
