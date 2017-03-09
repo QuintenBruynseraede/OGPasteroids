@@ -45,7 +45,6 @@ public class Ship {
 			this.radius = radius;
 	}
 	
-	
 	/**
 	 * Variable registering the X coordinate of this ship expressed in kilometres.
 	 */
@@ -192,7 +191,7 @@ public class Ship {
 	 * 			| result == (velocity > this.velocityLowerBound && velocity < this.velocityUpperBound)
 	 */
 	private boolean isValidVelocity(double velocity) {
-		return ( velocity > this.velocityLowerBound && velocity < this.velocityUpperBound );
+		return ( velocity > velocityLowerBound && velocity < velocityUpperBound );
 	}
 	
 	/**
@@ -212,6 +211,7 @@ public class Ship {
 	}
 	
 	/**
+	 * 
 	 * Return the total velocity as a function of a velocity in the X and Y direction
 	 * @param 	xVelocity
 	 * 			The velocity in the X direction.
@@ -230,7 +230,6 @@ public class Ship {
 	private double orientation;
 	
 	/**
-	 * 
 	 * @param 	orientation
 	 * 			The given orientation to check
 	 * @return	True if and only if the orientation is greater than or equal to 0 and lower than pi.
@@ -241,7 +240,6 @@ public class Ship {
 	}
 	
 	/**
-	 * 
 	 * @param 	orientation
 	 * 			The new orientation for this ship.
 	 * @pre		The orientation must be a valid angle in radians.
@@ -273,7 +271,6 @@ public class Ship {
 	private final static double radiusLowerBound = 10;
 	
 	/**
-	 * 
 	 * @param 	radius
 	 * 			The given radius to check.
 	 * @return	True if and only if the velocity is greater than the minimum value specified for a ship's radius.
@@ -331,6 +328,7 @@ public class Ship {
 		assert isValidOrientation(this.orientation + angle);
 		this.orientation += angle;
 	}
+	
 	/**
 	 * Change the ship's velocity based on the current velocity and a specified amount of thrust.
 	 * @param 	amount	
@@ -346,12 +344,11 @@ public class Ship {
 	 * 			| 		double velocityRatio = this.getXVelocity()/this.getYVelocity()
 	 *			| 		this.setYVelocity( Math.sqrt( (this.velocityUpperBound*this.velocityUpperBound) / (velocityRatio * velocityRatio + 1)))
 	 *			| 		this.setXVelocity( velocityRatio * this.getYVelocity())
-	 * 
+	 * @note	If YVelocity is equal to zero, the velocityRatio can be calculated. Therefore we only set XVelocity to velocityUpperBound, 
+	 * 			as multiplying zero by a ratio would be redundant.
 	 * @post	If a valid amount of thrust is specified, the ship's x and y velocity are updated accordingly
 	 * 			| new.xVelocity = this.xVelocity + amount * Math.cos(this.orientation)
-	 * 			| new.yVelocity = this.yVelocity + amount * Math.sin(this.orientation)
-	 * 
-	 * 
+	 * 			| new.yVelocity = this.yVelocity + amount * Math.sin(this.orientation) 
 	 */
 	public void thrust(double amount) {
 		if ( amount <= 0 )
@@ -360,16 +357,18 @@ public class Ship {
 			this.xVelocity = this.xVelocity + amount * Math.cos(this.orientation);
 			this.yVelocity = this.yVelocity + amount * Math.sin(this.orientation);
 			
-			double velocityRatio = this.getXVelocity()/this.getYVelocity();
-			
-			this.setYVelocity( Math.sqrt( (this.velocityUpperBound*this.velocityUpperBound) / (velocityRatio * velocityRatio + 1)));
-			this.setXVelocity( velocityRatio * this.getYVelocity());
+			if(this.getYVelocity() == 0) 
+				this.setXVelocity(velocityUpperBound);
+			else {
+				double velocityRatio = this.getXVelocity()/this.getYVelocity();
+				this.setYVelocity( Math.sqrt( (velocityUpperBound*velocityUpperBound) / (velocityRatio * velocityRatio + 1)));
+				this.setXVelocity( velocityRatio * this.getYVelocity());
+			}
 		}
 		else {
 			this.xVelocity = this.xVelocity + amount * Math.cos(this.orientation);
 			this.yVelocity = this.yVelocity + amount * Math.sin(this.orientation);
 		}
-	
 	}
 	
 	/**
@@ -394,7 +393,6 @@ public class Ship {
 		return Math.sqrt( Math.pow(this.getXCoordinate()-otherShip.getXCoordinate(), 2) + Math.pow(this.getYCoordinate()-otherShip.getYCoordinate(), 2) ) - (this.getRadius() + otherShip.getRadius());
 	}
 	
-	
 	/**
 	 * This method checks whether two ships overlap.
 	 * @param 	otherShip
@@ -413,6 +411,7 @@ public class Ship {
 		else
 			return false;
 	}
+	
 	/**
 	 * Returns the time to a collision between the ship invoking the method and another ship.
 	 * @param 	otherShip
@@ -461,10 +460,8 @@ public class Ship {
 		}
 		if (d <= 0)
 			return Double.POSITIVE_INFINITY;
-		return -( (part1 + Math.sqrt(d)) / (part2) );
-		
+		return -( (part1 + Math.sqrt(d)) / (part2) );	
 	}
-	
 	/**
 	 * 			Returns the position of a possible collision between the ship itself (prime object) and another ship.
 	 * @param 	otherShip
@@ -501,12 +498,3 @@ public class Ship {
 		return collision;
 		}
 }
-
-
-
-
-
-
-
-
-

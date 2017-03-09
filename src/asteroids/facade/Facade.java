@@ -129,7 +129,12 @@ public class Facade implements IFacade{
 		if (ship1 == null || ship2 == null)
 			throw new ModelException("ship == null");
 		
-		return ship1.getCollisionPosition(ship2);
+		try {
+			return ship1.getCollisionPosition(ship2);
+		} catch (IllegalArgumentException e) {
+			throw new ModelException("Overlap.");
+	
+		}
 	}
 	
 	
