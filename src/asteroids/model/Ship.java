@@ -7,8 +7,6 @@ import be.kuleuven.cs.som.annotate.Basic;
  * @author Tom De Backer and Quinten Bruynseraede
  *
  */
-// TODO Documentation thrust
-// TODO Documentation getTimeToCollision
 
 public class Ship {
 	
@@ -85,10 +83,8 @@ public class Ship {
 	 * 			| x < Double.MIN_VALUE || x >  Double.MAX_VALUE
 	 */
 	private void setXCoordinate(double x) throws IllegalArgumentException {
-		if (x < Double.MIN_VALUE || x >  Double.MAX_VALUE)
-			throw new IllegalArgumentException("Non-valid X coordinate");
-		else
-			this.x = x;
+		this.x = x;
+			
 	}
 	
 	/**
@@ -102,10 +98,7 @@ public class Ship {
 	 * 			| y < Double.MIN_VALUE || y >  Double.MAX_VALUE
 	 */
 	private void setYCoordinate(double y) throws IllegalArgumentException {
-		if (y < Double.MIN_VALUE || y >  Double.MAX_VALUE)
-			throw new IllegalArgumentException("Non-valid Y coordinate");
-		else
-			this.y = y;
+		this.y = y;
 	}
 	
 	/**
@@ -188,7 +181,7 @@ public class Ship {
 			this.yVelocity = yVelocity;
 	}
 	
-	private final static double velocityLowerBound = 0;
+	private final static double velocityLowerBound = -300000;
 	private final static double velocityUpperBound = 300000;
 	
 	/**
@@ -311,9 +304,8 @@ public class Ship {
 	 * @param 	time
 	 * 			The given time to move.
 	 * @post	The X and Y coordinates are updated according to the ship's respective xVelocity and yVelocity.
-	 * 			| for (int t = 0; t < time; t++)
-				|		this.setXCoordinate(this.getXCoordinate() + this.getXVelocity());
-				| 		this.setYCoordinate(this.getYCoordinate() + this.getYVelocity());
+	 * 			| new.x = this.x + time * this.xVelocity
+	 * 			| new.y = this.y + time * this.yVelocity
 	 * @throws 	IllegalArgumentException
 	 * 			The given time is not positive.
 	 * 			| time < 0
@@ -322,10 +314,8 @@ public class Ship {
 		if (time < 0)
 			throw new IllegalArgumentException("Argument time must be positive");
 		else {
-			for (int t = 0; t < time; t++) {
-				this.setXCoordinate(this.getXCoordinate() + this.getXVelocity());
-				this.setYCoordinate(this.getYCoordinate() + this.getYVelocity());
-			}
+			setXCoordinate(this.getXCoordinate() + time * this.getXVelocity());
+			setYCoordinate(this.getYCoordinate() + time * this.getYVelocity());
 		}
 	}
 	
@@ -427,9 +417,24 @@ public class Ship {
 	 * Returns the time to a collision between the ship invoking the method and another ship.
 	 * @param 	otherShip
 	 * 			
-	 * @return
+	 * @return	The time to a collision based on the ships' position and orientation
+	 * 			| result ==  {deltaT | (ship1.move(deltaT) => ship1.overlap(ship2)) && (ship2.move(deltaT) => ship2.overlap(ship1))}
 	 * @throws 	IllegalArgumentException
 	 * 			The ship to check a collision against is a null object.
+	 * @note	Knowing that a spaceship always moves in a straight line, a ship's position can
+	 * 			easily be calculated as a function of the current position and the ship's velocity 
+	 * 			| newPos = currPos + time * velocity (I)
+	 * 			This formula holds for ship1.x, ship1.y, ship2.x, ship2.y
+	 * 			A collision occurs if two spaceships are seperated by a distance equal to the sum of their radiuses
+	 * 			| getDistanceBetween(ship1, ship2) == ship1.radius + ship2.radius (II)
+	 * 			Substituting the position functions (I) into the collision position (II) gives us a quadratic equation
+	 * 			that makes use of the ship's position, velocity, radius and the time to a collision.
+	 * 			We can now find an expression that returns this time as a function of all previously mentioned variables.
+	 * 			The roots of this quadratic equation are our solution.
+	 * 			Special cases include a divide by zero (no solutions => no collision => infinity time to collision)
+	 * 			and the case where two ships move in the same direction, the furthest one faster than the other ship,
+	 * 			resulting in a situation where the distance between them keeps increasing forever => no collision
+	 * 			=> infinity time to collision.
 	 */
 	public double getTimeToCollision(Ship otherShip) throws IllegalArgumentException {
 		if (otherShip == null) 

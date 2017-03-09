@@ -77,7 +77,7 @@ public class Facade implements IFacade{
 			ship.move(dt);
 		} catch (IllegalArgumentException e) {
 			throw new ModelException("Invalid time");
-		}		
+		}
 	}
 
 	@Override

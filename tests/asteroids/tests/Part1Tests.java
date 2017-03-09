@@ -26,7 +26,22 @@ public class Part1Tests {
 	public void createShipInvalidRadius() throws ModelException {
 		Ship ship = facade.createShip(0,0,10,10,-5, Math.PI);
 	}
-	
+
+	@Test(expected = ModelException.class)
+	public void createShipInvalidOrientation() throws ModelException {
+		Ship ship = facade.createShip(0,0,10,10,5, 3*Math.PI);
+	}
+
+	@Test//
+	public void createShipPrintValues() throws ModelException {
+		Ship ship = facade.createShip(8,9,10,11,10, Math.PI);
+		assertEquals(8, ship.getXCoordinate(), EPSILON); 
+		assertEquals(9, ship.getYCoordinate(), EPSILON); 
+		assertEquals(10, ship.getXVelocity(), EPSILON); 
+		assertEquals(11, ship.getYVelocity(), EPSILON); 
+		assertEquals(10, ship.getRadius(), EPSILON); 
+		assertEquals( Math.PI, ship.getOrientation(), EPSILON); 
+	}
 	
 
 /** 
