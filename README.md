@@ -29,3 +29,6 @@ Some guidelines to explicitly point out:
 * If possible, curly brackets are not used (e.g the implication consists of only one statement)
 * Adequate whitespace is used in conditional phrases (see example)
 * One line of whitespace is used between blocks of code.
+
+##Cumulative working hours
+14/5 1 hour 45 minutes
