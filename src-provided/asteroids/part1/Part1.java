@@ -1,6 +1,5 @@
 package asteroids.part1;
 
-import asteroids.model.Ship;
 import asteroids.part1.facade.IFacade;
 import asteroids.part1.internal.AsteroidsFrame;
 
@@ -16,7 +15,7 @@ public class Part1 {
 			}
 		}
 		
-		IFacade facade = new asteroids.facade.Facade();		
+		IFacade facade = new asteroids.part1.facade.Facade();		
 		AsteroidsFrame.run(facade, tryFullscreen);	    
 	  }
 }

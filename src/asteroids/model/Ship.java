@@ -5,7 +5,6 @@ import be.kuleuven.cs.som.annotate.Basic;
  *  A class of ships with some properties.
  *  
  * @author Tom De Backer and Quinten Bruynseraede
- *
  */
 
 public class Ship {
@@ -18,7 +17,14 @@ public class Ship {
 	 * 			The X coordinate for this new ship.
 	 * @param 	yCoordinate
 	 * 			The Y coordinate for this new ship.
-	 * @pre		
+	 * @param	xVelocity
+	 * 			The Velocity in the X direction for this new ship.
+	 * @param	yVelocity
+	 * 			The Velocity in the Y direction for this new ship.
+	 * @param	radius
+	 * 			The radius for this new ship.
+	 * @param	orientation
+	 * 			The orientation for this new ship.
 	 * @post   	The X coordinate of this new ship is equal to the given X coordinate.
 	 *       	| new.getXCoordinate() == xCoordinate
 	 * @post   	The Y coordinate of this new ship is equal to the given Y coordinate.
@@ -57,7 +63,7 @@ public class Ship {
 	
 	
 	/**
-	 * Return the X coordinate of this ship.
+	 * Return the X coordinate of this ship expressed in kilometres.
 	 */
 	@Basic
 	public double getXCoordinate() {
@@ -65,7 +71,7 @@ public class Ship {
 	}
 	
 	/**
-	 * Return the Y coordinate of this ship.
+	 * Return the Y coordinate of this ship expressed in kilometres.
 	 */
 	@Basic
 	public double getYCoordinate() {
@@ -145,10 +151,10 @@ public class Ship {
 	 * 
 	 */
 	private void setXVelocity(double xVelocity){
-		if (! isValidVelocity(xVelocity) && xVelocity < velocityLowerBound)
-			this.xVelocity = velocityLowerBound;
-		else if(! isValidVelocity(xVelocity) && xVelocity > velocityUpperBound)
-			this.xVelocity = velocityUpperBound;
+		if (! isValidVelocity(xVelocity) && xVelocity < VELOCITYLOWERBOUND)
+			this.xVelocity = VELOCITYLOWERBOUND;
+		else if(! isValidVelocity(xVelocity) && xVelocity > VELOCITYUPPERBOUND)
+			this.xVelocity = VELOCITYUPPERBOUND;
 		else
 			this.xVelocity = xVelocity;
 	}
@@ -172,16 +178,16 @@ public class Ship {
 	 * 
 	 */
 	private void setYVelocity(double yVelocity){
-		if (! isValidVelocity(yVelocity) && yVelocity < velocityLowerBound)
-			this.yVelocity = velocityLowerBound;
-		else if(! isValidVelocity(yVelocity) && yVelocity > velocityUpperBound)
-			this.yVelocity = velocityUpperBound;
+		if (! isValidVelocity(yVelocity) && yVelocity < VELOCITYLOWERBOUND)
+			this.yVelocity = VELOCITYLOWERBOUND;
+		else if(! isValidVelocity(yVelocity) && yVelocity > VELOCITYUPPERBOUND)
+			this.yVelocity = VELOCITYUPPERBOUND;
 		else
 			this.yVelocity = yVelocity;
 	}
 	
-	private final static double velocityLowerBound = -300000;
-	private final static double velocityUpperBound = 300000;
+	private final static double VELOCITYLOWERBOUND = -300000;
+	private final static double VELOCITYUPPERBOUND = 300000;
 	
 	/**
 	 * 
@@ -191,7 +197,7 @@ public class Ship {
 	 * 			| result == (velocity > this.velocityLowerBound && velocity < this.velocityUpperBound)
 	 */
 	private boolean isValidVelocity(double velocity) {
-		return ( velocity > velocityLowerBound && velocity < velocityUpperBound );
+		return ( velocity > VELOCITYLOWERBOUND && velocity < VELOCITYUPPERBOUND );
 	}
 	
 	/**
@@ -199,7 +205,7 @@ public class Ship {
 	 */
 	@Basic
 	public static double getVelocityLowerBound() {
-		return velocityLowerBound;
+		return VELOCITYLOWERBOUND;
 	}
 	
 	/**
@@ -207,7 +213,7 @@ public class Ship {
 	 */
 	@Basic
 	public static double getVelocityUpperBound() {
-		return velocityUpperBound;
+		return VELOCITYUPPERBOUND;
 	}
 	
 	/**
@@ -268,7 +274,7 @@ public class Ship {
 	/**
 	 * Variable registering the radius lower bound of this ship.
 	 */
-	private final static double radiusLowerBound = 10;
+	private final static double RADIUSLOWERBOUND = 10;
 	
 	/**
 	 * @param 	radius
@@ -277,7 +283,7 @@ public class Ship {
 	 * 			| result == radius > this.radiusLowerBound
 	 */
 	private boolean isValidRadius(double radius) {
-		return ( radius >= Ship.radiusLowerBound );
+		return ( radius >= Ship.RADIUSLOWERBOUND );
 	}
 	
 	/**
@@ -293,7 +299,7 @@ public class Ship {
 	 */
 	@Basic
 	public static double getRadiusLowerBound() {
-		return radiusLowerBound;
+		return RADIUSLOWERBOUND;
 	}
 	
 	/**
@@ -353,15 +359,15 @@ public class Ship {
 	public void thrust(double amount) {
 		if ( amount <= 0 )
 			return; 
-		else if (getVelocity(this.getXVelocity() + amount * Math.cos(this.orientation), this.getYVelocity() + amount * Math.cos(this.orientation)) > velocityUpperBound) {
+		else if (getVelocity(this.getXVelocity() + amount * Math.cos(this.orientation), this.getYVelocity() + amount * Math.cos(this.orientation)) > VELOCITYUPPERBOUND) {
 			this.xVelocity = this.xVelocity + amount * Math.cos(this.orientation);
 			this.yVelocity = this.yVelocity + amount * Math.sin(this.orientation);
 			
 			if(this.getYVelocity() == 0) 
-				this.setXVelocity(velocityUpperBound);
+				this.setXVelocity(VELOCITYUPPERBOUND);
 			else {
 				double velocityRatio = this.getXVelocity()/this.getYVelocity();
-				this.setYVelocity( Math.sqrt( (velocityUpperBound*velocityUpperBound) / (velocityRatio * velocityRatio + 1)));
+				this.setYVelocity( Math.sqrt( (VELOCITYUPPERBOUND*VELOCITYUPPERBOUND) / (velocityRatio * velocityRatio + 1)));
 				this.setXVelocity( velocityRatio * this.getYVelocity());
 			}
 		}
@@ -462,6 +468,26 @@ public class Ship {
 			return Double.POSITIVE_INFINITY;
 		return -( (part1 + Math.sqrt(d)) / (part2) );	
 	}
+	
+	public final static int LEFT = 1;
+	public final static int TOP = 2;
+	public final static int RIGHT = 3;
+	public final static int BOTTOM = 4;
+	
+	
+	public double getTimeToCollision(int boundary) {
+		if (boundary == LEFT)
+			return this.getXCoordinate()/this.getXVelocity();
+		else if (boundary == TOP)
+			return (World.HEIGHTUPPERBOUND-this.getYCoordinate())/this.getYVelocity();
+		else if (boundary == RIGHT)
+			return (World.WIDTHUPPERBOUND-this.getXCoordinate())/this.getXVelocity();
+		else if (boundary == BOTTOM)
+			return this.getYCoordinate()/this.getYVelocity();
+		else
+			return Double.POSITIVE_INFINITY;
+	}
+	
 	/**
 	 * 			Returns the position of a possible collision between the ship itself (prime object) and another ship.
 	 * @param 	otherShip
