@@ -41,7 +41,7 @@ public class Ship {
 	 * 			The given radius is not a valid radius for this ship.
 	 * 			| ! isValidRadius(radius)
 	 */
-	public Ship (double x, double y, double xVelocity, double yVelocity, double radius, double orientation) throws IllegalArgumentException {
+	public Ship (double x, double y, double xVelocity, double yVelocity, double radius, double orientation, double mass) throws IllegalArgumentException {
 		setXCoordinate(x);
 		setYCoordinate(y);
 		setXVelocity(xVelocity);
@@ -51,6 +51,12 @@ public class Ship {
 			throw new IllegalArgumentException("Non-valid radius");
 		else
 			this.radius = radius;
+		
+		if (mass < 0)
+			this.massShip = 1;
+		else
+			this.massShip = mass;		
+
 	}
 	
 	/**
@@ -82,31 +88,33 @@ public class Ship {
 	
 	/**
 	 * 
-	 * @param 	xCoordinate
-	 * 			The new X coordinate for this ship.
-	 * @post	The X coordinate of this ship is equal to the given X coordinate.
+	 * @param 	X
+	 * 			The new X coordinate for this bullet.
+	 * @post	The X coordinate of this bullet is equal to the given X coordinate.
 	 * @throws	IllegalArgumentException
-	 * 			The given x coordinate is not a valid coordinate for a ship.
-	 * 			| x < Double.MIN_VALUE || x >  Double.MAX_VALUE
+	 * 			The given x coordinate is not a valid coordinate for a bullet.
+	 * 			| Double.isNaN(x) || Double.isInfinite(x)
 	 */
 	void setXCoordinate(double x) throws IllegalArgumentException {
-		this.x = x;
-			
+		if (Double.isNaN(x) || Double.isInfinite(x))
+			throw new IllegalArgumentException("Non valid x");
+		this.x = x;			
 	}
 	
 	/**
 	 * 
 	 * @param 	yCoordinate
-	 * 			The new Y coordinate for this ship.
-	 * @post	The Y coordinate of this ship is equal to the given X coordinate.
+	 * 			The new Y coordinate for this bullet.
+	 * @post	The Y coordinate of this bullet is equal to the given X coordinate.
 	 * @throws	IllegalArgumentException
-	 * 			The given y coordinate is not a valid coordinate for
-	 * 		   	a ship.
-	 * 			| y < Double.MIN_VALUE || y >  Double.MAX_VALUE
+	 * 			The given y coordinate is not a valid coordinate for a bullet.
+	 * 			| Double.isNaN(y) || Double.isInfinite(y)
 	 */
 	void setYCoordinate(double y) throws IllegalArgumentException {
+		if (Double.isNaN(y) || Double.isInfinite(y))
+			throw new IllegalArgumentException("Non valid y");
 		this.y = y;
-	}
+		}
 	
 	/**
 	 * Variable registering the X velocity of this ship expressed in kilometres per second.
@@ -543,7 +551,7 @@ public class Ship {
 	 * Returns the mass of this ship not including any entities it is carrying.
 	 */
 	@Basic
-	public double getMass(){
+	public double getMassShip(){
 		return this.massShip;
 	}
 	
@@ -552,19 +560,10 @@ public class Ship {
 	 */
 	@Basic
 	public double getMassTotal(){
-		return this.massTotal;
-	}
-	
-	/**
-	 * 
-	 * @param 	mass
-	 * 			The new mass for this ship.
-	 * @post	This.massTotal = max(1, mass)
-	 */
-	void setMassTotal(double mass) {
-		if (mass < 0)
-			this.massTotal = 1;
-		this.massTotal = mass;		
+		double totalMass = this.getMassShip();
+		for (Bullet b : bulletsLoaded)
+			totalMass += b.getMassBullet();
+		return totalMass;
 	}
 	
 	/**
@@ -588,7 +587,7 @@ public class Ship {
 	 * @note	The minimum mass density for a ship is defined as 1.42E12
 	 */
 	void setMassDensity(double massDensity) {
-		if (this.getMass() >= (4/3) * Math.PI * Math.pow(this.getRadius(), 3) * massDensity)
+		if (this.getMassShip() >= (4/3) * Math.PI * Math.pow(this.getRadius(), 3) * massDensity)
 			this.massDensity = massDensity;
 		else
 			this.massDensity = 1420000000000.0;
@@ -602,11 +601,11 @@ public class Ship {
 	//TODO modify constructor to account for new parameters
 	
 	/**
-	 * 
-	 * @param 	massDensity
-	 * 			The new mass density for this ship.
-	 * @post	This.massDensity = max(minimum, massDensity)
-	 * @note	The minimum mass density for a ship is defined as 1.42E12
+	 * Sets the world this ship is associated with. 
+	 * @param 	world
+	 * 			| new.getWorld = this.world
+	 * @throws 	IllegalArgumentException
+	 * 			| world == null
 	 */
 	
 	public void setWorld(World world) throws IllegalArgumentException {
@@ -618,9 +617,8 @@ public class Ship {
 	
 	/**
 	 * Returns the world this ship is currently associated with.
-	 * @return this.world
-	 * @return null - if no world variable has been set.
 	 */
+	@Basic
 	public World getWorld() {
 		return this.world;
 	}
@@ -629,17 +627,6 @@ public class Ship {
 	 *  A HashSet registering the bullets that are currently loaded by this ship
 	 */
 	public HashSet<Bullet> bulletsLoaded = new HashSet();
-	
-	/**
-	 *  A method to return the combined mass of a ship and its bullets.
-	 * @return | this.getMass() + sum(bullet.getMass()) where bullet is an element of this.bulletsLoaded
-	 */
-	public double calculateTotalWeight() {
-		double totalMass = this.getMass();
-		for (Bullet b : bulletsLoaded)
-			totalMass += b.getMass();
-		return totalMass;
-	}
 	
 	/**
 	 *  Variable registering whether this ship's thruster is currently on.
