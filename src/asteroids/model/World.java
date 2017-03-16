@@ -11,7 +11,7 @@ import java.util.*;
  */
 
 //TODO Uitgebreid testen van getShips()
-//TODO Evolve afwerken!
+//TODO Evolve hulpfuncties maken!!
 
 public class World {
 	
@@ -208,6 +208,21 @@ public class World {
 		return clone;
 	}
 	
+	/**
+	 * Returns a list of all ships and bullets in this world.
+	 * 
+	 * @return 	A list of all ships and bullets in this world.
+	 * 			| { entity1, entity2, ..., entityN | entityI.getWorld() = this}
+	 */
+	public HashSet<Object> getShipsAndBullets() {
+		HashSet<Object> entities = new HashSet();
+		for ( Ship s : ships) 
+			entities.add(s);
+		for ( Bullet b : bullets) 
+			entities.add(b);
+		return entities;
+	}
+	
 	public void evolve(double deltaTime) {
 		double minTime = Double.MAX_VALUE;
 		Object object1; 
@@ -237,18 +252,32 @@ public class World {
 			}
 		}
 		
-		for (Ship s1 : bullets) {
-			for (Bullet b2 : bullets) {
-				double timeToCollision = b1.getTimeToCollision(b2);
+		for (Ship s1 : ships) {
+			for (Ship s2 : ships) {
+				double timeToCollision = s1.getTimeToCollision(s2);
 			//TODO add getTimeToCollision to Bullet.java
 				if (timeToCollision < minTime) {
 					minTime = timeToCollision;
-					object1 = b1;
-					object2 = b2;	
+					object1 = s1;
+					object2 = s2;	
 				}
 			}
 		}
-	
+		if (minTime < deltaTime) {
+			advance(minTime);
+			resolveCollision();
+			evolve(deltaTime - minTime);
+		}
+		else
+			advance(deltaTime);	
 	}
 	
+	public void advance(double deltaTime) {
+		for (Ship ship : ships) {
+			ship.setXCoordinate(ship.getXCoordinate() + deltaTime * ship.getXVelocity());
+			ship.setYCoordinate(ship.getYCoordinate() + deltaTime * ship.getYVelocity());
+			if (ship.isThrusterEnabled) 
+				ship.updateVelocity()
+		}
+	}
 }

@@ -1,4 +1,6 @@
 package asteroids.model;
+import java.util.HashSet;
+
 import be.kuleuven.cs.som.annotate.Basic;
 
 /**
@@ -87,7 +89,7 @@ public class Ship {
 	 * 			The given x coordinate is not a valid coordinate for a ship.
 	 * 			| x < Double.MIN_VALUE || x >  Double.MAX_VALUE
 	 */
-	private void setXCoordinate(double x) throws IllegalArgumentException {
+	void setXCoordinate(double x) throws IllegalArgumentException {
 		this.x = x;
 			
 	}
@@ -102,7 +104,7 @@ public class Ship {
 	 * 		   	a ship.
 	 * 			| y < Double.MIN_VALUE || y >  Double.MAX_VALUE
 	 */
-	private void setYCoordinate(double y) throws IllegalArgumentException {
+	void setYCoordinate(double y) throws IllegalArgumentException {
 		this.y = y;
 	}
 	
@@ -523,4 +525,165 @@ public class Ship {
 		double[] collision = {collisionX, collisionY};
 		return collision;
 		}
+	
+	/**
+	 * variable registering the mass of a ship in kilograms. 
+	 * @note	Not including any objects ship is carrying.
+	 */
+	private final double massShip;	
+	
+	/**
+	 * variable registering the mass of a ship and any entities it is carrying in kilograms. 
+	 * @note	Including any objects ship is carrying.
+	 */
+	private double massTotal;
+	
+	
+	/**
+	 * Returns the mass of this ship not including any entities it is carrying.
+	 */
+	@Basic
+	public double getMass(){
+		return this.massShip;
+	}
+	
+	/**
+	 * Returns the mass of this ship including any entities it is carrying.
+	 */
+	@Basic
+	public double getMassTotal(){
+		return this.massTotal;
+	}
+	
+	/**
+	 * 
+	 * @param 	mass
+	 * 			The new mass for this ship.
+	 * @post	This.massTotal = max(1, mass)
+	 */
+	void setMassTotal(double mass) {
+		if (mass < 0)
+			this.massTotal = 1;
+		this.massTotal = mass;		
+	}
+	
+	/**
+	 * variable registering the mass density of this ship.
+	 */
+	private double massDensity;
+	
+	/**
+	 * Returns the mass density of this ship.
+	 */
+	@Basic
+	public double getmassDensity(){
+		return this.massDensity;
+	}
+	
+	/**
+	 * 
+	 * @param 	massDensity
+	 * 			The new mass density for this ship.
+	 * @post	This.massDensity = max(minimum, massDensity)
+	 * @note	The minimum mass density for a ship is defined as 1.42E12
+	 */
+	void setMassDensity(double massDensity) {
+		if (this.getMass() >= (4/3) * Math.PI * Math.pow(this.getRadius(), 3) * massDensity)
+			this.massDensity = massDensity;
+		else
+			this.massDensity = 1420000000000.0;
+	}
+	
+	/**
+	 * Variable registering the world this ship is bound to.
+	 */
+	private World world = null; 
+	
+	//TODO modify constructor to account for new parameters
+	
+	/**
+	 * 
+	 * @param 	massDensity
+	 * 			The new mass density for this ship.
+	 * @post	This.massDensity = max(minimum, massDensity)
+	 * @note	The minimum mass density for a ship is defined as 1.42E12
+	 */
+	
+	public void setWorld(World world) throws IllegalArgumentException {
+		if (world == null) {
+			throw new IllegalArgumentException("Setting a ship's world to a null value.");
+		}
+		this.world = world;
+	}
+	
+	/**
+	 * Returns the world this ship is currently associated with.
+	 * @return this.world
+	 * @return null - if no world variable has been set.
+	 */
+	public World getWorld() {
+		return this.world;
+	}
+	
+	/**
+	 *  A HashSet registering the bullets that are currently loaded by this ship
+	 */
+	public HashSet<Bullet> bulletsLoaded = new HashSet();
+	
+	/**
+	 *  A method to return the combined mass of a ship and its bullets.
+	 * @return | this.getMass() + sum(bullet.getMass()) where bullet is an element of this.bulletsLoaded
+	 */
+	public double calculateTotalWeight() {
+		double totalMass = this.getMass();
+		for (Bullet b : bulletsLoaded)
+			totalMass += b.getMass();
+		return totalMass;
+	}
+	
+	/**
+	 *  Variable registering whether this ship's thruster is currently on.
+	 */
+	public boolean thrusterOn = false;
+	
+	/**
+	 * Returns whether the ship's thruster is currently on.
+	 * @return this.thrusterOn
+	 */
+	public boolean isThrusterEnabled() {
+		return this.thrusterOn;
+	}
+	
+	/**
+	 * Sets the ship's thruster state to on.
+	 */
+	public void thrustOn() {
+		this.thrusterOn = true;
+	}
+	
+	/**
+	 * Set the ship's thruster state to off.
+	 */
+	public void thrustOf() {
+		this.thrusterOn = false;
+	}
+	
+	/**
+	 * Variable registering the force this ship's thruster exerts.
+	 */
+	public final double THRUSTERFORCE = 1.1e21;
+	
+	/**
+	 * Returns the acceleration this ship is subsceptible to, making use of Newton's second law of motion (F = ma).
+	 * @see implementation
+	 */
+	public double getAcceleration() {
+		return THRUSTERFORCE / this.getMassTotal();
+	}
+	
+	
 }
+
+
+
+

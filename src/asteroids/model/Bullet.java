@@ -2,6 +2,14 @@ package asteroids.model;
 
 import be.kuleuven.cs.som.annotate.Basic;
 
+
+/**
+ * A class of bullets with some properties.
+ *  
+ * @author Tom De Backer and Quinten Bruynseraede
+ *
+ */
+
 public class Bullet {
 	 
 	/**
