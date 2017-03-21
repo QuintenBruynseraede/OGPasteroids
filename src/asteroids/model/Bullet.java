@@ -25,11 +25,32 @@ public class Bullet {
 	 * @param	radius
 	 * 			The radius for this new bullet.
 	 * @param	ship
-				| //TODO formal definition
+	 *			The ship this bullet is carried by
+	 * @param 	world
+	 * 			The world this bullet is held by			
 	 * @post   	The X coordinate of this new bullet is equal to the given X coordinate.
 	 *       	| new.getXCoordinate() == xCoordinate
 	 * @post   	The Y coordinate of this new bullet is equal to the given Y coordinate.
 	 *       	| new.getYCoordinate() == yCoordinate
+	 * @post   	The x velocity of this new bullet is equal to the given X velocity.
+	 *       	| new.getXVelocity() == xVelocity
+	 * @post   	The Y velocity of this new bullet is equal to the given Y velocity.
+	 *       	| new.getYVelocity() == yVelocity
+	 * @post	The radius of this new bullet is set to the given radius if valid, or a predefined lower bound otherwise.
+	 * 			| new.getRadius() == max(Bullet.RADIUSLOWERBOUND, radius)
+	 * @post	The orientation of this bullet is set to the given orientation.
+	 *			| new.orientation == this.orientation
+	 * @post	The massdensity for this bullet is set.
+	 * 			| new.massDensity == Bullet.MASSDENSITY
+	 * @post	The mass for this bullet is set.
+	 * 			| new.mass = (4/3)*PI*radius^3*MASSDENSITY
+	 * @post	The world for this bullet is set.
+	 * 			| new.getWorld() == world;
+	 * @post	The ship which is carrying this bullet is set.
+	 * 			| new.getParent() == ship;
+	 * @note	A bullet can only be associated with a bullet or a world. If the bullet is still being carried by a ship,
+	 * 			world should be null. If the bullet is flying independently, ship should be null. Other cases are in theory
+	 * 			not possible.
 	 * @throws	IllegalArgumentException
 	 * 			The given x coordinate is not a valid coordinate for a bullet.
 	 * 			| Double.isNaN(x) || Double.isInfinity(x)
@@ -41,17 +62,28 @@ public class Bullet {
 	 * 			| ! isValidRadius(radius)
 	 * 
 	 */
-	public Bullet (double x, double y, double xVelocity, double yVelocity, double radius, Ship ship, World world) throws IllegalArgumentException {
+	public Bullet (double x, double y, double xVelocity, double yVelocity, double radius, Ship parent, World world) throws IllegalArgumentException {
 		setXCoordinate(x);
 		setYCoordinate(y);
 		setXVelocity(xVelocity);
 		setYVelocity(yVelocity);
+		
 		if (! isValidRadius(radius)) 
 			throw new IllegalArgumentException("Non-valid radius");
 		else
 			this.radius = radius;
-		setWorld(world);
-		setParent(ship);
+		
+		if ((world == null && parent == null)  || (world != null && parent != null)) {
+			throw new IllegalArgumentException("Either world or ship must be null.");
+		}
+		
+		if (parent == null) 
+			setWorld(world);
+		else if (world == null)
+			setParent(parent);
+		
+		
+		this.mass = (4/3) * Math.PI * Math.pow(this.getRadius(), 3) * Bullet.MASSDENSITY;
 	}
 	
 	/**
@@ -279,7 +311,7 @@ public class Bullet {
 	/**
 	 * variable registering the mass density of a bullet in kilogrammes 
 	 */
-	private double massDensity;
+	private static final double MASSDENSITY = 7.8E12;
 	
 	/**
 	 * Returns the mass of this bullet not including any entities it is carrying.
@@ -294,21 +326,7 @@ public class Bullet {
 	 */
 	@Basic
 	public double getmassDensity(){
-		return this.massDensity;
-	}
-	
-	/**
-	 * 
-	 * @param 	massDensity
-	 * 			The new mass density for this bullet.
-	 * @post	This.massDensity = max(minimum, massDensity)
-	 * @note	The minimum mass density for a bullet is defined as 1.42E12
-	 */
-	void setMassDensity(double massDensity) {
-		if (this.getMassBullet() >= (4/3) * Math.PI * Math.pow(this.getRadius(), 3) * massDensity)
-			this.massDensity = massDensity;
-		else
-			this.massDensity = 1420000000000.0;
+		return Bullet.MASSDENSITY;
 	}
 
 	/**
@@ -321,6 +339,8 @@ public class Bullet {
 	 * Sets the world this ship is associated with. 
 	 * @param 	world
 	 * 			| new.getWorld = this.world
+	 * @post	| this.getParent() == null
+	 * @post	| this.getWorld() == world
 	 * @throws 	IllegalArgumentException
 	 * 			| world == null
 	 */
@@ -329,6 +349,9 @@ public class Bullet {
 		if (world == null) {
 			throw new IllegalArgumentException("Setting a ship's world to a null value.");
 		}
+		
+		this.getWorld().removeBullet(this);
+		this.parent = null;
 		this.world = world;
 	}
 	
@@ -341,7 +364,7 @@ public class Bullet {
 	}
 	
 	/**
-	 * Variable registering the world this ship is bound to.
+	 * Variable registering the ship this bullet is carried by.
 	 */
 	private Ship parent = null; 
 		
@@ -358,6 +381,10 @@ public class Bullet {
 		if (ship == null) {
 			throw new IllegalArgumentException("Setting a bullet's parent to a null value.");
 		}
+		
+		this.getParent().removeBullet(this);
+		
+		this.world = null;
 		this.parent = ship;
 	}
 	
@@ -368,5 +395,115 @@ public class Bullet {
 	public Ship getParent() {
 		return this.parent;
 	}
+
+	/**
+	 * Returns the time to a collision between the bullet invoking the method and a ship.
+	 * @param 	s
+	 * @return	The time to a collision based on the positions and orientations of the bullet and the ship.
+	 * 			| result ==  {deltaT | (this.move(deltaT) => this.overlap(b2)) && (b2.move(deltaT) => b2.overlap(this))}
+	 * @throws 	IllegalArgumentException
+	 * 			The ship to check a collision against is a null object.
+	 */
 	
+	public double getTimeToCollision(Ship s) throws IllegalArgumentException {
+		if (s == null) 
+			throw new IllegalArgumentException("Invalid argument object (null).");
+		
+		double deltaVX = this.getXVelocity() - s.getXVelocity();
+		double deltaVY = this.getYVelocity() - s.getYVelocity();
+		double deltaX = this.getXCoordinate() - s.getXCoordinate();
+		double deltaY = this.getYCoordinate() - s.getYCoordinate();
+		
+		if ((deltaVX * deltaX) + (deltaVY * deltaY) >= 0)
+			return Double.POSITIVE_INFINITY;
+		
+		double radius1 = this.getRadius();
+		double radius2 = s.getRadius();
+			
+		double part1 = deltaVX * deltaX + deltaVY * deltaY;
+		double part2 = deltaVX * deltaVX + deltaVY * deltaVY;
+		double part3 = deltaX * deltaX + deltaY * deltaY - (radius1 + radius2) * (radius1 + radius2);
+		double d = part1 * part1 - part2 * part3;
+		
+		if (part2 == 0) {
+			return Double.POSITIVE_INFINITY;
+		}
+		if (d <= 0)
+			return Double.POSITIVE_INFINITY;
+		return -( (part1 + Math.sqrt(d)) / (part2) );
+	}
+
+	/**
+	 * Returns the time to a collision between the bullet invoking the method and another bullet.
+	 * @param 	b2
+	 * @return	The time to a collision based on the bullets' position and orientation.
+	 * 			| result ==  {deltaT | (this.move(deltaT) => this.overlap(b2)) && (b2.move(deltaT) => b2.overlap(this))}
+	 * @throws 	IllegalArgumentException
+	 * 			The bullet to check a collision against is a null object.
+	 */
+	public double getTimeToCollision(Bullet b2) throws IllegalArgumentException {
+		if (b2 == null) 
+			throw new IllegalArgumentException("Invalid argument object (null).");
+		
+		double deltaVX = this.getXVelocity() - b2.getXVelocity();
+		double deltaVY = this.getYVelocity() - b2.getYVelocity();
+		double deltaX = this.getXCoordinate() - b2.getXCoordinate();
+		double deltaY = this.getYCoordinate() - b2.getYCoordinate();
+		
+		if ((deltaVX * deltaX) + (deltaVY * deltaY) >= 0)
+			return Double.POSITIVE_INFINITY;
+		
+		double radius1 = this.getRadius();
+		double radius2 = b2.getRadius();
+			
+		double part1 = deltaVX * deltaX + deltaVY * deltaY;
+		double part2 = deltaVX * deltaVX + deltaVY * deltaVY;
+		double part3 = deltaX * deltaX + deltaY * deltaY - (radius1 + radius2) * (radius1 + radius2);
+		double d = part1 * part1 - part2 * part3;
+		
+		if (part2 == 0) {
+			return Double.POSITIVE_INFINITY;
+		}
+		if (d <= 0)
+			return Double.POSITIVE_INFINITY;
+		return -( (part1 + Math.sqrt(d)) / (part2) );
+	}
+	
+	/**
+	 * Move the bullet depending on bullet's position, velocity and a given time duration.
+	 * @param 	time
+	 * 			The given time to move.
+	 * @post	The X and Y coordinates are updated according to the bullet's respective xVelocity and yVelocity.
+	 * 			| new.x = this.x + time * this.xVelocity
+	 * 			| new.y = this.y + time * this.yVelocity
+	 * @throws 	IllegalArgumentException
+	 * 			The given time is not positive.
+	 * 			| time < 0
+	 */
+	public void move(double time) throws IllegalArgumentException {
+		if (time < 0)
+			throw new IllegalArgumentException("Argument time must be positive");
+		else {
+			setXCoordinate(this.getXCoordinate() + time * this.getXVelocity());
+			setYCoordinate(this.getYCoordinate() + time * this.getYVelocity());
+		}
+	}
+	
+	public final static int LEFT = 1;
+	public final static int TOP = 2;
+	public final static int RIGHT = 3;
+	public final static int BOTTOM = 4;
+	
+	public double getTimeToCollision(int boundary) {
+		if (boundary == LEFT)
+			return this.getXCoordinate()/this.getXVelocity();
+		else if (boundary == TOP)
+			return (World.HEIGHTUPPERBOUND-this.getYCoordinate())/this.getYVelocity();
+		else if (boundary == RIGHT)
+			return (World.WIDTHUPPERBOUND-this.getXCoordinate())/this.getXVelocity();
+		else if (boundary == BOTTOM)
+			return this.getYCoordinate()/this.getYVelocity();
+		else
+			return Double.POSITIVE_INFINITY;
+	}
 }

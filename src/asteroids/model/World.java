@@ -93,9 +93,17 @@ public class World {
 	 * 			The radius for this new ship.
 	 * @param	orientation
 	 * 			The orientation for this new ship.
+	 * @param	mass
+	 * 			The mass for this new ship.
+	 * @param	massDensity
+	 * 			The mass density for this new ship.
+	 * @param	world
+	 * 			The world for this new ship.
+	 * @post	See constructor Ship.
+	 * @post	| this.getShips().contains(ship)
 	 */
-	public void addShip(double x, double y, double xVelocity, double yVelocity, double radius, double orientation) {
-		Ship ship = new Ship(x, y, xVelocity, yVelocity, radius, orientation);
+	public void addShip(double x, double y, double xVelocity, double yVelocity, double radius, double orientation, double mass, double massDensity, World world) {
+		Ship ship = new Ship(x, y, xVelocity, yVelocity, radius, orientation, mass, massDensity, world);
 		ships.add(ship);
 	}
 
@@ -134,9 +142,14 @@ public class World {
 	 * 			The radius for this new  bullet.
 	 * @param	orientation
 	 * 			The orientation for this new bullet.
+	 * @param	ship
+	 * 			The ship carrying this bullet.
+	 * @param	world
+	 * 			The world encapsulating this bullet.
+	 * @post	| this.getBullets().contains(bullet)
 	 */
-	public void addBullet(double x, double y, double xVelocity, double yVelocity, double radius, Ship ship) {
-		Bullet bullet = new Bullet(x, y, xVelocity, yVelocity, radius, ship);
+	public void addBullet(double x, double y, double xVelocity, double yVelocity, double radius, Ship ship, World world) {
+		Bullet bullet = new Bullet(x, y, xVelocity, yVelocity, radius, ship, world);
 		bullets.add(bullet);
 	}
 
@@ -223,10 +236,16 @@ public class World {
 		return entities;
 	}
 	
+	public final static int LEFT = 1;
+	public final static int TOP = 2;
+	public final static int RIGHT = 3;
+	public final static int BOTTOM = 4;
+	
 	public void evolve(double deltaTime) {
 		double minTime = Double.MAX_VALUE;
-		Object object1; 
-		Object object2;
+		Object object1 = null; 
+		Object object2 = null;
+		int boundary = 0;
 		
 		for (Bullet b : bullets) {
 			for (Ship s : ships) {
@@ -243,7 +262,6 @@ public class World {
 		for (Bullet b1 : bullets) {
 			for (Bullet b2 : bullets) {
 				double timeToCollision = b1.getTimeToCollision(b2);
-			//TODO add getTimeToCollision to Bullet.java
 				if (timeToCollision < minTime) {
 					minTime = timeToCollision;
 					object1 = b1;
@@ -255,7 +273,6 @@ public class World {
 		for (Ship s1 : ships) {
 			for (Ship s2 : ships) {
 				double timeToCollision = s1.getTimeToCollision(s2);
-			//TODO add getTimeToCollision to Bullet.java
 				if (timeToCollision < minTime) {
 					minTime = timeToCollision;
 					object1 = s1;
@@ -263,21 +280,84 @@ public class World {
 				}
 			}
 		}
+		
+		for (Ship ship : getShips()) {
+			double timeToCollision = ship.getTimeToCollision(LEFT);
+			if (timeToCollision < minTime) {
+				object1 = ship;
+				boundary = LEFT;	
+			}
+			
+			timeToCollision = ship.getTimeToCollision(RIGHT);
+			if (timeToCollision < minTime) {
+				object1 = ship;
+				boundary = RIGHT;	
+			}
+			
+			timeToCollision = ship.getTimeToCollision(BOTTOM);
+			if (timeToCollision < minTime) {
+				object1 = ship;
+				boundary = BOTTOM;	
+			}
+			
+			timeToCollision = ship.getTimeToCollision(TOP);
+			if (timeToCollision < minTime) {
+				object1 = ship;
+				boundary = TOP;	
+			}
+		}
+		
+		for (Bullet bullet : getBullets()) {
+			double timeToCollision = bullet.getTimeToCollision(LEFT);
+			if (timeToCollision < minTime) {
+				object1 = bullet;
+				boundary = LEFT;	
+			}
+			
+			timeToCollision = bullet.getTimeToCollision(RIGHT);
+			if (timeToCollision < minTime) {
+				object1 = bullet;
+				boundary = RIGHT;	
+			}
+			
+			timeToCollision = bullet.getTimeToCollision(BOTTOM);
+			if (timeToCollision < minTime) {
+				object1 = bullet;
+				boundary = BOTTOM;	
+			}
+			
+			timeToCollision = bullet.getTimeToCollision(TOP);
+			if (timeToCollision < minTime) {
+				object1 = bullet;
+				boundary = TOP;	
+			}
+		}
+		
 		if (minTime < deltaTime) {
 			advance(minTime);
-			resolveCollision();
+			resolveCollision(object1, object2);
 			evolve(deltaTime - minTime);
 		}
 		else
 			advance(deltaTime);	
 	}
 	
+	private void resolveCollision(Object object1, Object object2) throws IllegalStateException {
+		if (object1 == null || object2 == null) 
+			throw new IllegalStateException("This world does not have any collisions.");
+		
+		
+	}
+
 	public void advance(double deltaTime) {
 		for (Ship ship : ships) {
-			ship.setXCoordinate(ship.getXCoordinate() + deltaTime * ship.getXVelocity());
-			ship.setYCoordinate(ship.getYCoordinate() + deltaTime * ship.getYVelocity());
-			if (ship.isThrusterEnabled) 
-				ship.updateVelocity()
+			ship.move(deltaTime);
+			if (ship.isThrusterEnabled()) 
+				ship.updateVelocity();
+		}
+		
+		for (Bullet bullet : bullets) {
+			bullet.move(deltaTime);
 		}
 	}
 }

@@ -27,10 +27,29 @@ public class Ship {
 	 * 			The radius for this new ship.
 	 * @param	orientation
 	 * 			The orientation for this new ship.
+	 * @param	mass
+	 * 			The mass for this new ship.
+	 * @param 	world
+	 * 			The world this ship is associated with.
 	 * @post   	The X coordinate of this new ship is equal to the given X coordinate.
 	 *       	| new.getXCoordinate() == xCoordinate
 	 * @post   	The Y coordinate of this new ship is equal to the given Y coordinate.
 	 *       	| new.getYCoordinate() == yCoordinate
+	 * @post   	The x velocity of this new ship is equal to the given X velocity.
+	 *       	| new.getXVelocity() == xVelocity
+	 * @post   	The Y velocity of this new ship is equal to the given Y velocity.
+	 *       	| new.getYVelocity() == yVelocity
+	 * @post	The radius of this new ship is set to the given radius if valid, or a predefined lower bound otherwise.
+	 * 			| new.getRadius() == max(Ship.RADIUSLOWERBOUND, radius)
+	 * @post	The orientation of this ship is set to the given orientation.
+	 *			| new.orientation == this.orientation
+	 * @post	The massdensity for this ship is set.
+	 * 			| new.massDensity = max(massDensity, 1.42E12)
+	 * @post	The mass for this ship is set.
+	 * 			| new.mass = max(mass, lowerBound)
+	 * @post	The world for this ship is set.
+	 * 			| new.getWorld() = world;
+	 * @note	The mass for a ship must not be lower than (4/3)*PI*r^3*massDensity
 	 * @throws	IllegalArgumentException
 	 * 			The given x coordinate is not a valid coordinate for a ship.
 	 * 			| x < Double.MIN_VALUE || x >  Double.MAX_VALUE
@@ -41,7 +60,7 @@ public class Ship {
 	 * 			The given radius is not a valid radius for this ship.
 	 * 			| ! isValidRadius(radius)
 	 */
-	public Ship (double x, double y, double xVelocity, double yVelocity, double radius, double orientation, double mass) throws IllegalArgumentException {
+	public Ship (double x, double y, double xVelocity, double yVelocity, double radius, double orientation, double mass, double massDensity, World world) throws IllegalArgumentException {
 		setXCoordinate(x);
 		setYCoordinate(y);
 		setXVelocity(xVelocity);
@@ -52,11 +71,13 @@ public class Ship {
 		else
 			this.radius = radius;
 		
-		if (mass < 0)
-			this.massShip = 1;
+		if (massDensity < 1.42E12)
+			this.massDensity = 1.42E12;
 		else
-			this.massShip = mass;		
-
+			this.massDensity = massDensity;
+		
+		setMassShip(mass);
+		setWorld(world);
 	}
 	
 	/**
@@ -431,7 +452,6 @@ public class Ship {
 	/**
 	 * Returns the time to a collision between the ship invoking the method and another ship.
 	 * @param 	otherShip
-	 * 			
 	 * @return	The time to a collision based on the ships' position and orientation
 	 * 			| result ==  {deltaT | (ship1.move(deltaT) => ship1.overlap(ship2)) && (ship2.move(deltaT) => ship2.overlap(ship1))}
 	 * @throws 	IllegalArgumentException
@@ -538,14 +558,7 @@ public class Ship {
 	 * variable registering the mass of a ship in kilograms. 
 	 * @note	Not including any objects ship is carrying.
 	 */
-	private final double massShip;	
-	
-	/**
-	 * variable registering the mass of a ship and any entities it is carrying in kilograms. 
-	 * @note	Including any objects ship is carrying.
-	 */
-	private double massTotal;
-	
+	private double massShip;		
 	
 	/**
 	 * Returns the mass of this ship not including any entities it is carrying.
@@ -553,6 +566,13 @@ public class Ship {
 	@Basic
 	public double getMassShip(){
 		return this.massShip;
+	}
+	
+	public void setMassShip(double mass) {
+		if (mass < (4/3) * Math.PI * Math.pow(this.getRadius(), 3) * massDensity)
+			this.massShip = (4/3) * Math.PI * Math.pow(this.getRadius(), 3) * massDensity;
+		else
+			this.massShip = mass;
 	}
 	
 	/**
@@ -569,7 +589,7 @@ public class Ship {
 	/**
 	 * variable registering the mass density of this ship.
 	 */
-	private double massDensity;
+	private final double massDensity;
 	
 	/**
 	 * Returns the mass density of this ship.
@@ -580,26 +600,10 @@ public class Ship {
 	}
 	
 	/**
-	 * 
-	 * @param 	massDensity
-	 * 			The new mass density for this ship.
-	 * @post	This.massDensity = max(minimum, massDensity)
-	 * @note	The minimum mass density for a ship is defined as 1.42E12
-	 */
-	void setMassDensity(double massDensity) {
-		if (this.getMassShip() >= (4/3) * Math.PI * Math.pow(this.getRadius(), 3) * massDensity)
-			this.massDensity = massDensity;
-		else
-			this.massDensity = 1420000000000.0;
-	}
-	
-	/**
 	 * Variable registering the world this ship is bound to.
 	 */
 	private World world = null; 
-	
-	//TODO modify constructor to account for new parameters
-	
+		
 	/**
 	 * Sets the world this ship is associated with. 
 	 * @param 	world
@@ -668,9 +672,23 @@ public class Ship {
 		return THRUSTERFORCE / this.getMassTotal();
 	}
 	
+	/**
+	 * Removes a bullet from the list of bullets this ship is carrying.
+	 * @param 	bullet
+	 * 			The bullet to remove.
+	 * @post	| bulletsLoaded.contains(bullet) == false
+	 */
+	public void removeBullet(Bullet bullet) {
+		for (Bullet b : bulletsLoaded) {
+			if (b == bullet) {
+				bulletsLoaded.remove(b);
+			}
+		}
+		
+	}
+
+	public void updateVelocity() {
+		this.thrust(getAcceleration());
+	}
 	
 }
-
-
-
-
