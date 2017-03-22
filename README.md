@@ -16,3 +16,4 @@ Quinten Bruynseraede & Tom de Backer
 
 21/3 11 hours 45 minutes
 
+22/3 13 hours
