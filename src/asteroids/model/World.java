@@ -12,6 +12,7 @@ import java.util.*;
 
 //TODO Uitgebreid testen van getShips()
 //TODO Evolve hulpfuncties maken!!
+//TODO Destructor ship en bullet
 
 public class World {
 	
@@ -284,24 +285,28 @@ public class World {
 		for (Ship ship : getShips()) {
 			double timeToCollision = ship.getTimeToCollision(LEFT);
 			if (timeToCollision < minTime) {
+				minTime = timeToCollision;
 				object1 = ship;
 				boundary = LEFT;	
 			}
 			
 			timeToCollision = ship.getTimeToCollision(RIGHT);
 			if (timeToCollision < minTime) {
+				minTime = timeToCollision;
 				object1 = ship;
 				boundary = RIGHT;	
 			}
 			
 			timeToCollision = ship.getTimeToCollision(BOTTOM);
 			if (timeToCollision < minTime) {
+				minTime = timeToCollision;
 				object1 = ship;
 				boundary = BOTTOM;	
 			}
 			
 			timeToCollision = ship.getTimeToCollision(TOP);
 			if (timeToCollision < minTime) {
+				minTime = timeToCollision;
 				object1 = ship;
 				boundary = TOP;	
 			}
@@ -335,6 +340,9 @@ public class World {
 		
 		if (minTime < deltaTime) {
 			advance(minTime);
+			if (boundary != 0) {
+				resolveCollision(object1, boundary);
+			}
 			resolveCollision(object1, object2);
 			evolve(deltaTime - minTime);
 		}
@@ -345,8 +353,68 @@ public class World {
 	private void resolveCollision(Object object1, Object object2) throws IllegalStateException {
 		if (object1 == null || object2 == null) 
 			throw new IllegalStateException("This world does not have any collisions.");
+
+		if (object1 instanceof Ship && object2 instanceof Ship) {		
+			Ship ship1 = (Ship) object1;
+			Ship ship2 = (Ship) object2;
+			
+			double deltaVX = ship1.getXVelocity() - ship2.getXVelocity();
+			double deltaVY = ship1.getYVelocity() - ship2.getYVelocity();
+			double deltaX = ship1.getXCoordinate() - ship2.getXCoordinate();
+			double deltaY = ship1.getYCoordinate() - ship2.getYCoordinate();
+			
+			double ship1J = (2*ship1.getMassTotal()*ship2.getMassTotal() * (deltaVX * deltaX + deltaVY * deltaY)) / (ship1.getRadius() * (ship1.getMassTotal() + ship2.getMassTotal()));
+			double ship1JX = (ship1J * deltaX) / ship1.getRadius();
+			double ship1JY = (ship1J * deltaY) / ship1.getRadius();
+			ship1.setXVelocity(ship1.getXVelocity() + ship1JX / ship1.getMassTotal());
+			ship1.setYVelocity(ship1.getYVelocity() + ship1JY / ship1.getMassTotal());
+			
+			deltaVX = ship2.getXVelocity() - ship1.getXVelocity();
+			deltaVY = ship2.getYVelocity() - ship1.getYVelocity();
+			deltaX = ship2.getXCoordinate() - ship1.getXCoordinate();
+			deltaY = ship2.getYCoordinate() - ship1.getYCoordinate();
+			
+			double ship2J = (2*ship1.getMassTotal()*ship2.getMassTotal() * (deltaVX * deltaX + deltaVY * deltaY)) / (ship2.getRadius() * (ship1.getMassTotal() + ship2.getMassTotal()));
+			double ship2JX = (ship2J * deltaX) / ship2.getRadius();
+			double ship2JY = (ship2J * deltaY) / ship2.getRadius();
+			ship2.setXVelocity(ship2.getXVelocity() + ship2JX / ship2.getMassTotal());
+			ship2.setYVelocity(ship2.getYVelocity() + ship2JY / ship2.getMassTotal());
+			
+			return;
+		}
 		
+		if (object1 instanceof Bullet && object2 instanceof Ship) {
+			Ship ship = (Ship) object2;
+			Bullet bullet = (Bullet) object1;
+			
+			if (ship.bulletsFired.contains(bullet)) {
+				ship.bulletsLoaded.add(bullet);
+				bullet.setWorld(null);
+				bullet.setParent(ship);
+			}
+			else {
+				ship.finalize();
+				bullet.finalize();	
+			}
+			return;
+		}
 		
+		if (object1 instanceof Bullet && object2 instanceof Bullet) {
+			Bullet bullet1 = (Bullet) object1;
+			Bullet bullet2 = (Bullet) object2;
+			
+			bullet1.finalize();
+			bullet2.finalize();
+			
+			return;
+		}
+	}
+	
+	private void resolveCollision(Object object1, int boundary) throws IllegalStateException {
+		if (object1 == null) 
+			throw new IllegalStateException("This world does not have any collisions.");
+		
+			
 	}
 
 	public void advance(double deltaTime) {
@@ -358,6 +426,8 @@ public class World {
 		
 		for (Bullet bullet : bullets) {
 			bullet.move(deltaTime);
+			//TODO if bullet not fired, x=parentX
+			//TODO if bullet not fired, y=parentY
 		}
 	}
 }

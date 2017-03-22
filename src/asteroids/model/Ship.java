@@ -181,7 +181,7 @@ public class Ship {
 	 * 			| 	new.xVelocity = velocityUpperBound
 	 * 
 	 */
-	private void setXVelocity(double xVelocity){
+	void setXVelocity(double xVelocity){
 		if (! isValidVelocity(xVelocity) && xVelocity < VELOCITYLOWERBOUND)
 			this.xVelocity = VELOCITYLOWERBOUND;
 		else if(! isValidVelocity(xVelocity) && xVelocity > VELOCITYUPPERBOUND)
@@ -208,7 +208,7 @@ public class Ship {
 	 * 			| 	new.yVelocity = velocityUpperBound
 	 * 
 	 */
-	private void setYVelocity(double yVelocity){
+	void setYVelocity(double yVelocity){
 		if (! isValidVelocity(yVelocity) && yVelocity < VELOCITYLOWERBOUND)
 			this.yVelocity = VELOCITYLOWERBOUND;
 		else if(! isValidVelocity(yVelocity) && yVelocity > VELOCITYUPPERBOUND)
@@ -628,9 +628,15 @@ public class Ship {
 	}
 	
 	/**
-	 *  A HashSet registering the bullets that are currently loaded by this ship
+	 *  A HashSet registering the bullets that are currently loaded by this ship.
 	 */
 	public HashSet<Bullet> bulletsLoaded = new HashSet();
+	
+	/**
+	 *  A HashSet registering the bullets that have been fired by this ship.
+	 */
+	public HashSet<Bullet> bulletsFired = new HashSet();
+
 	
 	/**
 	 *  Variable registering whether this ship's thruster is currently on.
@@ -682,6 +688,14 @@ public class Ship {
 		for (Bullet b : bulletsLoaded) {
 			if (b == bullet) {
 				bulletsLoaded.remove(b);
+				return;
+			}
+		}
+		
+		for (Bullet b : bulletsFired) {
+			if (b == bullet) {
+				bulletsFired.remove(b);
+				return;
 			}
 		}
 		
@@ -689,6 +703,15 @@ public class Ship {
 
 	public void updateVelocity() {
 		this.thrust(getAcceleration());
+	}
+	
+	public void finalize() {
+		for (Bullet b : bulletsLoaded)
+			b.setParent(null);
+		for (Bullet b : bulletsFired)
+			b.setParent(null);
+		this.getWorld().removeShip(this);
+		
 	}
 	
 }

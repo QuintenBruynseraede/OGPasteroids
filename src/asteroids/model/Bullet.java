@@ -345,11 +345,7 @@ public class Bullet {
 	 * 			| world == null
 	 */
 
-	public void setWorld(World world) throws IllegalArgumentException {
-		if (world == null) {
-			throw new IllegalArgumentException("Setting a ship's world to a null value.");
-		}
-		
+	public void setWorld(World world) {
 		this.getWorld().removeBullet(this);
 		this.parent = null;
 		this.world = world;
@@ -377,11 +373,7 @@ public class Bullet {
 	 * 			| ship == null
 	 */
 	
-	public void setParent(Ship ship) throws IllegalArgumentException {
-		if (ship == null) {
-			throw new IllegalArgumentException("Setting a bullet's parent to a null value.");
-		}
-		
+	public void setParent(Ship ship) {
 		this.getParent().removeBullet(this);
 		
 		this.world = null;
@@ -389,7 +381,6 @@ public class Bullet {
 	}
 	
 	/**
-	 * Returns the ship this bullet is loaded on or fired by.
 	 */
 	@Basic
 	public Ship getParent() {
@@ -495,15 +486,38 @@ public class Bullet {
 	public final static int BOTTOM = 4;
 	
 	public double getTimeToCollision(int boundary) {
-		if (boundary == LEFT)
+		if (boundary == LEFT) {
+			if (this.getXVelocity() == 0)
+				return Double.POSITIVE_INFINITY;
 			return this.getXCoordinate()/this.getXVelocity();
-		else if (boundary == TOP)
+		}
+		
+		else if (boundary == TOP) {
+			if (this.getYVelocity() == 0)
+				return Double.POSITIVE_INFINITY;
 			return (World.HEIGHTUPPERBOUND-this.getYCoordinate())/this.getYVelocity();
-		else if (boundary == RIGHT)
+			
+		}
+		
+		else if (boundary == RIGHT) {
+			if (this.getXVelocity() == 0)
+				return Double.POSITIVE_INFINITY;
 			return (World.WIDTHUPPERBOUND-this.getXCoordinate())/this.getXVelocity();
-		else if (boundary == BOTTOM)
+		}
+		
+		else if (boundary == BOTTOM) {
+			if (this.getYVelocity() == 0)
+				return Double.POSITIVE_INFINITY;
 			return this.getYCoordinate()/this.getYVelocity();
+		}
+		
 		else
 			return Double.POSITIVE_INFINITY;
 	}
+	
+	public void finalize() {
+		this.getParent().removeBullet(this);
+		this.getWorld().removeBullet(this);
+	}
+	
 }
