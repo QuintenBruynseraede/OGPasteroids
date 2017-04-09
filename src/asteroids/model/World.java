@@ -228,7 +228,7 @@ public class World {
 	 * @return 	A list of all ships and bullets in this world.
 	 * 			| { entity1, entity2, ..., entityN | entityI.getWorld() = this}
 	 */
-	public HashSet<Object> getShipsAndBullets() {
+	public HashSet<Object> getEntities() {
 		HashSet<Object> entities = new HashSet();
 		for ( Ship s : ships) 
 			entities.add(s);
@@ -243,111 +243,6 @@ public class World {
 	public final static int BOTTOM = 4;
 	
 	public void evolve(double deltaTime) {
-		double minTime = Double.MAX_VALUE;
-		Object object1 = null; 
-		Object object2 = null;
-		int boundary = 0;
-		
-		for (Bullet b : bullets) {
-			for (Ship s : ships) {
-				double timeToCollision = b.getTimeToCollision(s);
-				
-				if (timeToCollision < minTime) {
-					minTime = timeToCollision;
-					object1 = b;
-					object2 = s;	
-				}
-			}
-		}
-		
-		for (Bullet b1 : bullets) {
-			for (Bullet b2 : bullets) {
-				double timeToCollision = b1.getTimeToCollision(b2);
-				if (timeToCollision < minTime) {
-					minTime = timeToCollision;
-					object1 = b1;
-					object2 = b2;	
-				}
-			}
-		}
-		
-		for (Ship s1 : ships) {
-			for (Ship s2 : ships) {
-				double timeToCollision = s1.getTimeToCollision(s2);
-				if (timeToCollision < minTime) {
-					minTime = timeToCollision;
-					object1 = s1;
-					object2 = s2;	
-				}
-			}
-		}
-		
-		for (Ship ship : getShips()) {
-			double timeToCollision = ship.getTimeToCollision(LEFT);
-			if (timeToCollision < minTime) {
-				minTime = timeToCollision;
-				object1 = ship;
-				boundary = LEFT;	
-			}
-			
-			timeToCollision = ship.getTimeToCollision(RIGHT);
-			if (timeToCollision < minTime) {
-				minTime = timeToCollision;
-				object1 = ship;
-				boundary = RIGHT;	
-			}
-			
-			timeToCollision = ship.getTimeToCollision(BOTTOM);
-			if (timeToCollision < minTime) {
-				minTime = timeToCollision;
-				object1 = ship;
-				boundary = BOTTOM;	
-			}
-			
-			timeToCollision = ship.getTimeToCollision(TOP);
-			if (timeToCollision < minTime) {
-				minTime = timeToCollision;
-				object1 = ship;
-				boundary = TOP;	
-			}
-		}
-		
-		for (Bullet bullet : getBullets()) {
-			double timeToCollision = bullet.getTimeToCollision(LEFT);
-			if (timeToCollision < minTime) {
-				object1 = bullet;
-				boundary = LEFT;	
-			}
-			
-			timeToCollision = bullet.getTimeToCollision(RIGHT);
-			if (timeToCollision < minTime) {
-				object1 = bullet;
-				boundary = RIGHT;	
-			}
-			
-			timeToCollision = bullet.getTimeToCollision(BOTTOM);
-			if (timeToCollision < minTime) {
-				object1 = bullet;
-				boundary = BOTTOM;	
-			}
-			
-			timeToCollision = bullet.getTimeToCollision(TOP);
-			if (timeToCollision < minTime) {
-				object1 = bullet;
-				boundary = TOP;	
-			}
-		}
-		
-		if (minTime < deltaTime) {
-			advance(minTime);
-			if (boundary != 0) {
-				resolveCollision(object1, boundary);
-			}
-			resolveCollision(object1, object2);
-			evolve(deltaTime - minTime);
-		}
-		else
-			advance(deltaTime);	
 	}
 	
 	private void resolveCollision(Object object1, Object object2) throws IllegalStateException {

@@ -8,8 +8,9 @@ import be.kuleuven.cs.som.annotate.Basic;
  *  
  * @author Tom De Backer and Quinten Bruynseraede
  */
+//TODO: modify documentation for all methods
 
-public class Ship {
+public class Ship extends Entity {
 	
 	/**
 	 * 
@@ -61,15 +62,9 @@ public class Ship {
 	 * 			| ! isValidRadius(radius)
 	 */
 	public Ship (double x, double y, double xVelocity, double yVelocity, double radius, double orientation, double mass, double massDensity, World world) throws IllegalArgumentException {
-		setXCoordinate(x);
-		setYCoordinate(y);
-		setXVelocity(xVelocity);
-		setYVelocity(yVelocity);
+		super(x, y, xVelocity, yVelocity, radius);
+		
 		setOrientation(orientation);
-		if (! isValidRadius(radius)) 
-			throw new IllegalArgumentException("Non-valid radius");
-		else
-			this.radius = radius;
 		
 		if (massDensity < 1.42E12)
 			this.massDensity = 1.42E12;
@@ -80,186 +75,7 @@ public class Ship {
 		setWorld(world);
 	}
 	
-	/**
-	 * Variable registering the X coordinate of this ship expressed in kilometres.
-	 */
-	private double x;
 	
-	/**
-	 * Variable registering the Y coordinate of this ship expressed in kilometres.
-	 */
-	private double y;
-	
-	
-	/**
-	 * Return the X coordinate of this ship expressed in kilometres.
-	 */
-	@Basic
-	public double getXCoordinate() {
-		return this.x;
-	}
-	
-	/**
-	 * Return the Y coordinate of this ship expressed in kilometres.
-	 */
-	@Basic
-	public double getYCoordinate() {
-		return this.y;
-	}
-	
-	/**
-	 * 
-	 * @param 	X
-	 * 			The new X coordinate for this bullet.
-	 * @post	The X coordinate of this bullet is equal to the given X coordinate.
-	 * @throws	IllegalArgumentException
-	 * 			The given x coordinate is not a valid coordinate for a bullet.
-	 * 			| Double.isNaN(x) || Double.isInfinite(x)
-	 */
-	void setXCoordinate(double x) throws IllegalArgumentException {
-		if (Double.isNaN(x) || Double.isInfinite(x))
-			throw new IllegalArgumentException("Non valid x");
-		this.x = x;			
-	}
-	
-	/**
-	 * 
-	 * @param 	yCoordinate
-	 * 			The new Y coordinate for this bullet.
-	 * @post	The Y coordinate of this bullet is equal to the given X coordinate.
-	 * @throws	IllegalArgumentException
-	 * 			The given y coordinate is not a valid coordinate for a bullet.
-	 * 			| Double.isNaN(y) || Double.isInfinite(y)
-	 */
-	void setYCoordinate(double y) throws IllegalArgumentException {
-		if (Double.isNaN(y) || Double.isInfinite(y))
-			throw new IllegalArgumentException("Non valid y");
-		this.y = y;
-		}
-	
-	/**
-	 * Variable registering the X velocity of this ship expressed in kilometres per second.
-	 */
-	private double xVelocity;
-	
-	/**
-	 * Variable registering the Y velocity of this ship expressed in kilometres per second.
-	 */
-	private double yVelocity;
-	
-	/**
-	 * Returns the X velocity of this ship.
-	 */
-	@Basic
-	public double getXVelocity(){
-		return this.xVelocity;
-	}
-	
-	/**
-	 * Returns the Y velocity of this ship.
-	 */
-	@Basic
-	public double getYVelocity(){
-		return this.yVelocity;
-	}
-	
-	/**
-	 * 
-	 * @param 	xVelocity
-	 * 			The new velocity of X for this ship.
-	 * 
-	 * @post	If xVelocity is a valid velocity for this ship, then the velocity X of this ship is equal to the given X velocity
-	 * 			| if(isValidVelocity(xVelocity)
-	 * 			| 	new.xVelocity = xVelocity
-	 * 
-	 * @post	If xVelocity is not a valid velocity for this ship and xVelocity is lower than velocityLowerBound, then the velocity X of this ship is equal to velocityLowerBound.
-	 * 			| if(! isValidVelocity(xVelocity) && xVelocity < velocityLowerBound)
-	 * 			| 	new.xVelocity = velocityLowerBound
-	 * 
-	 * @post	If xVelocity is not a valid velocity for this ship and xVelocity is higher than velocityUpperBound, then the velocity X of this ship is equal to velocityUpperBound.
-	 * 			| if(! isValidVelocity(xVelocity) && xVelocity > velocityUpperBound)
-	 * 			| 	new.xVelocity = velocityUpperBound
-	 * 
-	 */
-	void setXVelocity(double xVelocity){
-		if (! isValidVelocity(xVelocity) && xVelocity < VELOCITYLOWERBOUND)
-			this.xVelocity = VELOCITYLOWERBOUND;
-		else if(! isValidVelocity(xVelocity) && xVelocity > VELOCITYUPPERBOUND)
-			this.xVelocity = VELOCITYUPPERBOUND;
-		else
-			this.xVelocity = xVelocity;
-	}
-	
-	/**
-	 * 
-	 * @param 	yVelocity
-	 * 			The new velocity of Y for this ship.
-	 * 
-	 * @post	If yVelocity is a valid velocity for this ship, then the velocity Y of this ship is equal to the given Y velocity
-	 * 			| if(isValidVelocity(yVelocity)
-	 * 			| 	new.yVelocity = yVelocity
-	 * 
-	 * @post	If yVelocity is not a valid velocity for this ship and yVelocity is lower than velocityLowerBound, then the velocity Y of this ship is equal to velocityLowerBound.
-	 * 			| if(! isValidVelocity(xVelocity) && xVelocity < velocityLowerBound)
-	 * 			| 	new.xVelocity = velocityLowerBound
-	 * 
-	 * @post	If yVelocity is not a valid velocity for this ship and yVelocity is higher than velocityUpperBound, then the velocity Y of this ship is equal to velocityUpperBound.
-	 * 			| if(! isValidVelocity(yVelocity) && yVelocity > velocityUpperBound)
-	 * 			| 	new.yVelocity = velocityUpperBound
-	 * 
-	 */
-	void setYVelocity(double yVelocity){
-		if (! isValidVelocity(yVelocity) && yVelocity < VELOCITYLOWERBOUND)
-			this.yVelocity = VELOCITYLOWERBOUND;
-		else if(! isValidVelocity(yVelocity) && yVelocity > VELOCITYUPPERBOUND)
-			this.yVelocity = VELOCITYUPPERBOUND;
-		else
-			this.yVelocity = yVelocity;
-	}
-	
-	private final static double VELOCITYLOWERBOUND = -300000;
-	private final static double VELOCITYUPPERBOUND = 300000;
-	
-	/**
-	 * 
-	 * @param 	velocity
-	 * 			The given velocity to check.
-	 * @return	True if and only if the velocity is greater than velocityLowerBound and lower than velocityLowerBound.
-	 * 			| result == (velocity > this.velocityLowerBound && velocity < this.velocityUpperBound)
-	 */
-	private boolean isValidVelocity(double velocity) {
-		return ( velocity > VELOCITYLOWERBOUND && velocity < VELOCITYUPPERBOUND );
-	}
-	
-	/**
-	 * This method returns the minimum velocity for this ship.
-	 */
-	@Basic
-	public static double getVelocityLowerBound() {
-		return VELOCITYLOWERBOUND;
-	}
-	
-	/**
-	 * This method returns the minimum velocity for this ship.
-	 */
-	@Basic
-	public static double getVelocityUpperBound() {
-		return VELOCITYUPPERBOUND;
-	}
-	
-	/**
-	 * 
-	 * Return the total velocity as a function of a velocity in the X and Y direction
-	 * @param 	xVelocity
-	 * 			The velocity in the X direction.
-	 * @param 	yVelocity
-	 * 			The velocity in the Y direction
-	 * @return  The total velocity of the ship 
-	 * 			sqrt(xVelocity * xVelocity + yVelocity * yVelocity)
-	 */
-	public double getVelocity(double xVelocity, double yVelocity) {
-		return Math.sqrt(xVelocity * xVelocity + yVelocity * yVelocity);
-	}
 	
 	/**
 	 * Variable registering the orientation of this ship expressed in radians.
@@ -297,42 +113,7 @@ public class Ship {
 		return this.orientation;
 	}
 	
-	/**
-	 * Variable registering the radius of this ship.
-	 */
-	private final double radius;
-	
-	/**
-	 * Variable registering the radius lower bound of this ship.
-	 */
-	private final static double RADIUSLOWERBOUND = 10;
-	
-	/**
-	 * @param 	radius
-	 * 			The given radius to check.
-	 * @return	True if and only if the velocity is greater than the minimum value specified for a ship's radius.
-	 * 			| result == radius > this.radiusLowerBound
-	 */
-	private boolean isValidRadius(double radius) {
-		return ( radius >= Ship.RADIUSLOWERBOUND );
-	}
-	
-	/**
-	 * This method returns the radius of this ship.
-	 */
-	@Basic
-	public double getRadius() {
-		return this.radius;
-	}
-	
-	/**
-	 * This method returns the minimum value for this ship's radius.
-	 */
-	@Basic
-	public static double getRadiusLowerBound() {
-		return RADIUSLOWERBOUND;
-	}
-	
+
 	/**
 	 * Move the ship depending on ship's position, velocity and a given time duration.
 	 * @param 	time
@@ -390,9 +171,10 @@ public class Ship {
 	public void thrust(double amount) {
 		if ( amount <= 0 )
 			return; 
-		else if (getVelocity(this.getXVelocity() + amount * Math.cos(this.orientation), this.getYVelocity() + amount * Math.cos(this.orientation)) > VELOCITYUPPERBOUND) {
-			this.xVelocity = this.xVelocity + amount * Math.cos(this.orientation);
-			this.yVelocity = this.yVelocity + amount * Math.sin(this.orientation);
+		else if (getTotalVelocity(this.getXVelocity() + amount * Math.cos(this.orientation), this.getYVelocity() + amount * Math.cos(this.orientation)) > VELOCITYUPPERBOUND) {
+		
+			this.setXVelocity(this.getXVelocity() + amount * Math.cos(this.orientation));
+			this.setYVelocity(this.getYVelocity() + amount * Math.sin(this.orientation));
 			
 			if(this.getYVelocity() == 0) 
 				this.setXVelocity(VELOCITYUPPERBOUND);
@@ -403,8 +185,8 @@ public class Ship {
 			}
 		}
 		else {
-			this.xVelocity = this.xVelocity + amount * Math.cos(this.orientation);
-			this.yVelocity = this.yVelocity + amount * Math.sin(this.orientation);
+			this.setXVelocity(this.getXVelocity() + amount * Math.cos(this.orientation));
+			this.setYVelocity(this.getYVelocity() + amount * Math.sin(this.orientation));
 		}
 	}
 	
@@ -582,7 +364,7 @@ public class Ship {
 	public double getMassTotal(){
 		double totalMass = this.getMassShip();
 		for (Bullet b : bulletsLoaded)
-			totalMass += b.getMassBullet();
+			totalMass += b.getMass();
 		return totalMass;
 	}
 	
