@@ -3,6 +3,7 @@ package asteroids.model;
 import be.kuleuven.cs.som.annotate.Basic;
 import java.util.*;
 
+
 /**
  * A class of worlds with some properties.
  *  
@@ -14,7 +15,7 @@ import java.util.*;
 //TODO Evolve hulpfuncties maken!!
 //TODO Destructor ship en bullet
 
-public class World {
+public class World extends GameObject {
 	
 	/**
 	 * 
@@ -25,6 +26,7 @@ public class World {
 	 * @see		implementation
 	 */
 	public World (double width, double height) {
+		super(Constants.WORLD);
 		if (width < 0 )
 			this.width = 0;
 		else if (width > WIDTHUPPERBOUND)
@@ -38,6 +40,16 @@ public class World {
 			this.height = HEIGHTUPPERBOUND;
 		else
 			this.height = height;
+		
+		Boundary boundaryLeft = new Boundary(Constants.LEFT);
+		Boundary boundaryRight = new Boundary(Constants.RIGHT);
+		Boundary boundaryBottom = new Boundary(Constants.BOTTOM);
+		Boundary boundaryTop = new Boundary(Constants.TOP);
+		
+		boundaries[0] = boundaryLeft;
+		boundaries[1] = boundaryRight;
+		boundaries[2] = boundaryBottom;
+		boundaries[3] = boundaryTop;
 	}
 	
 	/**
@@ -103,8 +115,13 @@ public class World {
 	 * @post	See constructor Ship.
 	 * @post	| this.getShips().contains(ship)
 	 */
-	public void addShip(double x, double y, double xVelocity, double yVelocity, double radius, double orientation, double mass, double massDensity, World world) {
-		Ship ship = new Ship(x, y, xVelocity, yVelocity, radius, orientation, mass, massDensity, world);
+	public void addShip(double x, double y, double xVelocity, double yVelocity, double radius, double orientation, double mass, double massDensity) {
+		Ship ship = new Ship(x, y, xVelocity, yVelocity, radius, orientation, massDensity);
+		ship.setWorld(this);
+		ships.add(ship);
+	}
+	
+	public void addShip(Ship ship) {
 		ships.add(ship);
 	}
 
@@ -149,8 +166,13 @@ public class World {
 	 * 			The world encapsulating this bullet.
 	 * @post	| this.getBullets().contains(bullet)
 	 */
-	public void addBullet(double x, double y, double xVelocity, double yVelocity, double radius, Ship ship, World world) {
-		Bullet bullet = new Bullet(x, y, xVelocity, yVelocity, radius, ship, world);
+	public void addBullet(double x, double y, double xVelocity, double yVelocity, double radius, Ship ship) {
+		Bullet bullet = new Bullet(x, y, xVelocity, yVelocity, radius, ship);
+		bullet.setWorld(this);
+		bullets.add(bullet);
+	}
+	
+	public void addBullet(Bullet bullet) {
 		bullets.add(bullet);
 	}
 
@@ -170,7 +192,8 @@ public class World {
 
 		if (! bullets.contains(bullet))
 			throw new IllegalArgumentException("Trying to remove bullet that is not in this world.");
-
+		
+		bullet.getParent().removeBullet(bullet);
 		bullet.setWorld(null);
 		bullets.remove(bullet);
 	}
@@ -185,8 +208,8 @@ public class World {
 	 * 			
 	 */
 	//TODO finish specification
-	public Object[] getInstancesAtPosition(double x, double y) {
-		Object[] instances = {null, null};
+	public Entity[] getInstancesAtPosition(double x, double y) {
+		Entity[] instances = {null, null};
 		
 		for ( Ship s : ships) {
 			if( s.getXCoordinate() == x && s.getYCoordinate() == y)
@@ -228,8 +251,8 @@ public class World {
 	 * @return 	A list of all ships and bullets in this world.
 	 * 			| { entity1, entity2, ..., entityN | entityI.getWorld() = this}
 	 */
-	public HashSet<Object> getEntities() {
-		HashSet<Object> entities = new HashSet();
+	public HashSet<Entity> getEntities() {
+		HashSet<Entity> entities = new HashSet();
 		for ( Ship s : ships) 
 			entities.add(s);
 		for ( Bullet b : bullets) 
@@ -237,15 +260,48 @@ public class World {
 		return entities;
 	}
 	
-	public final static int LEFT = 1;
-	public final static int TOP = 2;
-	public final static int RIGHT = 3;
-	public final static int BOTTOM = 4;
+	private Boundary[] boundaries = new Boundary[4];
 	
 	public void evolve(double deltaTime) {
+		double minTime = Double.MAX_VALUE;
+		GameObject object1 = null;
+		GameObject object2 = null;
+		
+		for (Entity e1 : this.getEntities()) {
+			for (Entity e2 : this.getEntities()) {
+				if ( e1 != e2) {
+					double time = e1.getTimeToCollision(e2);
+					if (time  < minTime ) {
+						minTime = time;
+						object1 = (GameObject) e1;
+						object2 = (GameObject) e2;
+					}
+				}
+			}
+		}
+		
+		for (Entity e1 : this.getEntities()) {
+			for (Boundary b : boundaries) {
+				double time = e1.getTimeToCollision(b.getBoundaryType());
+				if (time < minTime) {
+					minTime = time;
+					object1 = e1;
+					object2 = b;
+				}
+			}
+		}
+		
+		if (minTime > deltaTime) 
+			advance(deltaTime);
+		else {
+			advance(minTime);
+			resolveCollision(object1, object2);
+			evolve(deltaTime - minTime);
+		}
+		
 	}
 	
-	private void resolveCollision(Object object1, Object object2) throws IllegalStateException {
+	private void resolveCollision(GameObject object1, GameObject object2) throws IllegalStateException {
 		if (object1 == null || object2 == null) 
 			throw new IllegalStateException("This world does not have any collisions.");
 
@@ -278,11 +334,20 @@ public class World {
 			return;
 		}
 		
-		if (object1 instanceof Bullet && object2 instanceof Ship) {
-			Ship ship = (Ship) object2;
-			Bullet bullet = (Bullet) object1;
+		if ((object1 instanceof Bullet && object2 instanceof Ship) || (object1 instanceof Ship && object2 instanceof Bullet)) {
+			Bullet bullet = null;
+			Ship ship = null;
 			
-			if (ship.bulletsFired.contains(bullet)) {
+			if (object1 instanceof Bullet) {
+				bullet = (Bullet) object1;
+				ship = (Ship) object2;	
+			}
+			else {
+				ship = (Ship) object1;	
+				bullet = (Bullet) object2;
+			}
+			
+			if (bullet.getParent() == ship) {
 				ship.bulletsLoaded.add(bullet);
 				bullet.setWorld(null);
 				bullet.setParent(ship);
@@ -303,14 +368,33 @@ public class World {
 			
 			return;
 		}
+		
+		
+		if (object1 instanceof Ship && object2 instanceof Boundary) {
+			Boundary boundary = (Boundary) object2;
+			Ship ship = (Ship) object1;
+			
+			if (boundary.getBoundaryType() == Constants.BOTTOM || boundary.getBoundaryType() == Constants.TOP)
+				ship.setYVelocity(-ship.getYVelocity());
+			else 
+				ship.setXVelocity(-ship.getXVelocity());
+			return;
+		}
+		
+		if (object1 instanceof Bullet && object2 instanceof Boundary) {
+			Boundary boundary = (Boundary) object2;
+			Bullet bullet = (Bullet) object1;
+			
+			if (boundary.getBoundaryType() == Constants.BOTTOM || boundary.getBoundaryType() == Constants.TOP)
+				bullet.setYVelocity(-bullet.getYVelocity());
+			else 
+				bullet.setXVelocity(-bullet.getXVelocity());
+			bullet.addBounce();
+			return;
+		}
+		throw new IllegalStateException("Undefined collision.");
 	}
 	
-	private void resolveCollision(Object object1, int boundary) throws IllegalStateException {
-		if (object1 == null) 
-			throw new IllegalStateException("This world does not have any collisions.");
-		
-			
-	}
 
 	public void advance(double deltaTime) {
 		for (Ship ship : ships) {
@@ -321,8 +405,11 @@ public class World {
 		
 		for (Bullet bullet : bullets) {
 			bullet.move(deltaTime);
-			//TODO if bullet not fired, x=parentX
-			//TODO if bullet not fired, y=parentY
+			
+			if (bullet.isBulletLoaded()) {
+				bullet.setXCoordinate(bullet.getParent().getXCoordinate());
+				bullet.setYCoordinate(bullet.getParent().getYCoordinate());
+			}
 		}
 	}
 }

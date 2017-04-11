@@ -2,10 +2,12 @@ package asteroids.model;
 
 import be.kuleuven.cs.som.annotate.Basic;
 
+//TODO collisionPosition symmetrie
 
-public class Entity {
+public class Entity extends GameObject {
 	
 	public Entity(double x, double y, double xVelocity, double yVelocity, double radius) {
+		super(Constants.ENTITY);
 		setXCoordinate(x);
 		setYCoordinate(y);
 		setXVelocity(xVelocity);
@@ -54,7 +56,7 @@ public class Entity {
 	 * 			| Double.isNaN(x) || Double.isInfinite(x)
 	 */
 	void setXCoordinate(double x) throws IllegalArgumentException {
-		if (Double.isNaN(x) || Double.isInfinite(x))
+		if (Double.isNaN(x) || Double.isInfinite(x) || this.getXCoordinate() < 0)
 			throw new IllegalArgumentException("Non valid x");
 		this.x = x;			
 	}
@@ -70,7 +72,7 @@ public class Entity {
 	 * 			| Double.isNaN(y) || Double.isInfinite(y)
 	 */
 	void setYCoordinate(double y) throws IllegalArgumentException {
-		if (Double.isNaN(y) || Double.isInfinite(y))
+		if (Double.isNaN(y) || Double.isInfinite(y) || this.getXCoordinate() < 0)
 			throw new IllegalArgumentException("Non valid y");
 		this.y = y;
 		}
@@ -236,6 +238,36 @@ public class Entity {
 	}
 
 	/**
+	 * Variable registering the world this ship is bound to.
+	 */
+	private World world = null;
+	
+	public void setWorld(World world) throws IllegalStateException {
+		if (this.getXCoordinate() < 0 || this.getXCoordinate() > world.WIDTHUPPERBOUND || this.getXCoordinate() < 0 || this.getYCoordinate() > world.HEIGHTUPPERBOUND)
+			throw new IllegalStateException("Ship's position is invalid the world it is being assigned to.");
+		
+		if (this instanceof Bullet) {
+			this.getWorld().removeBullet((Bullet) this);
+			world.addBullet((Bullet) this);
+		}
+		if (this instanceof Ship) {
+			this.getWorld().removeShip((Ship) this);
+			world.addShip((Ship) this);
+		}
+		
+		this.world = world;
+		
+	}
+	
+	/**
+	 * Returns the world this ship is currently associated with.
+	 */
+	@Basic
+	public World getWorld() {
+		return this.world;
+	}
+	
+	/**
 	 * Move the entity depending on its position, velocity and a given time duration.
 	 * @param 	time
 	 * 			The given time to move.
@@ -256,12 +288,26 @@ public class Entity {
 	}
 	
 	/**
-	 * Returns the time to a collision between two entities.
-	 * @param 	entity
-	 * @return	The time to a collision based on the positions and orientations of the entity and the ship.
-	 * 			| result ==  {deltaT | (this.move(deltaT) => this.overlap(b2)) && (b2.move(deltaT) => b2.overlap(this))}
+	 * Returns the time to a collision between the ship invoking the method and another ship.
+	 * @param 	otherShip
+	 * @return	The time to a collision based on the ships' position and orientation
+	 * 			| result ==  {deltaT | (ship1.move(deltaT) => ship1.overlap(ship2)) && (ship2.move(deltaT) => ship2.overlap(ship1))}
 	 * @throws 	IllegalArgumentException
 	 * 			The ship to check a collision against is a null object.
+	 * @note	Knowing that a spaceship always moves in a straight line, a ship's position can
+	 * 			easily be calculated as a function of the current position and the ship's velocity 
+	 * 			| newPos = currPos + time * velocity (I)
+	 * 			This formula holds for ship1.x, ship1.y, ship2.x, ship2.y
+	 * 			A collision occurs if two spaceships are seperated by a distance equal to the sum of their radiuses
+	 * 			| getDistanceBetween(ship1, ship2) == ship1.radius + ship2.radius (II)
+	 * 			Substituting the position functions (I) into the collision position (II) gives us a quadratic equation
+	 * 			that makes use of the ship's position, velocity, radius and the time to a collision.
+	 * 			We can now find an expression that returns this time as a function of all previously mentioned variables.
+	 * 			The roots of this quadratic equation are our solution.
+	 * 			Special cases include a divide by zero (no solutions => no collision => infinity time to collision)
+	 * 			and the case where two ships move in the same direction, the furthest one faster than the other ship,
+	 * 			resulting in a situation where the distance between them keeps increasing forever => no collision
+	 * 			=> infinity time to collision.
 	 */
 	
 	public double getTimeToCollision(Entity other) throws IllegalArgumentException {
@@ -291,4 +337,107 @@ public class Entity {
 			return Double.POSITIVE_INFINITY;
 		return -( (part1 + Math.sqrt(d)) / (part2) );
 	}
+	
+	
+	
+	public double getTimeToCollision(int boundary) throws IllegalArgumentException {
+		if (boundary == Constants.LEFT) {
+			double time = -this.getXCoordinate() / this.getXVelocity();
+			return (time < 0 ? Double.POSITIVE_INFINITY : time);
+		}
+		
+		if (boundary == Constants.BOTTOM) {
+			double time = -this.getYCoordinate() / this.getYVelocity();
+			return (time < 0 ? Double.POSITIVE_INFINITY : time);
+		}
+		
+		if (boundary == Constants.RIGHT) {
+			double time = (this.getWorld().WIDTHUPPERBOUND-this.getXCoordinate()) / this.getXVelocity();
+			return (time < 0 ? Double.POSITIVE_INFINITY : time);
+		}
+		
+		if (boundary == Constants.TOP) {
+			double time = (this.getWorld().HEIGHTUPPERBOUND - this.getYCoordinate()) / this.getYVelocity();
+			return (time < 0 ? Double.POSITIVE_INFINITY : time);
+		}
+		
+		throw new IllegalArgumentException("No valid boundary.");
+	}
+	
+	/**
+	 * This method checks whether two entities overlap.
+	 * @param 	otherEntities
+	 * 			An entity to check against whether the object invoking the method and the argument Entity overlap.
+	 * @return	True if and only if the distance between entity1 and entity2 is greater than 0.
+	 * 			| result == thisgetDistanceBetween(otherEntity) < 0
+	 * @throws 	IllegalArgumentException
+	 * 			The entity to check an overlap against is a null object.
+	 */
+	public boolean overlap(Entity otherEntity) throws IllegalArgumentException {
+		if (otherEntity == null) 
+			throw new IllegalArgumentException("Invalid argument object (null).");
+		
+		if ( this.getDistanceBetween(otherEntity) <= 0 )
+			return true;
+		else
+			return false;
+	}
+	
+	/**
+	 * 			Checks the distance in km between two entities.
+	 * @param 	otherEntity
+	 * 			The entity to which this method checks the distance.
+	 * @return  The distance between the two entities provided as arguments.
+	 * 			| result == sqrt( (this.getXCoordinate()-otherEntity.getXCoordinate())^2 + (this.getYCoordinate()-otherEntity.getYCoordinate())^2 ) - (this.getRadius() + otherEntity.getRadius());
+	 * @return  If the method checks the distance between two entities represented by the same object, it returns 0.
+	 * 			| if ( otherEntity == this )
+	 * 			| 	result == 0; 
+	 * @throws	IllegalArgumentException 
+	 * 			The entity to check a collision against is a null object.
+	 * @note	As a result of the provided formula, the distance between two overlapping entities shall be negative.
+	 */
+	public double getDistanceBetween(Entity otherEntity) throws IllegalArgumentException {
+		if (otherEntity == null) 
+			throw new IllegalArgumentException("Invalid argument object (null).");
+		
+		if (otherEntity == this )
+			return 0;
+		return Math.sqrt( Math.pow(this.getXCoordinate()-otherEntity.getXCoordinate(), 2) + Math.pow(this.getYCoordinate()-otherEntity.getYCoordinate(), 2) ) - (this.getRadius() + otherEntity.getRadius());
+	}
+	
+	/**
+	 * 			Returns the position of a possible collision between the entity itself (prime object) and another entity.
+	 * @param 	otherEntity
+	 * 			The entity used to calculate the position of a collision with.
+	 * @return	If the two entities never collide, returns null.
+	 * 			| if getTimeToCollision(otherEntity) == Double.POSITIVE_INFINITY
+	 * 			| 		result == null;
+	 * @return	If (based on the entities' current position, velocity and orientation), there will be a collision, returns
+	 * 			the position of this collision.
+	 * 			| 	result == [ this.getXCoordinate() + this.getTimeToCollision(otherentity) * this.getXVelocity(), this.getYCoordinate() + this.getTimeToCollision(otherentity) * this.getYVelocity()]
+	 * @throws 	IllegalArgumentException
+	 * 			The two entities overlap already.
+	 * 			| this.overlap(otherEntity)
+	 * @throws 	IllegalArgumentException
+	 * 			The entity to check a collision against is a null object.
+	 * @note 	The position of a collision is returned from the viewpoint of the entity object calling the function.
+	 * 			The position returned represents the centerpoint of the entity at the moment of impact.
+	 * 			Therefore, calling a.getCollisionPosition(b) is not equal to b.getCollisionPosition(b)
+	 */
+	public double[] getCollisionPosition(Entity otherEntity) throws IllegalArgumentException {
+		if (otherEntity == null) 
+			throw new IllegalArgumentException("Invalid argument object (null).");
+		
+		if ( this.overlap(otherEntity) )
+			throw new IllegalArgumentException("No collision position specified between two overlapping ships.");
+		
+		if ( this.getTimeToCollision(otherEntity) == Double.POSITIVE_INFINITY)
+			return null;
+		
+		double collisionX = this.getXCoordinate() + this.getTimeToCollision(otherEntity) * this.getXVelocity();
+		double collisionY = this.getYCoordinate() + this.getTimeToCollision(otherEntity) * this.getYVelocity();
+		
+		double[] collision = {collisionX, collisionY};
+		return collision;
+		}
 }

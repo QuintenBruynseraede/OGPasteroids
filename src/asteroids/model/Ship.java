@@ -9,6 +9,9 @@ import be.kuleuven.cs.som.annotate.Basic;
  * @author Tom De Backer and Quinten Bruynseraede
  */
 //TODO: modify documentation for all methods
+//TODO if the bullet’s initial position is already
+// (partially) occupied by another entity, then the bullet immediately collides
+// with that entity
 
 public class Ship extends Entity {
 	
@@ -61,7 +64,7 @@ public class Ship extends Entity {
 	 * 			The given radius is not a valid radius for this ship.
 	 * 			| ! isValidRadius(radius)
 	 */
-	public Ship (double x, double y, double xVelocity, double yVelocity, double radius, double orientation, double mass, double massDensity, World world) throws IllegalArgumentException {
+	public Ship (double x, double y, double xVelocity, double yVelocity, double radius, double orientation, double massDensity) throws IllegalArgumentException {
 		super(x, y, xVelocity, yVelocity, radius);
 		
 		setOrientation(orientation);
@@ -71,8 +74,8 @@ public class Ship extends Entity {
 		else
 			this.massDensity = massDensity;
 		
-		setMassShip(mass);
-		setWorld(world);
+		this.massShip = (4/3)*Math.PI*Math.pow(radius, 3)*massDensity;
+		
 	}
 	
 	
@@ -190,151 +193,7 @@ public class Ship extends Entity {
 		}
 	}
 	
-	/**
-	 * 			Checks the distance in km between two ships.
-	 * @param 	otherShip
-	 * 			The ship to which this method checks the distance.
-	 * @return  The distance between the two ships provided as arguments.
-	 * 			| result == sqrt( (this.getXCoordinate()-otherShip.getXCoordinate())^2 + (this.getYCoordinate()-otherShip.getYCoordinate())^2 ) - (this.getRadius() + otherShip.getRadius());
-	 * @return  If the method checks the distance between two ships represented by the same object, it returns 0.
-	 * 			| if ( otherShip == this )
-	 * 			| 	result == 0; 
-	 * @throws	IllegalArgumentException 
-	 * 			The ship to check a collision against is a null object.
-	 * @note	As a result of the provided formula, the distance between two overlapping ships shall be negative.
-	 */
-	public double getDistanceBetween(Ship otherShip) throws IllegalArgumentException {
-		if (otherShip == null) 
-			throw new IllegalArgumentException("Invalid argument object (null).");
-		
-		if ( otherShip == this )
-			return 0;
-		return Math.sqrt( Math.pow(this.getXCoordinate()-otherShip.getXCoordinate(), 2) + Math.pow(this.getYCoordinate()-otherShip.getYCoordinate(), 2) ) - (this.getRadius() + otherShip.getRadius());
-	}
 	
-	/**
-	 * This method checks whether two ships overlap.
-	 * @param 	otherShip
-	 * 			A Ship to check against whether the object invoking the method and the argument Ship overlap.
-	 * @return	True if and only if the distance between ship1 and ship2 is greater than 0.
-	 * 			| result == thisgetDistanceBetween(otherShip) < 0
-	 * @throws 	IllegalArgumentException
-	 * 			The ship to check an overlap against is a null object.
-	 */
-	public boolean overlap(Ship otherShip) throws IllegalArgumentException {
-		if (otherShip == null) 
-			throw new IllegalArgumentException("Invalid argument object (null).");
-		
-		if ( this.getDistanceBetween(otherShip) <= 0 )
-			return true;
-		else
-			return false;
-	}
-	
-	/**
-	 * Returns the time to a collision between the ship invoking the method and another ship.
-	 * @param 	otherShip
-	 * @return	The time to a collision based on the ships' position and orientation
-	 * 			| result ==  {deltaT | (ship1.move(deltaT) => ship1.overlap(ship2)) && (ship2.move(deltaT) => ship2.overlap(ship1))}
-	 * @throws 	IllegalArgumentException
-	 * 			The ship to check a collision against is a null object.
-	 * @note	Knowing that a spaceship always moves in a straight line, a ship's position can
-	 * 			easily be calculated as a function of the current position and the ship's velocity 
-	 * 			| newPos = currPos + time * velocity (I)
-	 * 			This formula holds for ship1.x, ship1.y, ship2.x, ship2.y
-	 * 			A collision occurs if two spaceships are seperated by a distance equal to the sum of their radiuses
-	 * 			| getDistanceBetween(ship1, ship2) == ship1.radius + ship2.radius (II)
-	 * 			Substituting the position functions (I) into the collision position (II) gives us a quadratic equation
-	 * 			that makes use of the ship's position, velocity, radius and the time to a collision.
-	 * 			We can now find an expression that returns this time as a function of all previously mentioned variables.
-	 * 			The roots of this quadratic equation are our solution.
-	 * 			Special cases include a divide by zero (no solutions => no collision => infinity time to collision)
-	 * 			and the case where two ships move in the same direction, the furthest one faster than the other ship,
-	 * 			resulting in a situation where the distance between them keeps increasing forever => no collision
-	 * 			=> infinity time to collision.
-	 */
-	public double getTimeToCollision(Ship otherShip) throws IllegalArgumentException {
-		if (otherShip == null) 
-			throw new IllegalArgumentException("Invalid argument object (null).");
-		
-		double deltaVX = this.getXVelocity() - otherShip.getXVelocity();
-		double deltaVY = this.getYVelocity() - otherShip.getYVelocity();
-		double deltaX = this.getXCoordinate() - otherShip.getXCoordinate();
-		double deltaY = this.getYCoordinate() - otherShip.getYCoordinate();
-		
-		if ((deltaVX * deltaX) + (deltaVY * deltaY) >= 0)
-			return Double.POSITIVE_INFINITY;
-		
-		double radius1 = this.getRadius();
-		double radius2 = otherShip.getRadius();
-			
-		double part1 = deltaVX * deltaX + deltaVY * deltaY;
-		double part2 = deltaVX * deltaVX + deltaVY * deltaVY;
-		double part3 = deltaX * deltaX + deltaY * deltaY - (radius1 + radius2) * (radius1 + radius2);
-		double d = part1 * part1 - part2 * part3;
-		
-		if (part2 == 0) {
-			return Double.POSITIVE_INFINITY;
-		}
-		if (d <= 0)
-			return Double.POSITIVE_INFINITY;
-		return -( (part1 + Math.sqrt(d)) / (part2) );	
-	}
-	
-	public final static int LEFT = 1;
-	public final static int TOP = 2;
-	public final static int RIGHT = 3;
-	public final static int BOTTOM = 4;
-	
-	
-	public double getTimeToCollision(int boundary) {
-		if (boundary == LEFT)
-			return this.getXCoordinate()/this.getXVelocity();
-		else if (boundary == TOP)
-			return (World.HEIGHTUPPERBOUND-this.getYCoordinate())/this.getYVelocity();
-		else if (boundary == RIGHT)
-			return (World.WIDTHUPPERBOUND-this.getXCoordinate())/this.getXVelocity();
-		else if (boundary == BOTTOM)
-			return this.getYCoordinate()/this.getYVelocity();
-		else
-			return Double.POSITIVE_INFINITY;
-	}
-	
-	/**
-	 * 			Returns the position of a possible collision between the ship itself (prime object) and another ship.
-	 * @param 	otherShip
-	 * 			The ship used to calculate the position of a collision with.
-	 * @return	If the two ships never collide, returns null.
-	 * 			| if getTimeToCollision(otherShip) == Double.POSITIVE_INFINITY
-	 * 			| 		result == null;
-	 * @return	If (based on the ships' current position, velocity and orientation), there will be a collision, returns
-	 * 			the position of this collision.
-	 * 			| 	result == [ this.getXCoordinate() + this.getTimeToCollision(otherShip) * this.getXVelocity(), this.getYCoordinate() + this.getTimeToCollision(otherShip) * this.getYVelocity()]
-	 * @throws 	IllegalArgumentException
-	 * 			The two ships overlap already.
-	 * 			| this.overlap(otherShip)
-	 * @throws 	IllegalArgumentException
-	 * 			The ship to check a collision against is a null object.
-	 * @note 	The position of a collision is returned from the viewpoint of the Ship object calling the function.
-	 * 			The position returned represents the centerpoint of the Ship at the moment of impact.
-	 * 			Therefore, calling a.getCollisionPosition(b) is not equal to b.getCollisionPosition(b)
-	 */
-	public double[] getCollisionPosition(Ship otherShip) throws IllegalArgumentException {
-		if (otherShip == null) 
-			throw new IllegalArgumentException("Invalid argument object (null).");
-		
-		if ( this.overlap(otherShip) )
-			throw new IllegalArgumentException("No collision position specified between two overlapping ships.");
-		
-		if ( this.getTimeToCollision(otherShip) == Double.POSITIVE_INFINITY)
-			return null;
-		
-		double collisionX = this.getXCoordinate() + this.getTimeToCollision(otherShip) * this.getXVelocity();
-		double collisionY = this.getYCoordinate() + this.getTimeToCollision(otherShip) * this.getYVelocity();
-		
-		double[] collision = {collisionX, collisionY};
-		return collision;
-		}
 	
 	/**
 	 * variable registering the mass of a ship in kilograms. 
@@ -350,12 +209,6 @@ public class Ship extends Entity {
 		return this.massShip;
 	}
 	
-	public void setMassShip(double mass) {
-		if (mass < (4/3) * Math.PI * Math.pow(this.getRadius(), 3) * massDensity)
-			this.massShip = (4/3) * Math.PI * Math.pow(this.getRadius(), 3) * massDensity;
-		else
-			this.massShip = mass;
-	}
 	
 	/**
 	 * Returns the mass of this ship including any entities it is carrying.
@@ -371,7 +224,7 @@ public class Ship extends Entity {
 	/**
 	 * variable registering the mass density of this ship.
 	 */
-	private final double massDensity;
+	private double massDensity;
 	
 	/**
 	 * Returns the mass density of this ship.
@@ -381,45 +234,16 @@ public class Ship extends Entity {
 		return this.massDensity;
 	}
 	
-	/**
-	 * Variable registering the world this ship is bound to.
-	 */
-	private World world = null; 
-		
-	/**
-	 * Sets the world this ship is associated with. 
-	 * @param 	world
-	 * 			| new.getWorld = this.world
-	 * @throws 	IllegalArgumentException
-	 * 			| world == null
-	 */
-	
-	public void setWorld(World world) throws IllegalArgumentException {
-		if (world == null) {
-			throw new IllegalArgumentException("Setting a ship's world to a null value.");
-		}
-		this.world = world;
-	}
-	
-	/**
-	 * Returns the world this ship is currently associated with.
-	 */
-	@Basic
-	public World getWorld() {
-		return this.world;
+	public void setMassDensity(double massDensity) {
+		this.massDensity = massDensity;
+		this.massShip = (4/3)*Math.PI*Math.pow(this.getRadius(), 3)*massDensity;
 	}
 	
 	/**
 	 *  A HashSet registering the bullets that are currently loaded by this ship.
 	 */
 	public HashSet<Bullet> bulletsLoaded = new HashSet();
-	
-	/**
-	 *  A HashSet registering the bullets that have been fired by this ship.
-	 */
-	public HashSet<Bullet> bulletsFired = new HashSet();
 
-	
 	/**
 	 *  Variable registering whether this ship's thruster is currently on.
 	 */
@@ -473,24 +297,48 @@ public class Ship extends Entity {
 				return;
 			}
 		}
-		
-		for (Bullet b : bulletsFired) {
-			if (b == bullet) {
-				bulletsFired.remove(b);
-				return;
-			}
+	}
+	
+	public void addBulletToLoaded(Bullet bullet) {
+		bulletsLoaded.add(bullet);
+		bullet.setParent(this);
+	}
+	
+	public void addBulletListToLoaded(Bullet[] bullets) {
+		for (Bullet bullet : bullets) {
+			bulletsLoaded.add(bullet);
+			bullet.setParent(this);
 		}
-		
 	}
 
+	public final int FIRINGSPEED = 250;
+	
+	public void fire(Bullet bullet) throws IllegalArgumentException {
+		if (! bulletsLoaded.contains(bullet))
+			throw new IllegalArgumentException("Firing bullet that is not loaded.");
+		bulletsLoaded.remove(bullet);
+		bullet.setXVelocity(FIRINGSPEED * Math.cos(getOrientation()));
+		bullet.setYVelocity(FIRINGSPEED * Math.sin(getOrientation()));
+		
+		
+		bullet.setXCoordinate(bullet.getXCoordinate() + (this.getRadius() + bullet.getRadius() + 1) * Math.cos(this.getOrientation()));
+		bullet.setYCoordinate(bullet.getYCoordinate() + (this.getRadius() + bullet.getRadius() + 1) * Math.sin(this.getOrientation()));
+		
+	
+		if (bullet.getXCoordinate() < bullet.getRadius() 
+			|| bullet.getYCoordinate() < bullet.getRadius() 
+			|| bullet.getXCoordinate() + bullet.getRadius() > this.getWorld().WIDTHUPPERBOUND 
+			|| bullet.getYCoordinate() + bullet.getRadius() > this.getWorld().HEIGHTUPPERBOUND) {
+			bullet.finalize();
+		}
+	}
+	
 	public void updateVelocity() {
 		this.thrust(getAcceleration());
 	}
 	
 	public void finalize() {
 		for (Bullet b : bulletsLoaded)
-			b.setParent(null);
-		for (Bullet b : bulletsFired)
 			b.setParent(null);
 		this.getWorld().removeShip(this);
 		
