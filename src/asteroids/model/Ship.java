@@ -1,5 +1,7 @@
 package asteroids.model;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import be.kuleuven.cs.som.annotate.Basic;
 
@@ -267,7 +269,7 @@ public class Ship extends Entity {
 	/**
 	 * Set the ship's thruster state to off.
 	 */
-	public void thrustOf() {
+	public void thrustOff() {
 		this.thrusterOn = false;
 	}
 	
@@ -304,7 +306,7 @@ public class Ship extends Entity {
 		bullet.setParent(this);
 	}
 	
-	public void addBulletListToLoaded(Bullet[] bullets) {
+	public void addBulletToLoaded(Collection<Bullet> bullets) {
 		for (Bullet bullet : bullets) {
 			bulletsLoaded.add(bullet);
 			bullet.setParent(this);
@@ -313,7 +315,13 @@ public class Ship extends Entity {
 
 	public final int FIRINGSPEED = 250;
 	
-	public void fire(Bullet bullet) throws IllegalArgumentException {
+	public void fire() throws IllegalArgumentException {
+		if (this.getWorld() == null) return;
+		
+		Iterator<Bullet> i = this.bulletsLoaded.iterator();
+		Bullet bullet = i.next();
+		i.remove();
+		
 		if (! bulletsLoaded.contains(bullet))
 			throw new IllegalArgumentException("Firing bullet that is not loaded.");
 		bulletsLoaded.remove(bullet);
@@ -337,11 +345,21 @@ public class Ship extends Entity {
 		this.thrust(getAcceleration());
 	}
 	
+	public boolean finalized = false;
+	
 	public void finalize() {
-		for (Bullet b : bulletsLoaded)
-			b.setParent(null);
+		if (! bulletsLoaded.isEmpty()) {
+			for (Bullet b : bulletsLoaded) {
+				b.setParent(null);
+			}
+		}
+
 		this.getWorld().removeShip(this);
-		
+		this.finalized = true;
+	}
+	
+	public boolean isTerminated() {
+		return this.finalized;
 	}
 	
 }

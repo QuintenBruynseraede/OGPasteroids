@@ -1,5 +1,7 @@
 package asteroids.model;
 
+import org.hamcrest.core.IsNull;
+
 import be.kuleuven.cs.som.annotate.Basic;
 
 //TODO collisionPosition symmetrie
@@ -14,8 +16,12 @@ public class Entity extends GameObject {
 		setYVelocity(yVelocity);
 		if (! isValidRadius(radius)) 
 			throw new IllegalArgumentException("Non-valid radius");
-		else
-			this.radius = radius;	
+		else 
+			this.radius = radius;
+		
+				
+		
+		
 	}
 
 
@@ -246,13 +252,21 @@ public class Entity extends GameObject {
 		if (this.getXCoordinate() < 0 || this.getXCoordinate() > world.WIDTHUPPERBOUND || this.getXCoordinate() < 0 || this.getYCoordinate() > world.HEIGHTUPPERBOUND)
 			throw new IllegalStateException("Ship's position is invalid the world it is being assigned to.");
 		
+		
+		
 		if (this instanceof Bullet) {
-			this.getWorld().removeBullet((Bullet) this);
-			world.addBullet((Bullet) this);
+			if (! (this.getWorld() == null)) {
+				this.getWorld().removeBullet((Bullet) this);
+				world.addBullet((Bullet) this);
+			}
 		}
+		
 		if (this instanceof Ship) {
-			this.getWorld().removeShip((Ship) this);
-			world.addShip((Ship) this);
+			if (! (this.getWorld() == null)) {
+				this.getWorld().removeShip((Ship) this);
+				world.addShip((Ship) this);
+			}
+
 		}
 		
 		this.world = world;
@@ -310,60 +324,93 @@ public class Entity extends GameObject {
 	 * 			=> infinity time to collision.
 	 */
 	
-	public double getTimeToCollision(Entity other) throws IllegalArgumentException {
-		if (other == null) 
-			throw new IllegalArgumentException("Invalid argument object (null).");
-		
-		double deltaVX = this.getXVelocity() - other.getXVelocity();
-		double deltaVY = this.getYVelocity() - other.getYVelocity();
-		double deltaX = this.getXCoordinate() - other.getXCoordinate();
-		double deltaY = this.getYCoordinate() - other.getYCoordinate();
-		
-		if ((deltaVX * deltaX) + (deltaVY * deltaY) >= 0)
-			return Double.POSITIVE_INFINITY;
-		
-		double radius1 = this.getRadius();
-		double radius2 = other.getRadius();
+	public double getTimeToCollision(GameObject other) throws IllegalArgumentException {
+		if (other instanceof Entity) {
+			Entity otherEntity = (Entity) other;
 			
-		double part1 = deltaVX * deltaX + deltaVY * deltaY;
-		double part2 = deltaVX * deltaVX + deltaVY * deltaVY;
-		double part3 = deltaX * deltaX + deltaY * deltaY - (radius1 + radius2) * (radius1 + radius2);
-		double d = part1 * part1 - part2 * part3;
-		
-		if (part2 == 0) {
-			return Double.POSITIVE_INFINITY;
+			if (other == null) 
+				throw new IllegalArgumentException("Invalid argument object (null).");
+			
+			
+			double deltaVX = this.getXVelocity() - otherEntity.getXVelocity();
+			double deltaVY = this.getYVelocity() - otherEntity.getYVelocity();
+			double deltaX = this.getXCoordinate() - otherEntity.getXCoordinate();
+			double deltaY = this.getYCoordinate() - otherEntity.getYCoordinate();
+			
+			if ((deltaVX * deltaX) + (deltaVY * deltaY) >= 0)
+				return Double.POSITIVE_INFINITY;
+			
+			double radius1 = this.getRadius();
+			double radius2 = otherEntity.getRadius();
+				
+			double part1 = deltaVX * deltaX + deltaVY * deltaY;
+			double part2 = deltaVX * deltaVX + deltaVY * deltaVY;
+			double part3 = deltaX * deltaX + deltaY * deltaY - (radius1 + radius2) * (radius1 + radius2);
+			double d = part1 * part1 - part2 * part3;
+			
+			if (part2 == 0) {
+				return Double.POSITIVE_INFINITY;
+			}
+			if (d <= 0)
+				return Double.POSITIVE_INFINITY;
+			return -( (part1 + Math.sqrt(d)) / (part2) );
 		}
-		if (d <= 0)
-			return Double.POSITIVE_INFINITY;
-		return -( (part1 + Math.sqrt(d)) / (part2) );
+		
+		if (other instanceof Boundary) {
+			Boundary otherBoundary = (Boundary) other;
+			
+			if (otherBoundary.getBoundaryType() == Constants.LEFT) {
+				if (this.getXVelocity() == 0) return Double.POSITIVE_INFINITY;
+				double time = -this.getXCoordinate() / this.getXVelocity();
+				return (time < 0 ? Double.POSITIVE_INFINITY : time);
+			}
+			
+			if (otherBoundary.getBoundaryType() == Constants.BOTTOM) {
+				if (this.getYVelocity() == 0) return Double.POSITIVE_INFINITY;
+				double time = -this.getYCoordinate() / this.getYVelocity();
+				return (time < 0 ? Double.POSITIVE_INFINITY : time);
+			}
+			
+			if (otherBoundary.getBoundaryType() == Constants.RIGHT) {
+				if (this.getXVelocity() == 0) return Double.POSITIVE_INFINITY;
+				double time = (this.getWorld().WIDTHUPPERBOUND-this.getXCoordinate()) / this.getXVelocity();
+				return (time < 0 ? Double.POSITIVE_INFINITY : time);
+			}
+			
+			if (otherBoundary.getBoundaryType() == Constants.TOP) {
+				if (this.getYVelocity() == 0) return Double.POSITIVE_INFINITY;
+				double time = (this.getWorld().HEIGHTUPPERBOUND - this.getYCoordinate()) / this.getYVelocity();
+				return (time < 0 ? Double.POSITIVE_INFINITY : time);
+			}
+			
+			throw new IllegalArgumentException("No valid boundary.");
+		}
+		
+		return Double.POSITIVE_INFINITY;
 	}
 	
 	
-	
-	public double getTimeToCollision(int boundary) throws IllegalArgumentException {
-		if (boundary == Constants.LEFT) {
-			double time = -this.getXCoordinate() / this.getXVelocity();
-			return (time < 0 ? Double.POSITIVE_INFINITY : time);
-		}
-		
-		if (boundary == Constants.BOTTOM) {
-			double time = -this.getYCoordinate() / this.getYVelocity();
-			return (time < 0 ? Double.POSITIVE_INFINITY : time);
-		}
-		
-		if (boundary == Constants.RIGHT) {
-			double time = (this.getWorld().WIDTHUPPERBOUND-this.getXCoordinate()) / this.getXVelocity();
-			return (time < 0 ? Double.POSITIVE_INFINITY : time);
-		}
-		
-		if (boundary == Constants.TOP) {
-			double time = (this.getWorld().HEIGHTUPPERBOUND - this.getYCoordinate()) / this.getYVelocity();
-			return (time < 0 ? Double.POSITIVE_INFINITY : time);
-		}
-		
-		throw new IllegalArgumentException("No valid boundary.");
+	public double getTimeFirstCollisionBoundary() {
+		return Math.min(Math.min(this.getTimeToCollision(this.getWorld().getBoundaries()[0]), this.getTimeToCollision(this.getWorld().getBoundaries()[1])), Math.min(this.getTimeToCollision(this.getWorld().getBoundaries()[2]), this.getTimeToCollision(this.getWorld().getBoundaries()[3])));
 	}
 	
+	public Boundary getFirstCollisionBoundary() {
+		double minTime = Double.MAX_VALUE;
+		Boundary[] boundaries = this.getWorld().getBoundaries();
+		Boundary minBoundary = null;
+		
+		for (Boundary b : boundaries) {
+			if (this.getTimeToCollision(b) < minTime) {
+				minTime = this.getTimeToCollision(b);
+				minBoundary = b;
+			}
+		}
+
+		return minBoundary;
+		
+	}
+	
+		
 	/**
 	 * This method checks whether two entities overlap.
 	 * @param 	otherEntities
@@ -424,20 +471,35 @@ public class Entity extends GameObject {
 	 * 			The position returned represents the centerpoint of the entity at the moment of impact.
 	 * 			Therefore, calling a.getCollisionPosition(b) is not equal to b.getCollisionPosition(b)
 	 */
-	public double[] getCollisionPosition(Entity otherEntity) throws IllegalArgumentException {
-		if (otherEntity == null) 
-			throw new IllegalArgumentException("Invalid argument object (null).");
-		
-		if ( this.overlap(otherEntity) )
-			throw new IllegalArgumentException("No collision position specified between two overlapping ships.");
-		
-		if ( this.getTimeToCollision(otherEntity) == Double.POSITIVE_INFINITY)
-			return null;
-		
-		double collisionX = this.getXCoordinate() + this.getTimeToCollision(otherEntity) * this.getXVelocity();
-		double collisionY = this.getYCoordinate() + this.getTimeToCollision(otherEntity) * this.getYVelocity();
-		
-		double[] collision = {collisionX, collisionY};
-		return collision;
+	public double[] getCollisionPosition(GameObject gameObject) throws IllegalArgumentException {
+		if ( gameObject.getType() == Constants.BOUNDARY ) {
+			double time = this.getTimeToCollision(((Boundary) gameObject));
+			
+			if (time == 0)
+				return null;
+			double collisionX = this.getXCoordinate() + time * this.getXVelocity();
+			double collisionY = this.getYCoordinate() + time * this.getYVelocity();
+			
+			double[] collision = {collisionX, collisionY};
+			return collision;
 		}
+		
+		else {
+			Entity otherEntity = (Entity) gameObject;
+			if (otherEntity == null) 
+				throw new IllegalArgumentException("Invalid argument object (null).");
+			
+			if ( this.overlap(otherEntity) )
+				throw new IllegalArgumentException("No collision position specified between two overlapping ships.");
+			
+			if ( this.getTimeToCollision(otherEntity) == Double.POSITIVE_INFINITY)
+				return null;
+			
+			double collisionX = this.getXCoordinate() + this.getTimeToCollision(otherEntity) * this.getXVelocity();
+			double collisionY = this.getYCoordinate() + this.getTimeToCollision(otherEntity) * this.getYVelocity();
+			
+			double[] collision = {collisionX, collisionY};
+			return collision;
+		}
+	}
 }

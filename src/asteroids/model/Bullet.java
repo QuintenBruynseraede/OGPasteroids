@@ -113,9 +113,12 @@ public class Bullet extends Entity {
 	 */
 	
 	public void setParent(Ship ship) {
-		this.getParent().removeBullet(this);
-		this.isLoaded = true;
-		this.setWorld(null);
+		//if (! (this.getParent() == null))
+			//this.getParent().removeBullet(this);
+		if (ship == null)
+			this.isLoaded = false;
+		else
+			this.isLoaded = true;
 		this.parent = ship;
 	}
 	
@@ -137,15 +140,31 @@ public class Bullet extends Entity {
 		this.bounces++;
 	}
 	
+	public boolean isLoadedOnSameShipAs(Bullet bullet) {
+		if ((this.isBulletLoaded() && bullet.isBulletLoaded()) && (this.getParent() == bullet.getParent())) 
+			return true;
+		return false;
+	}
+	
+	
 	public boolean isLoaded = false;
 	
 	public boolean isBulletLoaded() {
 		return this.isLoaded;
 	}
+
+	private boolean finalized = false;
 	
 	public void finalize() {
-		this.getParent().removeBullet(this);
-		this.getWorld().removeBullet(this);
+		if (this.getParent() != null)
+			this.getParent().removeBullet(this);
+		if (this.getWorld() != null)
+			this.getWorld().removeBullet(this);
+		this.finalized = true;
+	}
+
+	public boolean isTerminated() {
+		return this.finalized;
 	}
 	
 }

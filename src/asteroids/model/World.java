@@ -208,19 +208,13 @@ public class World extends GameObject {
 	 * 			
 	 */
 	//TODO finish specification
-	public Entity[] getInstancesAtPosition(double x, double y) {
-		Entity[] instances = {null, null};
-		
-		for ( Ship s : ships) {
-			if( s.getXCoordinate() == x && s.getYCoordinate() == y)
-				instances[0] = s;
+	public Entity getInstancesAtPosition(double x, double y) {
+		for (Entity e : this.getEntities()) {
+			if (e.getXCoordinate() == x && e.getYCoordinate() == y) {
+				return e;
+			}
 		}
-		
-		for ( Bullet b : bullets) {
-			if( b.getXCoordinate() == x && b.getYCoordinate() == y)
-				instances[1] = b;
-		}
-		return instances;	
+		return null;
 	}
 	
 	/**
@@ -228,10 +222,7 @@ public class World extends GameObject {
 	 */
 	@Basic
 	public HashSet<Ship> getShips() {
-		HashSet<Ship> clone = new HashSet();
-		for ( Ship s : ships) 
-			clone.add(s);
-		return clone;
+		return (HashSet<Ship>) ships;
 	}
 	
 	/**
@@ -262,19 +253,52 @@ public class World extends GameObject {
 	
 	private Boundary[] boundaries = new Boundary[4];
 	
-	public void evolve(double deltaTime) {
+	public Boundary[] getBoundaries() {
+		return this.boundaries;
+	}
+	
+	public double getTimeNextCollision() {
+		double minTime = Double.MAX_VALUE;
+		
+		for (Entity e1 : this.getEntities()) {
+			for (Entity e2 : this.getEntities()) {
+				if ( e1 != e2 ) {
+					if (!(e1 instanceof Bullet && e2 instanceof Bullet && (((Bullet) e1).isLoadedOnSameShipAs((Bullet) e2)))) {
+						double time = e1.getTimeToCollision(e2);
+						if (time < minTime ) {
+							minTime = time;
+						}
+					}
+				}
+			}
+		}
+		for (Entity e1 : this.getEntities()) {
+			for (Boundary b : boundaries) {
+				double time = e1.getTimeToCollision(b);
+				if (time < minTime) {
+					minTime = time;
+				}
+			}
+		}
+		
+		return minTime;
+	}
+	
+	public GameObject[] getObjectsNextCollision() {
 		double minTime = Double.MAX_VALUE;
 		GameObject object1 = null;
 		GameObject object2 = null;
 		
 		for (Entity e1 : this.getEntities()) {
 			for (Entity e2 : this.getEntities()) {
-				if ( e1 != e2) {
-					double time = e1.getTimeToCollision(e2);
-					if (time  < minTime ) {
-						minTime = time;
-						object1 = (GameObject) e1;
-						object2 = (GameObject) e2;
+				if ( e1 != e2 ) {
+					if (!(e1 instanceof Bullet && e2 instanceof Bullet && (((Bullet) e1).isLoadedOnSameShipAs((Bullet) e2)))) {
+						double time = e1.getTimeToCollision(e2);
+						if (time  < minTime ) {
+							minTime = time;
+							object1 = (GameObject) e1;
+							object2 = (GameObject) e2;
+						}
 					}
 				}
 			}
@@ -282,7 +306,7 @@ public class World extends GameObject {
 		
 		for (Entity e1 : this.getEntities()) {
 			for (Boundary b : boundaries) {
-				double time = e1.getTimeToCollision(b.getBoundaryType());
+				double time = e1.getTimeToCollision(b);
 				if (time < minTime) {
 					minTime = time;
 					object1 = e1;
@@ -291,21 +315,41 @@ public class World extends GameObject {
 			}
 		}
 		
-		if (minTime > deltaTime) 
+		GameObject[] objects = {object1, object2};
+		return objects;
+	}
+	
+	public double[] getPositionNextCollision() {
+		GameObject[] objects = getObjectsNextCollision();
+		if (objects[0] instanceof Entity) {
+			return ((Entity) objects[0]).getCollisionPosition(objects[1]);
+		}
+		
+		return ((Entity) objects[1]).getCollisionPosition(objects[0]);
+	}
+	
+	public void evolve(double deltaTime) {
+		
+		double nextCollisionTime = getTimeNextCollision();
+		
+		GameObject[] nextCollisionObjects = getObjectsNextCollision();
+		
+		if (nextCollisionTime > deltaTime) 
 			advance(deltaTime);
 		else {
-			advance(minTime);
-			resolveCollision(object1, object2);
-			evolve(deltaTime - minTime);
+			advance(nextCollisionTime);
+			resolveCollision(nextCollisionObjects[0], nextCollisionObjects[1]);
+			evolve(deltaTime - nextCollisionTime);
 		}
 		
 	}
 	
-	private void resolveCollision(GameObject object1, GameObject object2) throws IllegalStateException {
+	public void resolveCollision(GameObject object1, GameObject object2) throws IllegalStateException {
 		if (object1 == null || object2 == null) 
 			throw new IllegalStateException("This world does not have any collisions.");
 
-		if (object1 instanceof Ship && object2 instanceof Ship) {		
+		if (object1 instanceof Ship && object2 instanceof Ship) {	
+			
 			Ship ship1 = (Ship) object1;
 			Ship ship2 = (Ship) object2;
 			
@@ -314,11 +358,14 @@ public class World extends GameObject {
 			double deltaX = ship1.getXCoordinate() - ship2.getXCoordinate();
 			double deltaY = ship1.getYCoordinate() - ship2.getYCoordinate();
 			
-			double ship1J = (2*ship1.getMassTotal()*ship2.getMassTotal() * (deltaVX * deltaX + deltaVY * deltaY)) / (ship1.getRadius() * (ship1.getMassTotal() + ship2.getMassTotal()));
+			double ship1J = (2*ship1.getMassTotal()*ship2.getMassTotal() * (deltaVX * deltaX + deltaVY * deltaY)) / (ship1.getRadius() * (ship1.getMassTotal() + ship2.getMassTotal()));	
+			
 			double ship1JX = (ship1J * deltaX) / ship1.getRadius();
+
+			
+			
 			double ship1JY = (ship1J * deltaY) / ship1.getRadius();
-			ship1.setXVelocity(ship1.getXVelocity() + ship1JX / ship1.getMassTotal());
-			ship1.setYVelocity(ship1.getYVelocity() + ship1JY / ship1.getMassTotal());
+			
 			
 			deltaVX = ship2.getXVelocity() - ship1.getXVelocity();
 			deltaVY = ship2.getYVelocity() - ship1.getYVelocity();
@@ -328,6 +375,11 @@ public class World extends GameObject {
 			double ship2J = (2*ship1.getMassTotal()*ship2.getMassTotal() * (deltaVX * deltaX + deltaVY * deltaY)) / (ship2.getRadius() * (ship1.getMassTotal() + ship2.getMassTotal()));
 			double ship2JX = (ship2J * deltaX) / ship2.getRadius();
 			double ship2JY = (ship2J * deltaY) / ship2.getRadius();
+			
+			
+			
+			ship1.setXVelocity(ship1.getXVelocity() + ship1JX / ship1.getMassTotal());
+			ship1.setYVelocity(ship1.getYVelocity() + ship1JY / ship1.getMassTotal());
 			ship2.setXVelocity(ship2.getXVelocity() + ship2JX / ship2.getMassTotal());
 			ship2.setYVelocity(ship2.getYVelocity() + ship2JY / ship2.getMassTotal());
 			
@@ -411,5 +463,20 @@ public class World extends GameObject {
 				bullet.setYCoordinate(bullet.getParent().getYCoordinate());
 			}
 		}
+	}
+	
+	private boolean finalized = false;
+	
+	public boolean isTerminated() {
+		return this.finalized;
+	}
+	
+	public void finalize() {
+		for (Entity e : this.getEntities()) {
+			e.setWorld(null);
+		}
+		bullets.clear();
+		ships.clear();
+		this.finalized = true;
 	}
 }
