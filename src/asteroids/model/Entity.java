@@ -8,7 +8,19 @@ import be.kuleuven.cs.som.annotate.Basic;
 
 public class Entity extends GameObject {
 	
-	public Entity(double x, double y, double xVelocity, double yVelocity, double radius) {
+	/**
+	 * 
+	 * @param x
+	 * @param y
+	 * @param xVelocity
+	 * @param yVelocity
+	 * @param radius
+	 * 
+	 * @throws	IllegalArgumentException
+	 * 			The given radius is not a valid radius for this bullet.
+	 * 			| ! isValidRadius(radius)
+	 */
+	public Entity(double x, double y, double xVelocity, double yVelocity, double radius) throws IllegalArgumentException {
 		super(Constants.ENTITY);
 		setXCoordinate(x);
 		setYCoordinate(y);
@@ -62,7 +74,7 @@ public class Entity extends GameObject {
 	 * 			| Double.isNaN(x) || Double.isInfinite(x)
 	 */
 	void setXCoordinate(double x) throws IllegalArgumentException {
-		if (Double.isNaN(x) || Double.isInfinite(x) || this.getXCoordinate() < 0)
+		if (Double.isNaN(x) || Double.isInfinite(x))
 			throw new IllegalArgumentException("Non valid x");
 		this.x = x;			
 	}
@@ -78,8 +90,9 @@ public class Entity extends GameObject {
 	 * 			| Double.isNaN(y) || Double.isInfinite(y)
 	 */
 	void setYCoordinate(double y) throws IllegalArgumentException {
-		if (Double.isNaN(y) || Double.isInfinite(y) || this.getXCoordinate() < 0)
+		if (Double.isNaN(y) || Double.isInfinite(y)) 
 			throw new IllegalArgumentException("Non valid y");
+		
 		this.y = y;
 		}
 	
@@ -424,7 +437,7 @@ public class Entity extends GameObject {
 		if (otherEntity == null) 
 			throw new IllegalArgumentException("Invalid argument object (null).");
 		
-		if ( this.getDistanceBetween(otherEntity) <= 0 )
+		if ( this.getDistanceBetween(otherEntity) > 0.99 * (this.getRadius()+otherEntity.getRadius())  && this.getDistanceBetween(otherEntity) < 1.01 * (this.getRadius()+otherEntity.getRadius()))
 			return true;
 		else
 			return false;

@@ -21,9 +21,9 @@ public class Ship extends Entity {
 	 * 
 	 * Initialize a new ship with given x and y coordinate.
 	 * 
-	 * @param 	xCoordinate 
+	 * @param 	x
 	 * 			The X coordinate for this new ship.
-	 * @param 	yCoordinate
+	 * @param 	y
 	 * 			The Y coordinate for this new ship.
 	 * @param	xVelocity
 	 * 			The Velocity in the X direction for this new ship.
@@ -33,14 +33,12 @@ public class Ship extends Entity {
 	 * 			The radius for this new ship.
 	 * @param	orientation
 	 * 			The orientation for this new ship.
-	 * @param	mass
-	 * 			The mass for this new ship.
-	 * @param 	world
-	 * 			The world this ship is associated with.
+	 * @param	massDensity
+	 * 			The massDensity for this new ship.
 	 * @post   	The X coordinate of this new ship is equal to the given X coordinate.
-	 *       	| new.getXCoordinate() == xCoordinate
+	 *       	| new.getXCoordinate() == x
 	 * @post   	The Y coordinate of this new ship is equal to the given Y coordinate.
-	 *       	| new.getYCoordinate() == yCoordinate
+	 *       	| new.getYCoordinate() == y
 	 * @post   	The x velocity of this new ship is equal to the given X velocity.
 	 *       	| new.getXVelocity() == xVelocity
 	 * @post   	The Y velocity of this new ship is equal to the given Y velocity.
@@ -52,19 +50,7 @@ public class Ship extends Entity {
 	 * @post	The massdensity for this ship is set.
 	 * 			| new.massDensity = max(massDensity, 1.42E12)
 	 * @post	The mass for this ship is set.
-	 * 			| new.mass = max(mass, lowerBound)
-	 * @post	The world for this ship is set.
-	 * 			| new.getWorld() = world;
-	 * @note	The mass for a ship must not be lower than (4/3)*PI*r^3*massDensity
-	 * @throws	IllegalArgumentException
-	 * 			The given x coordinate is not a valid coordinate for a ship.
-	 * 			| x < Double.MIN_VALUE || x >  Double.MAX_VALUE
-	 * @throws	IllegalArgumentException
-	 * 			The given y coordinate is not a valid coordinate for a ship.
-	 * 			| y < Double.MIN_VALUE || y >  Double.MAX_VALUE
-	 * @throws	IllegalArgumentException
-	 * 			The given radius is not a valid radius for this ship.
-	 * 			| ! isValidRadius(radius)
+	 * 			| new.massShip = (4/3)*Math.PI*Math.pow(radius, 3)*massDensity
 	 */
 	public Ship (double x, double y, double xVelocity, double yVelocity, double radius, double orientation, double massDensity) throws IllegalArgumentException {
 		super(x, y, xVelocity, yVelocity, radius);
@@ -79,8 +65,6 @@ public class Ship extends Entity {
 		this.massShip = (4/3)*Math.PI*Math.pow(radius, 3)*massDensity;
 		
 	}
-	
-	
 	
 	/**
 	 * Variable registering the orientation of this ship expressed in radians.
@@ -131,8 +115,11 @@ public class Ship extends Entity {
 	 * 			| time < 0
 	 */
 	public void move(double time) throws IllegalArgumentException {
-		if (time < 0)
+		if (time < 0.01) {
+			System.out.println(time);
 			throw new IllegalArgumentException("Argument time must be positive");
+		
+		}
 		else {
 			setXCoordinate(this.getXCoordinate() + time * this.getXVelocity());
 			setYCoordinate(this.getYCoordinate() + time * this.getYVelocity());
@@ -294,22 +281,43 @@ public class Ship extends Entity {
 	 */
 	public void removeBullet(Bullet bullet) {
 		for (Bullet b : bulletsLoaded) {
-			if (b == bullet) {
+			if (b.equals(bullet)) {
 				bulletsLoaded.remove(b);
+				b.isLoaded = false;
 				return;
 			}
 		}
+		
 	}
 	
+	/**
+	 * Adds a bullet to the list of bullets this ship is carrying.
+	 * @param 	bullet
+	 * 			The bullet to be added.
+	 * @post	| bulletsLoaded.contains(bullet) == true
+	 * @post	| bullet.getParent() == this
+	 */
 	public void addBulletToLoaded(Bullet bullet) {
 		bulletsLoaded.add(bullet);
 		bullet.setParent(this);
 	}
 	
+	/**
+	 * Adds a list of bullets to the list of bullets this ship is carrying.
+	 * @param 	bullets
+	 * 			The collection of bullets to be added.
+	 * @post	| For each Bullet b in bullets
+	 * 			| 	bulletsLoaded.contains(b) == true
+	 * @post	| For each Bullet b in bullets
+	 * 			| 	b.getParent() == this
+	 */
 	public void addBulletToLoaded(Collection<Bullet> bullets) {
 		for (Bullet bullet : bullets) {
-			bulletsLoaded.add(bullet);
-			bullet.setParent(this);
+			if (! this.bulletsLoaded.contains(bullet)) {
+				bulletsLoaded.add(bullet);
+				bullet.setParent(this);
+			}
+				
 		}
 	}
 
@@ -318,27 +326,37 @@ public class Ship extends Entity {
 	public void fire() throws IllegalArgumentException {
 		if (this.getWorld() == null) return;
 		
-		Iterator<Bullet> i = this.bulletsLoaded.iterator();
-		Bullet bullet = i.next();
-		i.remove();
+		if (this.bulletsLoaded.isEmpty())
+			{ return;}
+		Bullet bullet = this.bulletsLoaded.iterator().next();
+
 		
-		if (! bulletsLoaded.contains(bullet))
-			throw new IllegalArgumentException("Firing bullet that is not loaded.");
-		bulletsLoaded.remove(bullet);
+		if (bulletsLoaded.contains(bullet) == false)
+			{ throw new IllegalArgumentException("Firing bullet that is not loaded."); }
+		
+		
+		this.removeBullet(bullet);
+		//System.out.println(bulletsLoaded);
+		bullet.isLoaded = false;
+		//System.out.println(bullet.isBulletLoaded());
+		
 		bullet.setXVelocity(FIRINGSPEED * Math.cos(getOrientation()));
 		bullet.setYVelocity(FIRINGSPEED * Math.sin(getOrientation()));
 		
 		
-		bullet.setXCoordinate(bullet.getXCoordinate() + (this.getRadius() + bullet.getRadius() + 1) * Math.cos(this.getOrientation()));
-		bullet.setYCoordinate(bullet.getYCoordinate() + (this.getRadius() + bullet.getRadius() + 1) * Math.sin(this.getOrientation()));
-		
+		bullet.setXCoordinate(bullet.getXCoordinate() + (this.getRadius() + bullet.getRadius() + 50) * Math.cos(this.getOrientation()));
+		bullet.setYCoordinate(bullet.getYCoordinate() + (this.getRadius() + bullet.getRadius() + 50) * Math.sin(this.getOrientation()));
+		//bullet.setXCoordinate(100);
+		//bullet.setYCoordinate(100);
 	
-		if (bullet.getXCoordinate() < bullet.getRadius() 
-			|| bullet.getYCoordinate() < bullet.getRadius() 
-			|| bullet.getXCoordinate() + bullet.getRadius() > this.getWorld().WIDTHUPPERBOUND 
-			|| bullet.getYCoordinate() + bullet.getRadius() > this.getWorld().HEIGHTUPPERBOUND) {
-			bullet.finalize();
-		}
+//		if (bullet.getXCoordinate() < bullet.getRadius() 
+//			|| bullet.getYCoordinate() < bullet.getRadius() 
+//			|| bullet.getXCoordinate() + bullet.getRadius() > this.getWorld().WIDTHUPPERBOUND 
+//			|| bullet.getYCoordinate() + bullet.getRadius() > this.getWorld().HEIGHTUPPERBOUND) {
+//			bullet.finalize();
+//		}
+//		
+		
 	}
 	
 	public void updateVelocity() {

@@ -1,7 +1,11 @@
 package asteroids.model;
 
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Raw;
+
 import java.util.*;
+
+import asteroids.part2.CollisionListener;
 
 
 /**
@@ -13,17 +17,22 @@ import java.util.*;
 
 //TODO Uitgebreid testen van getShips()
 //TODO Evolve hulpfuncties maken!!
-//TODO Destructor ship en bullet
 
 public class World extends GameObject {
 	
 	/**
-	 * 
+	 * Creates a world with a given height and width
 	 * @param 	width		
 	 * 			The width for this new world.
 	 * @param 	height	
 	 * 			The height for this new world.
 	 * @see		implementation
+	 * @invar 	| this.height <= HEIGTHUPPERBOUND
+	 * @invar	| this.width <= WIDTHUPPERBOUND
+	 * @invar 	| for each Ship s in ships
+	 * 			|	s.getWorld() == this
+	 * @invar 	| for each Bullet b in bullet
+	 * 			|	b.getWorld() == this
 	 */
 	public World (double width, double height) {
 		super(Constants.WORLD);
@@ -110,17 +119,22 @@ public class World extends GameObject {
 	 * 			The mass for this new ship.
 	 * @param	massDensity
 	 * 			The mass density for this new ship.
-	 * @param	world
-	 * 			The world for this new ship.
 	 * @post	See constructor Ship.
 	 * @post	| this.getShips().contains(ship)
 	 */
+	@Raw
 	public void addShip(double x, double y, double xVelocity, double yVelocity, double radius, double orientation, double mass, double massDensity) {
 		Ship ship = new Ship(x, y, xVelocity, yVelocity, radius, orientation, massDensity);
 		ship.setWorld(this);
 		ships.add(ship);
 	}
 	
+	/**
+	 * 
+	 * @param 	ship
+	 * 			The ship to be added to this world.
+	 * @post	| this.getShips().contains(ship)
+	 */
 	public void addShip(Ship ship) {
 		ships.add(ship);
 	}
@@ -135,6 +149,7 @@ public class World extends GameObject {
 	 * 			The list containing all ships in this world does not contain the ship provided as an argument.
 	 * @post	| ! ships.contains(ship)
 	 */
+	@Raw
 	public void removeShip(Ship ship) throws IllegalArgumentException {
 		if (!(ship instanceof Ship)) 
 			throw new IllegalArgumentException("Trying to remove non ship object.");
@@ -150,7 +165,7 @@ public class World extends GameObject {
 	 * 
 	 * @param 	x
 	 * 			The X coordinate for this new bullet.
-	 * @param 	yCoordinate
+	 * @param 	y
 	 * 			The Y coordinate for this new bullet.
 	 * @param	xVelocity
 	 * 			The Velocity in the X direction for this new bullet.
@@ -158,20 +173,23 @@ public class World extends GameObject {
 	 * 			The Velocity in the Y direction for this new bullet.
 	 * @param	radius
 	 * 			The radius for this new  bullet.
-	 * @param	orientation
-	 * 			The orientation for this new bullet.
 	 * @param	ship
 	 * 			The ship carrying this bullet.
-	 * @param	world
-	 * 			The world encapsulating this bullet.
 	 * @post	| this.getBullets().contains(bullet)
 	 */
+	@Raw
 	public void addBullet(double x, double y, double xVelocity, double yVelocity, double radius, Ship ship) {
 		Bullet bullet = new Bullet(x, y, xVelocity, yVelocity, radius, ship);
 		bullet.setWorld(this);
 		bullets.add(bullet);
 	}
 	
+	/**
+	 * 
+	 * @param 	bullet
+	 * 			The bullet to be added to this world.
+	 * @post	| this.getBullets().contains(bullet)
+	 */
 	public void addBullet(Bullet bullet) {
 		bullets.add(bullet);
 	}
@@ -186,6 +204,7 @@ public class World extends GameObject {
 	 * 			The list containing all bullets in this world does not contain the bullet provided as an argument.
 	 * @post	| ! bullets.contains(bullet)
 	 */
+	@Raw
 	public void removeBullet(Bullet bullet) throws IllegalArgumentException {
 		if (!(bullet instanceof Bullet)) 
 			throw new IllegalArgumentException("Trying to remove non bullet object.");
@@ -204,11 +223,15 @@ public class World extends GameObject {
 	 * 			The X coordinate to check for presence of ship and bullet.
 	 * @param 	y
 	 * 			The Y coordinate to check for presence of ship and bullet.
-	 * @return	
+	 * @return	Returns the entity at position x, y.
+	 * 			| result == Entity e
+	 * 			| e.getXCoordinate() == x
+	 * 			| e.getYCoordinate() == y
+	 * @return	returns null, if there is no entity at position x,y
+	 * 			| result == null
 	 * 			
 	 */
-	//TODO finish specification
-	public Entity getInstancesAtPosition(double x, double y) {
+	public Entity getInstanceAtPosition(double x, double y) {
 		for (Entity e : this.getEntities()) {
 			if (e.getXCoordinate() == x && e.getYCoordinate() == y) {
 				return e;
@@ -251,12 +274,25 @@ public class World extends GameObject {
 		return entities;
 	}
 	
+	/**
+	 * Array containing four boundaries of this world.
+	 */
 	private Boundary[] boundaries = new Boundary[4];
 	
+	/**
+	 * Returns an array of four boundaries of this world.
+	 */
+	@Basic
 	public Boundary[] getBoundaries() {
 		return this.boundaries;
 	}
 	
+	/**
+	 * Returns the time of the next collision.
+	 * 
+	 * @return	The time of the first collsion in this world.
+	 * 			| result == 
+	 */
 	public double getTimeNextCollision() {
 		double minTime = Double.MAX_VALUE;
 		
@@ -284,6 +320,12 @@ public class World extends GameObject {
 		return minTime;
 	}
 	
+	/**
+	 * Returns the two objects of the next collision.
+	 * 
+	 * @return	The two objects involved in the next collision.
+	 * 			| 
+	 */
 	public GameObject[] getObjectsNextCollision() {
 		double minTime = Double.MAX_VALUE;
 		GameObject object1 = null;
@@ -319,6 +361,13 @@ public class World extends GameObject {
 		return objects;
 	}
 	
+	/**
+	 * Returns the position of the next collision.
+	 * 
+	 * @return	The X and Y coordinate of the next collision.
+	 * 			| result == {xCoordinate, yCoordinate}
+	 * 		
+	 */
 	public double[] getPositionNextCollision() {
 		GameObject[] objects = getObjectsNextCollision();
 		if (objects[0] instanceof Entity) {
@@ -328,28 +377,127 @@ public class World extends GameObject {
 		return ((Entity) objects[1]).getCollisionPosition(objects[0]);
 	}
 	
-	public void evolve(double deltaTime) {
+	/**
+	 * Returns a collision object of the next collision.
+	 * 
+	 * @return	A new collision object with the data of the next collision.
+	 * 			| result == new Collision(objects[0], objects[1], pos[0], pos[1], time, type)
+	 */
+	public Collision getNextCollisionData() {
+		// [ object1, object2, x, y, time, type (1 = boundary, 2 = entity) ]
 		
-		double nextCollisionTime = getTimeNextCollision();
+		double time;
+		double[] pos;
+		int type;
 		
-		GameObject[] nextCollisionObjects = getObjectsNextCollision();
+		GameObject[] objects = getObjectsNextCollision();
 		
-		if (nextCollisionTime > deltaTime) 
-			advance(deltaTime);
-		else {
-			advance(nextCollisionTime);
-			resolveCollision(nextCollisionObjects[0], nextCollisionObjects[1]);
-			evolve(deltaTime - nextCollisionTime);
+		if (objects[0] instanceof Entity) {
+			time = ((Entity) objects[0]).getTimeToCollision(objects[1]);
+			pos = ((Entity) objects[0]).getCollisionPosition(objects[1]);
+			if (objects[1] instanceof Entity)
+				type = 2;
+			else
+				type = 1;
+			//System.out.println(objects[0].toString() + " --- " + objects[1].toString() +  " --- " + pos[0] + " --- " +  pos[1] + " --- " +  time + " --- " +  type);
+			return new Collision(objects[0], objects[1], pos[0], pos[1], time, type);
+			
 		}
-		
+		else {
+			time = ((Entity) objects[1]).getTimeToCollision(objects[0]);
+			pos = ((Entity) objects[1]).getCollisionPosition(objects[0]);
+			type = 1;
+			
+			return new Collision(objects[1], objects[0], pos[0], pos[1], time, type);
+		}
 	}
 	
-	public void resolveCollision(GameObject object1, GameObject object2) throws IllegalStateException {
+	/**
+	 * 
+	 * @param 	deltaTime
+	 * 			The time to advance this world.
+	 * @param 	collisionListener
+	 * 
+	 * @post	If no collisions will occur within the timeframe [now, now + deltaTime], all objects' positions
+	 * 			are updated, according to their current position and velocity
+	 * 			| if (nextCollision.getTime() > deltaTime) {
+	 * 			|	this.advance()
+	 * @post	If a collision will occur within the timeframe [now, now + deltaTime], all objects' positions
+	 * 			are updated to the moment right before the next collision, the collision is resolved, and positions are updated again
+	 * 			| if (nextCollision.getTime() <= deltaTime) {
+	 * 			|	this.advance(nextCollision.getTime())
+	 * 			|	this.resolvecollision(nextCollision)
+	 * 			|	this.evolve(deltaTime - nextCollision.getTime())
+	 *
+	 */
+	public void evolve(double deltaTime, CollisionListener collisionListener) {
+		Collision nextCollision = getNextCollisionData();
+		
+		if (nextCollision.getTime() > deltaTime) 
+			advance(deltaTime);
+		else {
+			advance(nextCollision.getTime());
+			if (collisionListener != null) {
+				if (nextCollision.getType() == Constants.BOUNDARYCOLLISION) 
+					collisionListener.boundaryCollision(nextCollision.getObject1(), nextCollision.getX(), nextCollision.getY());
+				else 
+					collisionListener.objectCollision(nextCollision.getObject1(), nextCollision.getObject2(), nextCollision.getX(), nextCollision.getY());
+			}
+			
+			resolveCollision(nextCollision);
+			evolve(deltaTime - nextCollision.getTime(), collisionListener);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param 	object1
+	 * 			The first object involved in the collision this method resolves.
+	 * @param 	object2
+	 * 			The second object involved in the collision this method resolves.
+	 * @param 	collisionListener
+	 * @throws 	IllegalStateException
+	 * 			This world does not have any collisions.
+	 * @post	If the two objects involved in this collision are ships:
+	 * 			the ships' orientation and velocity are updated to make them bounce off each other.
+	 * @post	If the objects involved in this collision are bullets, they both are terminated.
+	 * 			| collision.getObject1.finalize()
+	 * 			| collision.getObject2.finalize()
+	 * @post	If the objects involved in this collision are a bullet and a boundary, the bullet bounces off the boundary.
+	 * 			Bouncing off a horizontal boundary means inverting its vertical velocity, bouncing off a vertical boundary
+	 * 			means inverting its horizontal velocity.
+	 * 			A bullet can only bounce off a boundary three times, the method bullet.addBounce() keeps track of this number. 
+	 * 			If the maximum amount of bounces has been reached, the bullet gets destroyed.
+	 * 			|	if (boundary.getType() == LEFT || boundary.getType() == RIGHT)
+	 * 			|		bullet.setXVelocity(-bullet.getXVelocity());
+	 * 			|	else 
+	 * 			|		bullet.setYVelocity(-bullet.getXVelocity());
+	 * 			|	bullet.addBounce()
+	 * @post 	If the objects involved in this collision are a ship and a boundary, the ship bounces off the boundary.
+	 * 			Bouncing off a horizontal boundary means inverting its vertical velocity, bouncing off a vertical boundary
+	 * 			means inverting its horizontal velocity.
+	 * 			| if (boundary.getType() == LEFT || boundary.getType() == RIGHT)
+	 * 			|		ship.setXVelocity(-ship.getXVelocity());
+	 * 			|	else 
+	 * 			|		ship.setYVelocity(-ship.getXVelocity());
+	 * @post	If the objects involved in this collision are a bullet and a ship, the ship and bullet are destroyed immediately.
+	 * 			| bullet.finalize()
+	 * 			| ship.finalize();
+	 * @post	If the objects involved in this collision are a bullet and the ship that fired this bullet, the bullet is readded
+	 * 			to the ship.
+	 * 			| ship.bulletsLoaded.add(bullet);
+	 *			| bullet.setParent(ship);
+	 * 			
+	 */
+	public void resolveCollision(Collision collision) throws IllegalStateException {
+		GameObject object1 = collision.getObject1();
+		GameObject object2 = collision.getObject2();
+		
 		if (object1 == null || object2 == null) 
 			throw new IllegalStateException("This world does not have any collisions.");
 
 		if (object1 instanceof Ship && object2 instanceof Ship) {	
-			
+			System.out.println("ship ship");
 			Ship ship1 = (Ship) object1;
 			Ship ship2 = (Ship) object2;
 			
@@ -359,13 +507,8 @@ public class World extends GameObject {
 			double deltaY = ship1.getYCoordinate() - ship2.getYCoordinate();
 			
 			double ship1J = (2*ship1.getMassTotal()*ship2.getMassTotal() * (deltaVX * deltaX + deltaVY * deltaY)) / (ship1.getRadius() * (ship1.getMassTotal() + ship2.getMassTotal()));	
-			
 			double ship1JX = (ship1J * deltaX) / ship1.getRadius();
-
-			
-			
 			double ship1JY = (ship1J * deltaY) / ship1.getRadius();
-			
 			
 			deltaVX = ship2.getXVelocity() - ship1.getXVelocity();
 			deltaVY = ship2.getYVelocity() - ship1.getYVelocity();
@@ -376,17 +519,21 @@ public class World extends GameObject {
 			double ship2JX = (ship2J * deltaX) / ship2.getRadius();
 			double ship2JY = (ship2J * deltaY) / ship2.getRadius();
 			
-			
-			
 			ship1.setXVelocity(ship1.getXVelocity() + ship1JX / ship1.getMassTotal());
 			ship1.setYVelocity(ship1.getYVelocity() + ship1JY / ship1.getMassTotal());
 			ship2.setXVelocity(ship2.getXVelocity() + ship2JX / ship2.getMassTotal());
 			ship2.setYVelocity(ship2.getYVelocity() + ship2JY / ship2.getMassTotal());
-			
+//			ship1.setYVelocity(-ship1.getYVelocity());
+//			ship1.setXVelocity(-ship1.getXVelocity());
+//			ship2.setXVelocity(-ship1.getXVelocity());
+//			ship2.setYVelocity(-ship1.getYVelocity());
+			//this.advance(1);
 			return;
 		}
 		
 		if ((object1 instanceof Bullet && object2 instanceof Ship) || (object1 instanceof Ship && object2 instanceof Bullet)) {
+			System.out.println("bullet ship");
+
 			Bullet bullet = null;
 			Ship ship = null;
 			
@@ -401,8 +548,8 @@ public class World extends GameObject {
 			
 			if (bullet.getParent() == ship) {
 				ship.bulletsLoaded.add(bullet);
-				bullet.setWorld(null);
 				bullet.setParent(ship);
+				
 			}
 			else {
 				ship.finalize();
@@ -412,6 +559,8 @@ public class World extends GameObject {
 		}
 		
 		if (object1 instanceof Bullet && object2 instanceof Bullet) {
+			System.out.println("bullet bullet");
+
 			Bullet bullet1 = (Bullet) object1;
 			Bullet bullet2 = (Bullet) object2;
 			
@@ -423,6 +572,8 @@ public class World extends GameObject {
 		
 		
 		if (object1 instanceof Ship && object2 instanceof Boundary) {
+			System.out.println("ship boudnary");
+
 			Boundary boundary = (Boundary) object2;
 			Ship ship = (Ship) object1;
 			
@@ -434,6 +585,8 @@ public class World extends GameObject {
 		}
 		
 		if (object1 instanceof Bullet && object2 instanceof Boundary) {
+			System.out.println("bullet boundary");
+
 			Boundary boundary = (Boundary) object2;
 			Bullet bullet = (Bullet) object1;
 			
@@ -447,7 +600,16 @@ public class World extends GameObject {
 		throw new IllegalStateException("Undefined collision.");
 	}
 	
-
+	/**
+	 * Updates all entities' positions depending on their position and velocity. 
+	 * Ships' velocities may be updated depending on its state(thruster on/off)
+	 * @param 	deltaTime
+	 * 			The time to update the entities.
+	 * @post	Every ship in this world is moved during an interval deltaTime, if a ship's thruster is on, the velocity will be updated.
+	 * @post	Every loaded bullet will get the coordinates of his parent ship.
+	 * @post	Every unloaded bullet in this world is moved during an interval deltaTime.
+	 * 
+	 */
 	public void advance(double deltaTime) {
 		for (Ship ship : ships) {
 			ship.move(deltaTime);
@@ -456,21 +618,33 @@ public class World extends GameObject {
 		}
 		
 		for (Bullet bullet : bullets) {
-			bullet.move(deltaTime);
-			
-			if (bullet.isBulletLoaded()) {
+			if (bullet.isBulletLoaded()) {	
 				bullet.setXCoordinate(bullet.getParent().getXCoordinate());
 				bullet.setYCoordinate(bullet.getParent().getYCoordinate());
+			}
+			else {
+				bullet.move(deltaTime);
 			}
 		}
 	}
 	
+	/**
+	 * Variable registering whether the world is finalized.
+	 */
 	private boolean finalized = false;
 	
+	/**
+	 * Returns whether this world is finalized.
+	 */
+	@Basic
 	public boolean isTerminated() {
 		return this.finalized;
 	}
 	
+	/**
+	 * A method prepares this world to be removed by the garbage collector.
+	 * @see implementation
+	 */
 	public void finalize() {
 		for (Entity e : this.getEntities()) {
 			e.setWorld(null);
