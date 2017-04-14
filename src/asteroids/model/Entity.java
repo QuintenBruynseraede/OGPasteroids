@@ -4,18 +4,31 @@ import org.hamcrest.core.IsNull;
 
 import be.kuleuven.cs.som.annotate.Basic;
 
-//TODO collisionPosition symmetrie
+
+/**
+* A class representing all basic game entities that have a position, velocity and radius.
+* @invar An Entity object will always have a valid radius.
+* 	 | isValidRadius(this.getRadius())
+* @invar An Entity object will always have a valid X and Y position
+*	 | isValidCoordinate(this.getCoordinate())
+* @invar An Entity object will always have velocities larger than the lower bound and smaller than the upper bound
+* 	 | this.getVelocity() > this.getVelocityLowerBound && this.getVelocity() < this.getVelocityupperBound
+*/
 
 public class Entity extends GameObject {
 	
 	/**
-	 * 
+	 * Creates a new Entity with given parameters
 	 * @param x
+	 *	  A x coordinate for this Entity
 	 * @param y
+	  *	  A y coordinate for this Entity
 	 * @param xVelocity
+	  *	  A x velocity for this Entity
 	 * @param yVelocity
+	  *	  A y velocity for this Entity
 	 * @param radius
-	 * 
+	 * 	  A radius for this Entity
 	 * @throws	IllegalArgumentException
 	 * 			The given radius is not a valid radius for this bullet.
 	 * 			| ! isValidRadius(radius)
@@ -74,9 +87,17 @@ public class Entity extends GameObject {
 	 * 			| Double.isNaN(x) || Double.isInfinite(x)
 	 */
 	void setXCoordinate(double x) throws IllegalArgumentException {
-		if (Double.isNaN(x) || Double.isInfinite(x))
+		if (!isValidCoordinate(x))
 			throw new IllegalArgumentException("Non valid x");
 		this.x = x;			
+	}
+	
+	/**
+	* Returns whether this coordinate is a valid coordinate (not accounting for world size)
+	* @see implementation
+	*/
+	boolean isValidCoordinate(double a) {
+		return (!(Double.isNaN(x) || Double.isInfinite(x)))
 	}
 	
 	
@@ -402,11 +423,18 @@ public class Entity extends GameObject {
 		return Double.POSITIVE_INFINITY;
 	}
 	
-	
+	/*
+	* Returns the time to the first collision of this entity with a boundary.
+	* @see implementation
+	*/
 	public double getTimeFirstCollisionBoundary() {
 		return Math.min(Math.min(this.getTimeToCollision(this.getWorld().getBoundaries()[0]), this.getTimeToCollision(this.getWorld().getBoundaries()[1])), Math.min(this.getTimeToCollision(this.getWorld().getBoundaries()[2]), this.getTimeToCollision(this.getWorld().getBoundaries()[3])));
 	}
 	
+	/*
+	* Returns the boundary this entity will first collide with based on its current position and velocity.
+	* @see implementation
+	*/
 	public Boundary getFirstCollisionBoundary() {
 		double minTime = Double.MAX_VALUE;
 		Boundary[] boundaries = this.getWorld().getBoundaries();
