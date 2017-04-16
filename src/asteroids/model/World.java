@@ -15,8 +15,6 @@ import asteroids.part2.CollisionListener;
  *
  */
 
-//TODO Uitgebreid testen van getShips()
-//TODO Evolve hulpfuncties maken!!
 
 public class World extends GameObject {
 	
@@ -123,7 +121,7 @@ public class World extends GameObject {
 	 * @post	| this.getShips().contains(ship)
 	 */
 	@Raw
-	public void addShip(double x, double y, double xVelocity, double yVelocity, double radius, double orientation, double mass, double massDensity) {
+	public void addShip(double x, double y, double xVelocity, double yVelocity, double radius, double orientation, double massDensity) throws IllegalArgumentException {
 		Ship ship = new Ship(x, y, xVelocity, yVelocity, radius, orientation, massDensity);
 		ship.setWorld(this);
 		ships.add(ship);
@@ -178,7 +176,7 @@ public class World extends GameObject {
 	 * @post	| this.getBullets().contains(bullet)
 	 */
 	@Raw
-	public void addBullet(double x, double y, double xVelocity, double yVelocity, double radius, Ship ship) {
+	public void addBullet(double x, double y, double xVelocity, double yVelocity, double radius, Ship ship) throws IllegalArgumentException {
 		Bullet bullet = new Bullet(x, y, xVelocity, yVelocity, radius, ship);
 		bullet.setWorld(this);
 		bullets.add(bullet);
@@ -233,7 +231,7 @@ public class World extends GameObject {
 	 */
 	public Entity getInstanceAtPosition(double x, double y) {
 		for (Entity e : this.getEntities()) {
-			if (e.getXCoordinate() == x && e.getYCoordinate() == y) {
+			if (e.getXCoordinate() > 0.99 * x && e.getXCoordinate() < 1.01 * x && e.getYCoordinate() > 0.99 * y && e.getYCoordinate() < 1.01 * y) {
 				return e;
 			}
 		}
@@ -253,10 +251,7 @@ public class World extends GameObject {
 	 */
 	@Basic
 	public HashSet<Bullet> getBullets() {
-		HashSet<Bullet> clone = new HashSet();
-		for ( Bullet b : bullets) 
-			clone.add(b);
-		return clone;
+		return (HashSet<Bullet>) bullets;
 	}
 	
 	/**
@@ -275,7 +270,7 @@ public class World extends GameObject {
 	}
 	
 	/**
-	 * Array containing four boundaries of this world.
+	 * Array containing the four boundaries of this world.
 	 */
 	private Boundary[] boundaries = new Boundary[4];
 	
@@ -290,8 +285,8 @@ public class World extends GameObject {
 	/**
 	 * Returns the time of the next collision.
 	 * 
-	 * @return	The time of the first collsion in this world.
-	 * 			| result == 
+	 * @return	The time of the first collision in this world.
+	 * 			| result == (time where for each Collision c: c.getTime() >= time)
 	 */
 	public double getTimeNextCollision() {
 		double minTime = Double.MAX_VALUE;
@@ -324,7 +319,7 @@ public class World extends GameObject {
 	 * Returns the two objects of the next collision.
 	 * 
 	 * @return	The two objects involved in the next collision.
-	 * 			| 
+	 * 			| [object1, object2] where getNextCollisionData().getObject1() == object1 && getNextCollisionData().getObject2() == object2
 	 */
 	public GameObject[] getObjectsNextCollision() {
 		double minTime = Double.MAX_VALUE;
@@ -365,7 +360,8 @@ public class World extends GameObject {
 	 * Returns the position of the next collision.
 	 * 
 	 * @return	The X and Y coordinate of the next collision.
-	 * 			| result == {xCoordinate, yCoordinate}
+	 * 			| result == {xCoordinate, yCoordinate} for each Collision c
+	 * 			| (c.getX() != xCoordinate || c.getY() != yCoordinate) => c.getTime() > getTimeNextCollision()
 	 * 		
 	 */
 	public double[] getPositionNextCollision() {
@@ -382,11 +378,13 @@ public class World extends GameObject {
 	 * 
 	 * @return	A new collision object with the data of the next collision.
 	 * 			| result == new Collision(objects[0], objects[1], pos[0], pos[1], time, type)
+	 * 			| For each future Collision c
+	 * 			| c.getTime() >= time
 	 */
 	public Collision getNextCollisionData() {
 		// [ object1, object2, x, y, time, type (1 = boundary, 2 = entity) ]
 		
-		double time;
+		double time = 0;
 		double[] pos;
 		int type;
 		
@@ -399,8 +397,20 @@ public class World extends GameObject {
 				type = 2;
 			else
 				type = 1;
-			//System.out.println(objects[0].toString() + " --- " + objects[1].toString() +  " --- " + pos[0] + " --- " +  pos[1] + " --- " +  time + " --- " +  type);
-			return new Collision(objects[0], objects[1], pos[0], pos[1], time, type);
+			Collision c;
+			try {
+				c = new Collision(objects[0], objects[1], pos[0], pos[1], time, type);
+				return c;
+			} catch (Exception e) {
+				System.out.println(objects[0]);
+				System.out.println(objects[1]);
+				System.out.println(pos[0]);
+				System.out.println(pos[1]);
+				System.out.println(time);
+				System.out.println(type);
+				return null;
+			}
+			
 			
 		}
 		else {
@@ -445,6 +455,7 @@ public class World extends GameObject {
 			}
 			
 			resolveCollision(nextCollision);
+			advance(0.1);
 			evolve(deltaTime - nextCollision.getTime(), collisionListener);
 		}
 	}
@@ -500,13 +511,13 @@ public class World extends GameObject {
 			System.out.println("ship ship");
 			Ship ship1 = (Ship) object1;
 			Ship ship2 = (Ship) object2;
-			
+			 
 			double deltaVX = ship1.getXVelocity() - ship2.getXVelocity();
 			double deltaVY = ship1.getYVelocity() - ship2.getYVelocity();
 			double deltaX = ship1.getXCoordinate() - ship2.getXCoordinate();
 			double deltaY = ship1.getYCoordinate() - ship2.getYCoordinate();
 			
-			double ship1J = (2*ship1.getMassTotal()*ship2.getMassTotal() * (deltaVX * deltaX + deltaVY * deltaY)) / (ship1.getRadius() * (ship1.getMassTotal() + ship2.getMassTotal()));	
+			double ship1J = (2*ship1.getMassTotal()*ship2.getMassTotal() * (deltaVX * deltaX + deltaVY * deltaY)) / (ship1.getRadius() * (ship1.getMassTotal() + ship2.getMassTotal()));
 			double ship1JX = (ship1J * deltaX) / ship1.getRadius();
 			double ship1JY = (ship1J * deltaY) / ship1.getRadius();
 			
@@ -523,11 +534,7 @@ public class World extends GameObject {
 			ship1.setYVelocity(ship1.getYVelocity() + ship1JY / ship1.getMassTotal());
 			ship2.setXVelocity(ship2.getXVelocity() + ship2JX / ship2.getMassTotal());
 			ship2.setYVelocity(ship2.getYVelocity() + ship2JY / ship2.getMassTotal());
-//			ship1.setYVelocity(-ship1.getYVelocity());
-//			ship1.setXVelocity(-ship1.getXVelocity());
-//			ship2.setXVelocity(-ship1.getXVelocity());
-//			ship2.setYVelocity(-ship1.getYVelocity());
-			//this.advance(1);
+			
 			return;
 		}
 		
@@ -572,7 +579,7 @@ public class World extends GameObject {
 		
 		
 		if (object1 instanceof Ship && object2 instanceof Boundary) {
-			System.out.println("ship boudnary");
+			System.out.println("ship boundary");
 
 			Boundary boundary = (Boundary) object2;
 			Ship ship = (Ship) object1;
@@ -602,12 +609,20 @@ public class World extends GameObject {
 	
 	/**
 	 * Updates all entities' positions depending on their position and velocity. 
-	 * Ships' velocities may be updated depending on its state(thruster on/off)
+	 * Ships' velocities may be updated depending on its state(thruster on/off).
 	 * @param 	deltaTime
-	 * 			The time to update the entities.
+	 * 			The time duration over which to update the entities' properties.
 	 * @post	Every ship in this world is moved during an interval deltaTime, if a ship's thruster is on, the velocity will be updated.
+	 * 			| if (ship.isThrustherEnabled())
+	 * 			|	ship.updateVelocity()
 	 * @post	Every loaded bullet will get the coordinates of his parent ship.
+	 * 			| if (this.isLoaded())
+	 * 			| 	this.setXCoordinate(this.getParent().getXCoordinate())
+	 * 			|	this.setYCoordinate(this.getParent().getYCoordinate())
 	 * @post	Every unloaded bullet in this world is moved during an interval deltaTime.
+	 * 			| bullet.move(deltaTime)
+	 * @post	Every ship is moved during an interval deltaTime.
+	 * 			| ship.move(deltaTime)
 	 * 
 	 */
 	public void advance(double deltaTime) {
@@ -618,7 +633,7 @@ public class World extends GameObject {
 		}
 		
 		for (Bullet bullet : bullets) {
-			if (bullet.isBulletLoaded()) {	
+			if (bullet.isLoaded()) {	
 				bullet.setXCoordinate(bullet.getParent().getXCoordinate());
 				bullet.setYCoordinate(bullet.getParent().getYCoordinate());
 			}
@@ -637,7 +652,7 @@ public class World extends GameObject {
 	 * Returns whether this world is finalized.
 	 */
 	@Basic
-	public boolean isTerminated() {
+	public boolean isFinalized() {
 		return this.finalized;
 	}
 	

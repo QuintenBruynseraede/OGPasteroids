@@ -13,6 +13,8 @@ public abstract class GameObject {
 	
 	/**
 	* Creates a new GameObject that has a type.
+	* @param 	type
+	* 			The GameObject's type. GameObject types are defined in Constants.java
 	**/
 	public GameObject(int type) {
 		this.type = type;

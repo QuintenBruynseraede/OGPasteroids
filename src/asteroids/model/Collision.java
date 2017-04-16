@@ -1,4 +1,3 @@
-
 package asteroids.model;
 
 import be.kuleuven.cs.som.annotate.Basic;
@@ -9,7 +8,7 @@ import be.kuleuven.cs.som.annotate.Value;
 * 	therefore no checking of the collisions' data has been implemented.
 */
 @Value
-public class Collision {\
+public class Collision {
 	
 	/**
 	* Creates a new collision object

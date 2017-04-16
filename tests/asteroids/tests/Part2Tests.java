@@ -3,24 +3,21 @@ package asteroids.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Collection;
 import java.util.HashSet;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import asteroids.facade.Facade;
 import asteroids.model.Bullet;
 import asteroids.model.Collision;
 import asteroids.model.GameObject;
 import asteroids.model.Ship;
 import asteroids.model.World;
-import asteroids.facade.Facade;
-import asteroids.part2.CollisionListener;
 import asteroids.part2.facade.IFacade;
 import asteroids.util.ModelException;
 
-public class Part2TestPartial {
-
+public class Part2Tests {
 	private static final double EPSILON = 0.0001;
 
 	IFacade facade;
@@ -29,45 +26,7 @@ public class Part2TestPartial {
 	public void setUp() {
 		facade = new Facade();
 	}
-
-	@Test
-	public void testCreateWorld() throws ModelException {
-		World world = facade.createWorld(1000, 800);
-		assertEquals(1000, facade.getWorldSize(world)[0], EPSILON);
-		assertEquals(800, facade.getWorldSize(world)[1], EPSILON);
-		assertTrue(facade.getWorldShips(world).isEmpty());
-		assertTrue(facade.getWorldBullets(world).isEmpty());
-	}
-
-	@Test
-	public void testLoadBulletOnShipOverlappingBullets() throws ModelException {
-		Ship ship = facade.createShip(100, 120, 10, 5, 500, 0, 1.0E20);
-		Bullet bullet1 = facade.createBullet(100, 120, 10, 5, 50);
-		Bullet bullet2 = facade.createBullet(130, 110, 10, 5, 30);
-		facade.loadBulletOnShip(ship, bullet1);
-		facade.loadBulletOnShip(ship, bullet2);
-		assertEquals(2, facade.getNbBulletsOnShip(ship));
-		assertEquals(bullet1.getParent(), ship);
-		bullet1.addBounce();
-		assertEquals(1, bullet1.getBounces());
-		assertTrue(bullet1.isLoadedOnSameShipAs(bullet2));
-		bullet1.finalize();
-		assertTrue(bullet1.isFinalized());
-	}
-
-//	@Test
-//	public void testEvolveShipWithActiveThruster() throws ModelException {
-//		World world = facade.createWorld(5000, 5000);
-//		Ship ship = facade.createShip(100, 120, 10, 0, 50, Math.PI, 1.1E18);
-//		facade.addShipToWorld(world, ship);
-//		facade.setThrusterActive(ship, true);
-//		assertEquals(1000.0, facade.getShipAcceleration(ship), EPSILON);
-//		assertTrue(facade.isShipThrusterActive(ship));
-//		facade.evolve(world, 1, null);
-//		assertEquals(-990, facade.getShipVelocity(ship)[0], EPSILON);
-//		assertEquals(0, facade.getShipVelocity(ship)[1], EPSILON);
-//	}
-
+	
 	@Test
 	public void testResolveCollisions() throws ModelException {
 		World world = facade.createWorld(5000, 5000);
@@ -203,7 +162,7 @@ public class Part2TestPartial {
 		assertTrue(bullet3.getParent() == ship);
 	}
 	
-@Test	
+	@Test	
 	public void testGetObjectsNextCollision() throws ModelException {
 		World world = facade.createWorld(5000, 5000);
 		Ship ship = facade.createShip(100, 120, -10, 0, 20, 0, 1.0E20);
@@ -221,8 +180,70 @@ public class Part2TestPartial {
 		assertEquals(coll.getY(), 120.0, EPSILON);
 		assertEquals(coll.getTime(), 10.0, EPSILON);
 		assertEquals(coll.getType(), 1, EPSILON);
-
-		
 	}	
-}
 
+	@Test
+	public void testTimeFirstCollisionBoundary() throws ModelException {
+		
+	}
+	
+	@Test
+	public void testFirstCollisionBoundary() throws ModelException {
+		
+	}
+	
+	@Test
+	public void testParentOfBullet() throws ModelException {
+		
+	}
+	
+	@Test
+	public void testBulletLoadedOnSameShip() throws ModelException {
+		
+	}
+	
+	@Test
+	public void testFinalizeBullet() throws ModelException {
+		
+	}
+	
+	@Test
+	public void testAddShipToWorld() throws ModelException {
+		
+	}
+	
+	@Test
+	public void testRemoveShipFromWorld() throws ModelException {
+		
+	}
+	
+	@Test
+	public void testInstanceAtPosition() throws ModelException {
+		
+	}
+	
+	@Test
+	public void testGetEntities() throws ModelException {
+		
+	}
+	
+	@Test
+	public void testTimeNextCollision() throws ModelException {
+		
+	}
+
+	@Test
+	public void testObjectsNextCollision() throws ModelException {
+		
+	}
+	
+	@Test
+	public void testPositionNextCollision() throws ModelException {
+		
+	}
+	
+	@Test
+	public void testFinalizeWorld() throws ModelException {
+		
+	}
+}

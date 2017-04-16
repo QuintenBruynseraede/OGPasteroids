@@ -10,8 +10,7 @@ import be.kuleuven.cs.som.annotate.Basic;
  *  
  * @author Tom De Backer and Quinten Bruynseraede
  */
-//TODO: modify documentation for all methods
-//TODO if the bulletâ€™s initial position is already
+//TODO if the bullet’s initial position is already
 // (partially) occupied by another entity, then the bullet immediately collides
 // with that entity
 
@@ -115,15 +114,14 @@ public class Ship extends Entity {
 	 * 			| time < 0
 	 */
 	public void move(double time) throws IllegalArgumentException {
-		if (time < 0.01) {
-			System.out.println(time);
-			throw new IllegalArgumentException("Argument time must be positive");
+		if (time < 0.01 && time > 0)
+			return;
+		//else if (time < 0)
+			//throw new IllegalArgumentException("Argument time must be positive");
+	
+		setXCoordinate(this.getXCoordinate() + time * this.getXVelocity());
+		setYCoordinate(this.getYCoordinate() + time * this.getYVelocity());
 		
-		}
-		else {
-			setXCoordinate(this.getXCoordinate() + time * this.getXVelocity());
-			setYCoordinate(this.getYCoordinate() + time * this.getYVelocity());
-		}
 	}
 	
 	/**
@@ -283,7 +281,7 @@ public class Ship extends Entity {
 		for (Bullet b : bulletsLoaded) {
 			if (b.equals(bullet)) {
 				bulletsLoaded.remove(b);
-				b.isLoaded = false;
+				b.setLoaded(false);
 				return;
 			}
 		}
@@ -320,33 +318,24 @@ public class Ship extends Entity {
 				
 		}
 	}
-	
-	/**
-	* Variable representing the initial speed that is given to a fired bullet.
-	*/
+
 	public final int FIRINGSPEED = 250;
 	
-	/**
-	* Fires a bullet from the list of loaded bullets
-	* @post The fired bullet is removed from the list of loaded bullets
-	*	| this.bulletsLoaded.contains(bullet) == false
-	* @post	The fired bullet knows it is no longer held by a ship
-	*	| bullet.isLoaded = false
-	* @post	The bullet gets an initial velocity in the same direction as the ship 
-	*	| bullet.setXVelocity(FIRINGSPEED * Math.cos(getOrientation()))
-	*	| bullet.setYVelocity(FIRINGSPEED * Math.sin(getOrientation()))
-	*	
-	*/
-	public void fire() {
+	public void fire() throws IllegalArgumentException {
 		if (this.getWorld() == null) return;
 		
 		if (this.bulletsLoaded.isEmpty())
 			{ return;}
 		Bullet bullet = this.bulletsLoaded.iterator().next();
+
+		
+		if (bulletsLoaded.contains(bullet) == false)
+			{ throw new IllegalArgumentException("Firing bullet that is not loaded."); }
+		
 		
 		this.removeBullet(bullet);
 		//System.out.println(bulletsLoaded);
-		bullet.isLoaded = false;
+		bullet.setLoaded(false);
 		//System.out.println(bullet.isBulletLoaded());
 		
 		bullet.setXVelocity(FIRINGSPEED * Math.cos(getOrientation()));
@@ -368,32 +357,14 @@ public class Ship extends Entity {
 		
 	}
 	
-	/**
-	* Updates the velocity of this ship, according to the ship's thruster
-	* 
-	* @effect this.thrust(getAcceleration())
-	*/
 	public void updateVelocity() {
 		this.thrust(getAcceleration());
 	}
 	
-	/**
-	* Variable representing whether this ship has been finalized.
-	*/
-	
 	public boolean finalized = false;
 	
-	/**
-	* Finalizes this ship
-	* @post Each bullet this ship holds loses its parent.
-	*	| For each Bullet b in this.bulletsLoaded
-	*	| 	b.getParent() == null
-	* @post	The world no longer keeps track of this ship.
-	*	| new.world.ships.contains(this) == false
-	* @post	The ship is given the finalized state
-	*	| new.finalized == true
-	*/
 	public void finalize() {
+		System.out.println("Terminating " + this.toString());
 		if (! bulletsLoaded.isEmpty()) {
 			for (Bullet b : bulletsLoaded) {
 				b.setParent(null);
@@ -404,10 +375,6 @@ public class Ship extends Entity {
 		this.finalized = true;
 	}
 	
-	/*
-	* Returns whether this ship has been terminated
-	*/
-	@Basic
 	public boolean isTerminated() {
 		return this.finalized;
 	}

@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import asteroids.model.Bullet;
+import asteroids.model.Entity;
 import asteroids.part2.CollisionListener;
 import asteroids.part2.facade.IFacade;
 import asteroids.util.ModelException;
@@ -16,25 +17,19 @@ import asteroids.util.ModelException;
 
 public class Facade implements asteroids.part2.facade.IFacade {
 	
-	Facade(){}
+	public Facade(){}
 	
-	@Override
-	public Ship createShip() throws ModelException {
-		Ship ship1 = new Ship(0.0, 0.0, Ship.getVelocityLowerBound(), Ship.getVelocityLowerBound(), 0.0, Ship.getRadiusLowerBound(), (4/3)*Math.PI*Math.pow(Ship.getRadiusLowerBound()*1.42E12, 3), 1.42E12, (World) null);
-		
-		return ship1;
-	}
-
+	
 	@Override
 	public Ship createShip(double x, double y, double xVelocity, double yVelocity, double radius, double orientation)
 			throws ModelException {
 		try {
-			Ship ship1 = new Ship(x, y, xVelocity, yVelocity, radius, orientation, 0,0,(World) null);
+			Ship ship1 = new Ship(x, y, xVelocity, yVelocity, radius, orientation, 1.42E12);
 			return ship1;
 		} catch (IllegalArgumentException e) {
 			throw new ModelException("IllegalArgumentException thrown in createShip()");
 		} catch (AssertionError e) {
-			throw new ModelException("orientation invalid");
+			throw new ModelException("Orientation invalid");
 		}
 	}
 
@@ -147,13 +142,6 @@ public class Facade implements asteroids.part2.facade.IFacade {
 		}
 	}
 
-	@Override
-	public Ship createShip(double x, double y, double xVelocity, double yVelocity, double radius, double direction,
-			double mass) throws ModelException {
-		
-		Ship ship1 = new Ship(0.0, 0.0, Ship.getVelocityLowerBound(), Ship.getVelocityLowerBound(), 0.0, Ship.getRadiusLowerBound(), (4/3)*Math.PI*Math.pow(Ship.getRadiusLowerBound()*1.42E12, 3), 1.42E12, (World) null);
-		return ship1;
-	}
 
 	@Override
 	public void terminateShip(Ship ship) throws ModelException {
@@ -206,7 +194,7 @@ public class Facade implements asteroids.part2.facade.IFacade {
 	public Bullet createBullet(double x, double y, double xVelocity, double yVelocity, double radius)
 			throws ModelException {
 		
-		Bullet bullet = new Bullet(x ,y , xVelocity, yVelocity, radius, (Ship) null, (World) null);
+		Bullet bullet = new Bullet(x ,y , xVelocity, yVelocity, radius, (Ship) null);
 		return bullet;
 	}
 
@@ -219,7 +207,7 @@ public class Facade implements asteroids.part2.facade.IFacade {
 	@Override
 	public boolean isTerminatedBullet(Bullet bullet) throws ModelException {
 		if (bullet == null) throw new ModelException("Trying to terminate null bullet.");
-		return bullet.isTerminated();
+		return bullet.isFinalized();
 	}
 
 	@Override
@@ -251,7 +239,7 @@ public class Facade implements asteroids.part2.facade.IFacade {
 	@Override
 	public double getBulletMass(Bullet bullet) throws ModelException {
 		if (bullet == null) throw new ModelException("Trying to terminate null bullet.");
-		return bullet.getMassBullet();
+		return bullet.getMass();
 	}
 
 	@Override
@@ -280,17 +268,20 @@ public class Facade implements asteroids.part2.facade.IFacade {
 
 	@Override
 	public void terminateWorld(World world) throws ModelException {
+		if (world == null) throw new ModelException("Trying to terminate null world.");
 		world.finalize();
 				
 	}
 
 	@Override
 	public boolean isTerminatedWorld(World world) throws ModelException {
-		return world.isTerminated();
+		if (world == null) throw new ModelException("Checking state of null world");
+		return world.isFinalized();
 	}
 
 	@Override
 	public double[] getWorldSize(World world) throws ModelException {
+		if (world == null) throw new ModelException("Checking size of null world");
 		double[] size = new double[2];
 		
 		size[0] = world.getWidth();
@@ -301,128 +292,150 @@ public class Facade implements asteroids.part2.facade.IFacade {
 
 	@Override
 	public Set<? extends Ship> getWorldShips(World world) throws ModelException {
+		if (world == null) throw new ModelException("Querying list of ships in null world");
 		return world.getShips();
 	}
 
 	@Override
 	public Set<? extends Bullet> getWorldBullets(World world) throws ModelException {
+		if (world == null) throw new ModelException("Querying list of bullets in null world");
 		return world.getBullets();
 	}
 
 	@Override
 	public void addShipToWorld(World world, Ship ship) throws ModelException {
+		if (world == null) throw new ModelException("Null reference to world when adding ship to world");
+		if (ship == null) throw new ModelException("Null reference to ship when adding ship to world");
 		ship.setWorld(world);
+		world.addShip(ship);
 	}
 
 	@Override
 	public void removeShipFromWorld(World world, Ship ship) throws ModelException {
+		if (world == null || ship == null) throw new ModelException("Null reference removing ship");
 		world.removeShip(ship);
 	}
 
 	@Override
 	public void addBulletToWorld(World world, Bullet bullet) throws ModelException {
+		if (world == null || bullet == null) throw new ModelException("Null reference adding bullet");
 		bullet.setWorld(world);
 	}
 
 	@Override
 	public void removeBulletFromWorld(World world, Bullet bullet) throws ModelException {
+		if (world == null || bullet == null) throw new ModelException("Null reference removing bullet");
 		world.removeBullet(bullet);
 	}
 
 	@Override
 	public Set<? extends Bullet> getBulletsOnShip(Ship ship) throws ModelException {
+		if (ship == null) throw new ModelException("Querying list of bullets on null ship");
 		return ship.bulletsLoaded;
 	}
 
 	@Override
 	public int getNbBulletsOnShip(Ship ship) throws ModelException {
+		if (ship == null) throw new ModelException("Querying number of bullets on null ship");
 		return ship.bulletsLoaded.size();
 	}
 
 	@Override
 	public void loadBulletOnShip(Ship ship, Bullet bullet) throws ModelException {
-		ship.bulletsLoaded.add(bullet);
-		bullet.setParent(ship);
+		if (ship == null || bullet == null) throw new ModelException("Null reference adding bullet to ship");
+		ship.addBulletToLoaded(bullet);
 	}
 
 	@Override
 	public void loadBulletsOnShip(Ship ship, Collection<Bullet> bullets) throws ModelException {
-		for (Bullet bullet : bullets) {
-			loadBulletOnShip(ship, bullet);
-		}
+		if (ship == null || bullets == null) throw new ModelException("Null reference adding bullets to ship");
+		ship.addBulletToLoaded(bullets);
 	}
 
 	@Override
 	public void removeBulletFromShip(Ship ship, Bullet bullet) throws ModelException {
+		if (ship == null || bullet == null) throw new ModelException("Null reference removing bullet from ship");
 		ship.removeBullet(bullet);
 	}
 
 	@Override
 	public void fireBullet(Ship ship) throws ModelException {
-		// TODO Auto-generated method stub
-		
+		if (ship == null) throw new ModelException("Null reference firing bullet");
+		ship.fire();
 	}
 
 	@Override
 	public double getTimeCollisionBoundary(Object object) throws ModelException {
-		if (object instanceof Bullet) {
-			Bullet b = (Bullet) object;
-			return Math.min(Math.min(b.getTimeToCollision(3),  b.getTimeToCollision(4)), Math.min(b.getTimeToCollision(1), b.getTimeToCollision(2) ));
-		}
-		else if (object instanceof Ship) {
-			Ship s = (Ship) object;
-			return Math.min(Math.min(s.getTimeToCollision(3),  s.getTimeToCollision(4)), Math.min(s.getTimeToCollision(1), s.getTimeToCollision(2) ));
-		}
-		else
-			return Double.POSITIVE_INFINITY;
+		if (object == null) throw new ModelException("Null reference checking collision");
+		Entity e = (Entity) object;
+		return e.getTimeFirstCollisionBoundary();
 		
 	}
 
 	@Override
 	public double[] getPositionCollisionBoundary(Object object) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		Entity e = (Entity) object;
+		return e.getCollisionPosition(e.getFirstCollisionBoundary());
+		
 	}
 
 	@Override
 	public double getTimeCollisionEntity(Object entity1, Object entity2) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		Entity e1 = (Entity) entity1;
+		Entity e2 = (Entity) entity2;
+		
+		return e1.getTimeToCollision(e2);
+		
+		
 	}
 
 	@Override
 	public double[] getPositionCollisionEntity(Object entity1, Object entity2) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		Entity e1 = (Entity) entity1;
+		Entity e2 = (Entity) entity2;
+		
+		return e1.getCollisionPosition(e2);
 	}
 
 	@Override
 	public double getTimeNextCollision(World world) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		return world.getTimeNextCollision();
 	}
 
 	@Override
 	public double[] getPositionNextCollision(World world) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return world.getPositionNextCollision();
 	}
 
 	@Override
 	public void evolve(World world, double dt, CollisionListener collisionListener) throws ModelException {
-		// TODO Auto-generated method stub
+		world.evolve(dt, collisionListener);
 		
 	}
 
 	@Override
 	public Object getEntityAt(World world, double x, double y) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return world.getInstanceAtPosition(x, y);
 	}
 
 	@Override
 	public Set<? extends Object> getEntities(World world) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return world.getEntities();
 	}
+
+
+	@Override
+	public Ship createShip(double x, double y, double xVelocity, double yVelocity, double radius, double direction,
+			double mass) throws ModelException {
+		try {
+			Ship ship1 = new Ship(x, y, xVelocity, yVelocity, radius, direction,  (3 * mass) / (4 * Math.PI * Math.pow(radius, 3)));
+			return ship1;
+		} catch (IllegalArgumentException e) {
+			throw new ModelException("IllegalArgumentException thrown in createShip()");
+		} catch (AssertionError e) {
+			throw new ModelException("Orientation invalid");
+		}
+	}
+
+
 }

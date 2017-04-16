@@ -1,5 +1,7 @@
 package asteroids.model;
 
+import be.kuleuven.cs.som.annotate.Basic;
+
 /**
 * A Class wrapping the abstract concept of a world's boundary in a usable GameObject
 */

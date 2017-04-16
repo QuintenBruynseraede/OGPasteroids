@@ -1,34 +1,23 @@
 package asteroids.model;
 
-import org.hamcrest.core.IsNull;
-
 import be.kuleuven.cs.som.annotate.Basic;
 
-
-/**
-* A class representing all basic game entities that have a position, velocity and radius.
-* @invar An Entity object will always have a valid radius.
-* 	 | isValidRadius(this.getRadius())
-* @invar An Entity object will always have a valid X and Y position
-*	 | isValidCoordinate(this.getCoordinate())
-* @invar An Entity object will always have velocities larger than the lower bound and smaller than the upper bound
-* 	 | this.getVelocity() > this.getVelocityLowerBound && this.getVelocity() < this.getVelocityupperBound
-*/
+//TODO collisionPosition symmetrie
 
 public class Entity extends GameObject {
 	
 	/**
-	 * Creates a new Entity with given parameters
-	 * @param x
-	 *	  A x coordinate for this Entity
-	 * @param y
-	  *	  A y coordinate for this Entity
-	 * @param xVelocity
-	  *	  A x velocity for this Entity
-	 * @param yVelocity
-	  *	  A y velocity for this Entity
-	 * @param radius
-	 * 	  A radius for this Entity
+	 * 
+	 * @param 	x
+	 * 			The X coordinate for this new entity.
+	 * @param 	y
+	 * 			The Y coordinate for this new entity.
+	 * @param 	xVelocity
+	 * 			The velocity in the x direction of this new entity.
+	 * @param 	yVelocity
+	 * 			The velocity in the y direction of this new entity.
+	 * @param 	radius
+	 * 			The radius for this enw entity.	 * 
 	 * @throws	IllegalArgumentException
 	 * 			The given radius is not a valid radius for this bullet.
 	 * 			| ! isValidRadius(radius)
@@ -42,11 +31,7 @@ public class Entity extends GameObject {
 		if (! isValidRadius(radius)) 
 			throw new IllegalArgumentException("Non-valid radius");
 		else 
-			this.radius = radius;
-		
-				
-		
-		
+			this.radius = radius;		
 	}
 
 
@@ -87,17 +72,11 @@ public class Entity extends GameObject {
 	 * 			| Double.isNaN(x) || Double.isInfinite(x)
 	 */
 	void setXCoordinate(double x) throws IllegalArgumentException {
-		if (!isValidCoordinate(x))
+		if (Double.isNaN(x) || Double.isInfinite(x))
 			throw new IllegalArgumentException("Non valid x");
-		this.x = x;			
-	}
-	
-	/**
-	* Returns whether this coordinate is a valid coordinate (not accounting for world size)
-	* @see implementation
-	*/
-	boolean isValidCoordinate(double a) {
-		return (!(Double.isNaN(x) || Double.isInfinite(x)))
+		if (isValidYCoordinate(y))
+			this.x = x;
+					
 	}
 	
 	
@@ -113,9 +92,33 @@ public class Entity extends GameObject {
 	void setYCoordinate(double y) throws IllegalArgumentException {
 		if (Double.isNaN(y) || Double.isInfinite(y)) 
 			throw new IllegalArgumentException("Non valid y");
-		
-		this.y = y;
+		if (isValidYCoordinate(y))
+			this.y = y;
 		}
+	
+	/**
+	 * Returns whether a given coordinate is a valid x coordinate in this world. 
+	 * @param 	x
+	 * 			The x coordinate
+	 * @see implementation
+	 */
+	boolean isValidXCoordinate(double x) {
+		if (this.getWorld() == null)
+			return true;
+		return (x < this.getWorld().getWidth() && x >= 0);
+	}
+	
+	/**
+	 * Returns whether a given coordinate is a valid y coordinate in this world.
+	 * @param 	y
+	 * 			The y coordinate	
+	 * @see implementation
+	 */
+	boolean isValidYCoordinate(double y) {
+		if (this.getWorld() == null)
+			return true;
+		return (y < this.getWorld().getHeight() && y >= 0);
+	}
 	
 	/**
 	 * Variable registering the X velocity of this entity expressed in kilometres per second.
@@ -197,7 +200,7 @@ public class Entity extends GameObject {
 			this.yVelocity = yVelocity;
 	}
 	
-	private final static double VELOCITYLOWERBOUND = -300000;
+	protected final static double VELOCITYLOWERBOUND = -300000;
 	protected final static double VELOCITYUPPERBOUND = 300000;
 	
 	/**
@@ -395,26 +398,35 @@ public class Entity extends GameObject {
 			
 			if (otherBoundary.getBoundaryType() == Constants.LEFT) {
 				if (this.getXVelocity() == 0) return Double.POSITIVE_INFINITY;
-				double time = -this.getXCoordinate() / this.getXVelocity();
-				return (time < 0 ? Double.POSITIVE_INFINITY : time);
+				if (this.getXVelocity() < 0) 
+					return Math.abs(this.getXCoordinate() / this.getXVelocity());	
+				else
+					return Double.MAX_VALUE;
 			}
 			
 			if (otherBoundary.getBoundaryType() == Constants.BOTTOM) {
 				if (this.getYVelocity() == 0) return Double.POSITIVE_INFINITY;
-				double time = -this.getYCoordinate() / this.getYVelocity();
-				return (time < 0 ? Double.POSITIVE_INFINITY : time);
+				if (this.getYVelocity() < 0) 
+					return Math.abs(this.getYCoordinate() / this.getYVelocity());	
+				else
+					return Double.MAX_VALUE;
 			}
 			
 			if (otherBoundary.getBoundaryType() == Constants.RIGHT) {
 				if (this.getXVelocity() == 0) return Double.POSITIVE_INFINITY;
-				double time = (this.getWorld().WIDTHUPPERBOUND-this.getXCoordinate()) / this.getXVelocity();
-				return (time < 0 ? Double.POSITIVE_INFINITY : time);
+				
+				if (this.getXVelocity() > 0) 
+					return Math.abs((this.getWorld().getWidth() - this.getXCoordinate()) / this.getXVelocity());	
+				else
+					return Double.MAX_VALUE;
 			}
 			
 			if (otherBoundary.getBoundaryType() == Constants.TOP) {
 				if (this.getYVelocity() == 0) return Double.POSITIVE_INFINITY;
-				double time = (this.getWorld().HEIGHTUPPERBOUND - this.getYCoordinate()) / this.getYVelocity();
-				return (time < 0 ? Double.POSITIVE_INFINITY : time);
+				if (this.getYVelocity() > 0) 
+					return Math.abs((this.getWorld().getHeight() - this.getYCoordinate()) / this.getYVelocity());	
+				else
+					return Double.MAX_VALUE;
 			}
 			
 			throw new IllegalArgumentException("No valid boundary.");
@@ -423,18 +435,11 @@ public class Entity extends GameObject {
 		return Double.POSITIVE_INFINITY;
 	}
 	
-	/*
-	* Returns the time to the first collision of this entity with a boundary.
-	* @see implementation
-	*/
+	
 	public double getTimeFirstCollisionBoundary() {
 		return Math.min(Math.min(this.getTimeToCollision(this.getWorld().getBoundaries()[0]), this.getTimeToCollision(this.getWorld().getBoundaries()[1])), Math.min(this.getTimeToCollision(this.getWorld().getBoundaries()[2]), this.getTimeToCollision(this.getWorld().getBoundaries()[3])));
 	}
 	
-	/*
-	* Returns the boundary this entity will first collide with based on its current position and velocity.
-	* @see implementation
-	*/
 	public Boundary getFirstCollisionBoundary() {
 		double minTime = Double.MAX_VALUE;
 		Boundary[] boundaries = this.getWorld().getBoundaries();
@@ -530,8 +535,10 @@ public class Entity extends GameObject {
 			if (otherEntity == null) 
 				throw new IllegalArgumentException("Invalid argument object (null).");
 			
-			if ( this.overlap(otherEntity) )
-				throw new IllegalArgumentException("No collision position specified between two overlapping ships.");
+			if ( this.overlap(otherEntity) ) {
+				double[] collision = {this.getXCoordinate(), this.getYCoordinate()};
+				return collision; 
+			}
 			
 			if ( this.getTimeToCollision(otherEntity) == Double.POSITIVE_INFINITY)
 				return null;

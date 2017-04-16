@@ -84,7 +84,7 @@ public class Bullet extends Entity {
 	/**
 	 * Sets the ship this bullet is loaded on or fired by. 
 	 * @param 	ship
-	 * 			| new.getParent() = this.getParent()
+	 * @post	| new.getParent() = this.getParent()
 	 */
 	
 	public void setParent(Ship ship) {
@@ -140,13 +140,14 @@ public class Bullet extends Entity {
 	}
 	
 	/**
-	 * Returns whether this bullet and another bullet are loaded and loaded on the same ship.
+	 * Returns whether this bullet and another bullet are loaded and both loaded on the same ship.
 	 * @param 	bullet
 	 * 		  	The second bullet
 	 * @return	result == ((this.isBulletLoaded() && bullet.isBulletLoaded()) && (this.getParent() == bullet.getParent())
 	 */
 	public boolean isLoadedOnSameShipAs(Bullet bullet) {
-		if ((this.isBulletLoaded() && bullet.isBulletLoaded()) && (this.getParent() == bullet.getParent())) 
+		
+		if ((this.isLoaded() && bullet.isLoaded()) && (this.getParent() == bullet.getParent())) 
 			return true;
 		return false;
 	}
@@ -154,14 +155,25 @@ public class Bullet extends Entity {
 	/**
 	 * Variable representing whether this bullet has been loaded on a ship.
 	 */
-	public boolean isLoaded = false;
+	private boolean isLoaded = false;
 	
 	/**
 	 * Returns whether a bullet has been loaded on a ship.
 	 */
 	@Basic
-	public boolean isBulletLoaded() {
+	public boolean isLoaded() {
 		return this.isLoaded;
+	}
+	
+	
+	/**
+	 * Sets the loaded state for a bullet.
+	 * @param 	loaded
+	 * 		  	Whether this bullet is loaded or not.
+	 * @post	new.isBulletLoaded() == loaded
+	 */
+	public void setLoaded(boolean loaded) {
+		this.isLoaded = loaded;
 	}
 
 	/**
@@ -174,6 +186,7 @@ public class Bullet extends Entity {
 	 * @post	If this bullet has a parent, make it remove it from its list of bullets
 	 * @post	If this bullet has been added to a world, make the world remove it from its list of bullets
 	 * @post	| new.isTerminated() == true
+	 * @see implementation
 	 */
 	public void finalize() {
 		
@@ -185,10 +198,10 @@ public class Bullet extends Entity {
 	}
 
 	/**
-	 * Returns whether this bullet has been terminated
+	 * Returns whether this bullet has been finalized.
 	 */
 	@Basic
-	public boolean isTerminated() {
+	public boolean isFinalized() {
 		return this.finalized;
 	}
 	
