@@ -272,12 +272,47 @@ public class Part2Tests {
 	
 	@Test
 	public void testInstanceAtPosition() throws ModelException {
+		World world = facade.createWorld(5000, 5000);
+		
+		Ship ship1 = facade.createShip(100, 100, -10, 0, 20, 0, 1.0E20);
+		Ship ship2 = facade.createShip(200, 100, -10, 0, 20, 0, 1.0E20);
+		Ship ship3 = facade.createShip(300, 100, -10, 0, 20, 0, 1.0E20);
+		
+		facade.addShipToWorld(world, ship1);
+		facade.addShipToWorld(world, ship2);
+		facade.addShipToWorld(world, ship3);
+		
+		assertTrue((world.getInstanceAtPosition(100, 100) == ship1));
+		assertTrue((world.getInstanceAtPosition(200, 100) == ship2));
+		assertTrue((world.getInstanceAtPosition(300, 100) == ship3));
+		assertTrue((world.getInstanceAtPosition(0, 0) == null));
+
+		
+		
+		facade.addShipToWorld(world, ship);
 		
 	}
 	
 	@Test
 	public void testGetEntities() throws ModelException {
+		World world = facade.createWorld(5000, 5000);
 		
+		Ship ship1 = facade.createShip(100, 100, -10, 0, 20, 0, 1.0E20);
+		Ship ship2 = facade.createShip(200, 100, -10, 0, 20, 0, 1.0E20);
+		Ship ship3 = facade.createShip(300, 100, -10, 0, 20, 0, 1.0E20);
+		Ship ship4 = facade.createShip(300, 100, -10, 0, 20, 0, 1.0E20);
+		
+		facade.addShipToWorld(world, ship1);
+		facade.addShipToWorld(world, ship2);
+		facade.addShipToWorld(world, ship3);
+		
+		assertTrue(world.getEntities().contains(ship1));
+		assertTrue(world.getEntities().contains(ship2));
+		assertTrue(world.getEntities().contains(ship3));
+		
+		assertTrue(world.getEntities().size() == 3));
+		
+		assertTrue(!world.getEntities().contains(ship4));
 	}
 	
 	@Test
