@@ -317,6 +317,29 @@ public class Part2Tests {
 	
 	@Test
 	public void testTimeNextCollision() throws ModelException {
+		World world = facade.createWorld(5000, 5000);
+		
+		Ship ship1 = facade.createShip(100, 100, -10, 0, 20, 0, 1.0E20);
+		Ship ship2 = facade.createShip(200, 100, 10, 0, 20, 0, 1.0E20);
+		facade.addShipToWorld(world, ship1);
+		facade.addShipToWorld(world, ship2);
+		
+		
+		assertTrue(world.getTimeNextCollision() == 5.0);
+		
+	}
+	
+	@Test
+	public void testTimeNextCollisionNoCollision() throws ModelException {
+		World world = facade.createWorld(5000, 5000);
+		
+		Ship ship1 = facade.createShip(100, 100, -10, 0, 20, 0, 1.0E20);
+		Ship ship2 = facade.createShip(200, 0, 10, 0, 20, 0, 1.0E20);
+		facade.addShipToWorld(world, ship1);
+		facade.addShipToWorld(world, ship2);
+		
+		
+		assertTrue(world.getTimeNextCollision() == Double.MAX_VALUE);
 		
 	}
 
@@ -327,11 +350,45 @@ public class Part2Tests {
 	
 	@Test
 	public void testPositionNextCollision() throws ModelException {
+		World world = facade.createWorld(5000, 5000);
 		
+		Ship ship1 = facade.createShip(100, 100, -10, 0, 20, 0, 1.0E20);
+		Ship ship2 = facade.createShip(200, 100, 10, 0, 20, 0, 1.0E20);
+		facade.addShipToWorld(world, ship1);
+		facade.addShipToWorld(world, ship2);
+		
+		
+		assertTrue(world.getPositionNextCollision()[0] == 150);
+		assertTrue(world.getPositionNextCollision()[1] == 100);
 	}
 	
 	@Test
 	public void testFinalizeWorld() throws ModelException {
+		World world = facade.createWorld(5000, 5000);
+		
+		Ship ship1 = facade.createShip(100, 100, -10, 0, 20, 0, 1.0E20);
+		Ship ship2 = facade.createShip(200, 100, 10, 0, 20, 0, 1.0E20);
+		
+		Bullet bullet1 = facade.createBullet(0, 0, 10, 20, 20);
+		Bullet bullet2 = facade.createBullet(0, 0, 10, 20, 20);
+		
+		facade.addShipToWorld(world, ship1);
+		facade.addShipToWorld(world, ship2);
+		facade.loadBulletOnShip(ship1, bullet1);
+		facade.loadBulletOnShip(ship2, bullet2);
+		facade.addBulletToWorld(world, bullet1);
+		facade.addBulletToWorld(world, bullet2);
+		
+		world.finalize();
+		assertTrue(ship1.getWorld() == null);
+		assertTrue(ship2.getWorld() == null);
+		assertTrue(bullet1.getWorld() == null);
+		assertTrue(bullet2.getWorld() == null);
+		assertTrue(this.bullets.size() == 0);
+		assertTrue(this.ships.size() == 0);
+		assertTrue(this.finalized == true);
+		assertTrue(ship1 != null);
+		
 		
 	}
 }
