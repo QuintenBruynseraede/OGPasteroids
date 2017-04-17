@@ -168,7 +168,6 @@ public class Part2Tests {
 		Ship ship = facade.createShip(100, 120, -10, 0, 20, 0, 1.0E20);
 		
 		facade.addShipToWorld(world, ship);
-		System.out.println(world.getTimeNextCollision());
 		Collision coll = world.getNextCollisionData();
 		GameObject object1 = world.getObjectsNextCollision()[0];
 		GameObject object2 = world.getObjectsNextCollision()[1];
@@ -184,27 +183,81 @@ public class Part2Tests {
 
 	@Test
 	public void testTimeFirstCollisionBoundary() throws ModelException {
+		World world = facade.createWorld(5000, 5000);
+		Ship ship = facade.createShip(100, 100, -10, 0, 20, 0, 1.0E20);
+		
+		facade.addShipToWorld(world, ship);
+		assertEquals(ship.getTimeFirstCollisionBoundary(), 10.0, EPSILON);
 		
 	}
-	
+	// FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 	@Test
 	public void testFirstCollisionBoundary() throws ModelException {
+		World world = facade.createWorld(5000, 5000);
+		Ship ship = facade.createShip(100, 100, -10, 0, 20, 0, 1.0E20);
+		
+		facade.addShipToWorld(world, ship);
+		System.out.println(ship.getFirstCollisionBoundary());
+		System.out.println(world.getBoundaries());
 		
 	}
 	
 	@Test
 	public void testParentOfBullet() throws ModelException {
+		World world = facade.createWorld(5000, 5000);
+		Ship ship = facade.createShip(100, 100, -10, 0, 20, 0, 1.0E20);
+		Bullet bullet = facade.createBullet(0, 0, 10, 20, 20);
 		
+		facade.addShipToWorld(world, ship);
+		facade.loadBulletOnShip(ship, bullet);
+		facade.addBulletToWorld(world, bullet);
+		
+		assertTrue(bullet.getParent() == ship);
+			
 	}
 	
 	@Test
 	public void testBulletLoadedOnSameShip() throws ModelException {
+		
+		World world = facade.createWorld(5000, 5000);
+		Ship ship = facade.createShip(100, 100, -10, 0, 20, 0, 1.0E20);
+		Bullet bullet = facade.createBullet(0, 0, 10, 20, 20);
+		Bullet bullet2 = facade.createBullet(0, 0, 10, 20, 20);
+		
+		facade.addShipToWorld(world, ship);
+		facade.loadBulletOnShip(ship, bullet);
+		facade.loadBulletOnShip(ship, bullet2);
+		
+		assertTrue(bullet.isLoadedOnSameShipAs(bullet2) == true);
 		
 	}
 	
 	@Test
 	public void testFinalizeBullet() throws ModelException {
 		
+		World world = facade.createWorld(5000, 5000);
+		Ship ship = facade.createShip(100, 100, -10, 0, 20, 0, 1.0E20);
+		Bullet bullet = facade.createBullet(0, 0, 10, 20, 20);
+		
+		facade.addShipToWorld(world, ship);
+		facade.loadBulletOnShip(ship, bullet);
+		facade.addBulletToWorld(world, bullet);
+		
+		bullet.finalize();
+		
+		boolean foundShip = false;
+		for (Bullet i : ship.bulletsLoaded) {
+			if (bullet == i)
+				foundShip = true;
+		}
+		assertTrue(foundShip == false);
+		
+//		boolean foundWorld = false;
+//		for (Bullet i : world.bullets) { // Visibility public???????????????????
+//			if (bullet == i)
+//				foundWorld = true;
+//		}
+//		assertTrue(foundWorld == false);
 	}
 	
 	@Test
