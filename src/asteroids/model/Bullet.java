@@ -47,13 +47,19 @@ public class Bullet extends Entity {
 		super(x, y, xVelocity, yVelocity, radius);
 		this.mass = (4/3) * Math.PI * Math.pow(this.getRadius(), 3) * Bullet.MASSDENSITY;
 		this.setParent(parent);	
+		
+		if (! isValidRadius(radius))  
+			throw new IllegalArgumentException("Non valid radius when initializing bullet");
+		
 	}
+	
 	
 	/**
 	 * variable registering the mass of a bullet in kilogrammes. The mass can be calculated as m = (4/3)pi*radius^3*massDensity
 	 */
 	private double mass;
 
+	
 	/**
 	 * Returns this bullet's mass.
 	 */
@@ -88,6 +94,8 @@ public class Bullet extends Entity {
 	 */
 	
 	public void setParent(Ship ship) {
+		if (this.getParent() == ship)
+			return;
 		if (! (this.getParent() == null))
 			this.getParent().removeBullet(this);
 		if (ship == null)
@@ -172,6 +180,7 @@ public class Bullet extends Entity {
 	 * 		  	Whether this bullet is loaded or not.
 	 * @post	new.isBulletLoaded() == loaded
 	 */
+	@Basic
 	public void setLoaded(boolean loaded) {
 		this.isLoaded = loaded;
 	}
@@ -185,7 +194,7 @@ public class Bullet extends Entity {
 	 * Finalizes the bullet, preparing it to be removed by the garbage collector.
 	 * @post	If this bullet has a parent, make it remove it from its list of bullets
 	 * @post	If this bullet has been added to a world, make the world remove it from its list of bullets
-	 * @post	| new.isTerminated() == true
+	 * @post	| new.isFinalized() == true
 	 * @see implementation
 	 */
 	public void finalize() {
@@ -193,7 +202,7 @@ public class Bullet extends Entity {
 		if (this.getParent() != null)
 			this.getParent().removeBullet(this);
 		if (this.getWorld() != null)
-			this.getWorld().removeBullet(this);
+			this.getWorld().removeEntity(this);
 		this.finalized = true;
 	}
 
@@ -203,6 +212,29 @@ public class Bullet extends Entity {
 	@Basic
 	public boolean isFinalized() {
 		return this.finalized;
+	}
+
+	@Override
+	public boolean isValidRadius(double radius) {
+		return (radius >= this.getRadiusLowerBound());
+	}
+
+	@Override
+	public void setRadius(double radius) {
+		if (isValidRadius(radius))
+			this.radius = radius;
+		else
+			throw new IllegalArgumentException("Non valid radius.");
+	}
+
+	@Override
+	public double getRadiusLowerBound() {
+		return 1;
+	}
+
+	@Override
+	public void advance(double deltaTime) {
+		move(deltaTime);
 	}
 	
 }

@@ -63,7 +63,13 @@ public class Ship extends Entity {
 		
 		this.massShip = (4/3)*Math.PI*Math.pow(radius, 3)*massDensity;
 		
+		if (! isValidRadius(radius))  
+			throw new IllegalArgumentException("Non valid radius when initializing ship");
+		this.radius = radius;
+		
+		
 	}
+	
 	
 	/**
 	 * Variable registering the orientation of this ship expressed in radians.
@@ -99,29 +105,6 @@ public class Ship extends Entity {
 	@Basic
 	public double getOrientation() {
 		return this.orientation;
-	}
-	
-
-	/**
-	 * Move the ship depending on ship's position, velocity and a given time duration.
-	 * @param 	time
-	 * 			The given time to move.
-	 * @post	The X and Y coordinates are updated according to the ship's respective xVelocity and yVelocity.
-	 * 			| new.x = this.x + time * this.xVelocity
-	 * 			| new.y = this.y + time * this.yVelocity
-	 * @throws 	IllegalArgumentException
-	 * 			The given time is not positive.
-	 * 			| time < 0
-	 */
-	public void move(double time) throws IllegalArgumentException {
-		if (time < 0.01 && time > 0)
-			return;
-		//else if (time < 0)
-			//throw new IllegalArgumentException("Argument time must be positive");
-	
-		setXCoordinate(this.getXCoordinate() + time * this.getXVelocity());
-		setYCoordinate(this.getYCoordinate() + time * this.getYVelocity());
-		
 	}
 	
 	/**
@@ -261,7 +244,7 @@ public class Ship extends Entity {
 	/**
 	 * Variable registering the force this ship's thruster exerts.
 	 */
-	public final double THRUSTERFORCE = 1.1e21;
+	public final double THRUSTERFORCE = 1.1e18;
 	
 	/**
 	 * Returns the acceleration this ship is subsceptible to, making use of Newton's second law of motion (F = ma).
@@ -278,10 +261,10 @@ public class Ship extends Entity {
 	 * @post	| bulletsLoaded.contains(bullet) == false
 	 */
 	public void removeBullet(Bullet bullet) {
-		for (Bullet b : bulletsLoaded) {
+		for (Entity b : this.getWorld().getEntitiesOfType(Bullet.class)) {
 			if (b.equals(bullet)) {
 				bulletsLoaded.remove(b);
-				b.setLoaded(false);
+				((Bullet) b).setLoaded(false);
 				return;
 			}
 		}
@@ -334,26 +317,14 @@ public class Ship extends Entity {
 		
 		
 		this.removeBullet(bullet);
-		//System.out.println(bulletsLoaded);
 		bullet.setLoaded(false);
-		//System.out.println(bullet.isBulletLoaded());
 		
 		bullet.setXVelocity(FIRINGSPEED * Math.cos(getOrientation()));
 		bullet.setYVelocity(FIRINGSPEED * Math.sin(getOrientation()));
 		
 		
-		bullet.setXCoordinate(bullet.getXCoordinate() + (this.getRadius() + bullet.getRadius() + 50) * Math.cos(this.getOrientation()));
-		bullet.setYCoordinate(bullet.getYCoordinate() + (this.getRadius() + bullet.getRadius() + 50) * Math.sin(this.getOrientation()));
-		//bullet.setXCoordinate(100);
-		//bullet.setYCoordinate(100);
-	
-//		if (bullet.getXCoordinate() < bullet.getRadius() 
-//			|| bullet.getYCoordinate() < bullet.getRadius() 
-//			|| bullet.getXCoordinate() + bullet.getRadius() > this.getWorld().WIDTHUPPERBOUND 
-//			|| bullet.getYCoordinate() + bullet.getRadius() > this.getWorld().HEIGHTUPPERBOUND) {
-//			bullet.finalize();
-//		}
-//		
+		bullet.setXCoordinate(this.getXCoordinate() + (this.getRadius() + bullet.getRadius() + 50) * Math.cos(this.getOrientation()));
+		bullet.setYCoordinate(this.getYCoordinate() + (this.getRadius() + bullet.getRadius() + 50) * Math.sin(this.getOrientation()));
 		
 	}
 	
@@ -364,19 +335,44 @@ public class Ship extends Entity {
 	public boolean finalized = false;
 	
 	public void finalize() {
-		System.out.println("Terminating " + this.toString());
+		
 		if (! bulletsLoaded.isEmpty()) {
 			for (Bullet b : bulletsLoaded) {
 				b.setParent(null);
 			}
 		}
 
-		this.getWorld().removeShip(this);
+		this.getWorld().removeEntity(this);
 		this.finalized = true;
 	}
 	
 	public boolean isTerminated() {
 		return this.finalized;
+	}
+
+	@Override
+	public boolean isValidRadius(double radius) {
+		return (radius >= this.getRadiusLowerBound());
+	}
+
+	@Override
+	public void setRadius(double radius) {
+		if (isValidRadius(radius))
+			this.radius = radius;
+		else
+			throw new IllegalArgumentException("Non valid radius.");
+	}
+
+	@Override
+	public double getRadiusLowerBound() {
+		return 1;
+	}
+
+	@Override
+	public void advance(double deltaTime) {
+		move(deltaTime);
+		if (this.isThrusterEnabled()) 
+			this.updateVelocity();
 	}
 	
 }

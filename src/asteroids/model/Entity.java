@@ -4,7 +4,7 @@ import be.kuleuven.cs.som.annotate.Basic;
 
 //TODO collisionPosition symmetrie
 
-public class Entity extends GameObject {
+public abstract class Entity extends GameObject {
 	
 	/**
 	 * 
@@ -27,11 +27,8 @@ public class Entity extends GameObject {
 		setXCoordinate(x);
 		setYCoordinate(y);
 		setXVelocity(xVelocity);
-		setYVelocity(yVelocity);
-		if (! isValidRadius(radius)) 
-			throw new IllegalArgumentException("Non-valid radius");
-		else 
-			this.radius = radius;		
+		setYVelocity(yVelocity);	
+		setRadius(radius);
 	}
 
 
@@ -244,42 +241,7 @@ public class Entity extends GameObject {
 		return Math.sqrt(xVelocity * xVelocity + yVelocity * yVelocity);
 	}
 	
-	/**
-	 * Variable registering the radius of this entity.
-	 */
-	private final double radius;
 	
-	/**
-	 * Variable registering the radius lower bound of this entity.
-	 */
-	private final static double RADIUSLOWERBOUND = 1;
-	
-	/**
-	 * @param 	radius
-	 * 			The given radius to check.
-	 * @return	True if and only if the velocity is greater than the minimum value specified for a entity's radius.
-	 * 			| result == radius > this.radiusLowerBound
-	 */
-	private boolean isValidRadius(double radius) {
-		return ( radius >= Entity.RADIUSLOWERBOUND );
-	}
-	
-	/**
-	 * This method returns the radius of this entity.
-	 */
-	@Basic
-	public double getRadius() {
-		return this.radius;
-	}
-	
-	/**
-	 * This method returns the minimum value for this entity's radius.
-	 */
-	@Basic
-	public static double getRadiusLowerBound() {
-		return RADIUSLOWERBOUND;
-	}
-
 	/**
 	 * Variable registering the world this ship is bound to.
 	 */
@@ -288,26 +250,13 @@ public class Entity extends GameObject {
 	public void setWorld(World world) throws IllegalStateException {
 		if (this.getXCoordinate() < 0 || this.getXCoordinate() > world.WIDTHUPPERBOUND || this.getXCoordinate() < 0 || this.getYCoordinate() > world.HEIGHTUPPERBOUND)
 			throw new IllegalStateException("Ship's position is invalid the world it is being assigned to.");
-		
-		
-		
-		if (this instanceof Bullet) {
-			if (! (this.getWorld() == null)) {
-				this.getWorld().removeBullet((Bullet) this);
-				world.addBullet((Bullet) this);
-			}
-		}
-		
-		if (this instanceof Ship) {
-			if (! (this.getWorld() == null)) {
-				this.getWorld().removeShip((Ship) this);
-				world.addShip((Ship) this);
-			}
 
+		if (! (this.getWorld() == null || world == null)) {
+			this.getWorld().removeEntity(this);
+			world.addEntity(this);
 		}
 		
 		this.world = world;
-		
 	}
 	
 	/**
@@ -330,6 +279,8 @@ public class Entity extends GameObject {
 	 * 			| time < 0
 	 */
 	public void move(double time) throws IllegalArgumentException {
+		if (time < 0.01 && time > 0)
+			return;
 		if (time < 0)
 			throw new IllegalArgumentException("Argument time must be positive");
 		else {
@@ -436,6 +387,43 @@ public class Entity extends GameObject {
 	}
 	
 	
+	/**
+	 * Variable registering the radius of this planetoid.
+	 */
+	protected double radius;
+	
+	/**
+	 * @param 	radius
+	 * 			The given radius to check.
+	 * @return	True if and only if the velocity is greater than the minimum value specified for a planetoid's radius.
+	 * 			| result == radius > this.radiusLowerBound
+	 */
+	public abstract boolean isValidRadius(double radius);
+	
+	
+	/**
+	 * This method returns the radius of this planetoid.
+	 */
+	@Basic
+	public double getRadius() {
+		return this.radius;
+	}
+	
+	/**
+	 * @param 	radius
+	 * 			The new radius for this planetoid.
+	 * @post	The new radius of the planetoid is equal to the given argument radius.
+	 * 			| new.radius = radius
+	 */
+	@Basic
+	public abstract void setRadius(double radius);
+	
+	/**
+	 * This method returns the minimum value for this planetoid's radius.
+	 */
+	@Basic
+	public abstract double getRadiusLowerBound();
+
 	public double getTimeFirstCollisionBoundary() {
 		return Math.min(Math.min(this.getTimeToCollision(this.getWorld().getBoundaries()[0]), this.getTimeToCollision(this.getWorld().getBoundaries()[1])), Math.min(this.getTimeToCollision(this.getWorld().getBoundaries()[2]), this.getTimeToCollision(this.getWorld().getBoundaries()[3])));
 	}
@@ -543,11 +531,14 @@ public class Entity extends GameObject {
 			if ( this.getTimeToCollision(otherEntity) == Double.POSITIVE_INFINITY)
 				return null;
 			
-			double collisionX = this.getXCoordinate() + this.getTimeToCollision(otherEntity) * this.getXVelocity();
-			double collisionY = this.getYCoordinate() + this.getTimeToCollision(otherEntity) * this.getYVelocity();
+			double collisionX = this.getXCoordinate() + this.getTimeToCollision(otherEntity) * this.getXVelocity()  + radius*(this.getXCoordinate()-otherEntity.getXCoordinate())/ (this.getRadius() + otherEntity.getRadius());
+			double collisionY = this.getYCoordinate() + this.getTimeToCollision(otherEntity) * this.getYVelocity()  + radius*(this.getYCoordinate()-otherEntity.getYCoordinate())/ (this.getRadius() + otherEntity.getRadius());
 			
 			double[] collision = {collisionX, collisionY};
 			return collision;
 		}
 	}
+
+	public abstract void advance(double deltaTime);
+	
 }

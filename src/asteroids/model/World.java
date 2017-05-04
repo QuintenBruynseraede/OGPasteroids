@@ -87,132 +87,66 @@ public class World extends GameObject {
 	public double getHeight() {
 		return this.height;
 	}
-
 	/**
-	 * Set registering the bullets contained in this world
-	 */
-	private Set<Bullet> bullets = new HashSet<Bullet>();
+	 * Set registering the entity contained by this world
+	 */	
+	private Set<Entity> entities = new HashSet<Entity>();
 	
-	/**
-	 * Set registering the ships contained in this world
-	 */
-	private Set<Ship> ships = new HashSet<Ship>();
+
+
+//	/**
+//	 * Removes a given ship object from this world.
+//	 * @param 	ship
+//	 * 			The ship to remove from this world.
+//	 * @throws 	IllegalArgumentException
+//	 * 			The argument contains no correct reference to an object of the Ship class.
+//	 * @throws	IllegalArgumentException
+//	 * 			The list containing all ships in this world does not contain the ship provided as an argument.
+//	 * @post	| ! ships.contains(ship)
+//	 */
+//	@Raw
+//	public void removeShip(Ship ship) throws IllegalArgumentException {
+//		if (!(ship instanceof Ship)) 
+//			throw new IllegalArgumentException("Trying to remove non ship object.");
+//
+//		if (! this.getShips().contains(ship))
+//			throw new IllegalArgumentException("Trying to remove ship that is not in this world.");
+//		
+//		
+//		entities.remove(ship);
+//	}
 	
 	
 	/**
 	 * 
-	 * @param 	x
-	 * 			The X coordinate for this new ship.
-	 * @param 	yCoordinate
-	 * 			The Y coordinate for this new ship.
-	 * @param	xVelocity
-	 * 			The Velocity in the X direction for this new ship.
-	 * @param	yVelocity
-	 * 			The Velocity in the Y direction for this new ship.
-	 * @param	radius
-	 * 			The radius for this new ship.
-	 * @param	orientation
-	 * 			The orientation for this new ship.
-	 * @param	mass
-	 * 			The mass for this new ship.
-	 * @param	massDensity
-	 * 			The mass density for this new ship.
-	 * @post	See constructor Ship.
-	 * @post	| this.getShips().contains(ship)
+	 * @param 	entity
+	 * 			The entity to be added to this world.
+	 * @post	| new.getEntities().contains(entity)
 	 */
-	@Raw
-	public void addShip(double x, double y, double xVelocity, double yVelocity, double radius, double orientation, double massDensity) throws IllegalArgumentException {
-		Ship ship = new Ship(x, y, xVelocity, yVelocity, radius, orientation, massDensity);
-		ship.setWorld(this);
-		ships.add(ship);
-	}
-	
-	/**
-	 * 
-	 * @param 	ship
-	 * 			The ship to be added to this world.
-	 * @post	| this.getShips().contains(ship)
-	 */
-	public void addShip(Ship ship) {
-		ships.add(ship);
+	public void addEntity(Entity e) {
+		entities.add(e);
 	}
 
 	/**
-	 * Removes a given ship object from this world.
-	 * @param 	ship
-	 * 			The ship to remove from this world.
+	 * Removes a given entity from this world.
+	 * @param 	entity
+	 * 			The entity to remove from this world.
 	 * @throws 	IllegalArgumentException
-	 * 			The argument contains no correct reference to an object of the Ship class.
+	 * 			The argument contains no correct reference to an object of the Entity class.
 	 * @throws	IllegalArgumentException
-	 * 			The list containing all ships in this world does not contain the ship provided as an argument.
-	 * @post	| ! ships.contains(ship)
+	 * 			The list containing all entity in this world does not contain the entity provided as an argument.
+	 * @post	| ! entities.contains(entity)
 	 */
 	@Raw
-	public void removeShip(Ship ship) throws IllegalArgumentException {
-		if (!(ship instanceof Ship)) 
-			throw new IllegalArgumentException("Trying to remove non ship object.");
-
-		if (! ships.contains(ship))
-			throw new IllegalArgumentException("Trying to remove ship that is not in this world.");
+	public void removeEntity(Entity entity) throws IllegalArgumentException {
+		if (!(entity instanceof Entity)) 
+			throw new IllegalArgumentException("Trying to remove object that is no entity in removeEntity");
 		
-		ship.setWorld(null);
-		ships.remove(ship);
-	}
-	
-	/**
-	 * 
-	 * @param 	x
-	 * 			The X coordinate for this new bullet.
-	 * @param 	y
-	 * 			The Y coordinate for this new bullet.
-	 * @param	xVelocity
-	 * 			The Velocity in the X direction for this new bullet.
-	 * @param	yVelocity
-	 * 			The Velocity in the Y direction for this new bullet.
-	 * @param	radius
-	 * 			The radius for this new  bullet.
-	 * @param	ship
-	 * 			The ship carrying this bullet.
-	 * @post	| this.getBullets().contains(bullet)
-	 */
-	@Raw
-	public void addBullet(double x, double y, double xVelocity, double yVelocity, double radius, Ship ship) throws IllegalArgumentException {
-		Bullet bullet = new Bullet(x, y, xVelocity, yVelocity, radius, ship);
-		bullet.setWorld(this);
-		bullets.add(bullet);
-	}
-	
-	/**
-	 * 
-	 * @param 	bullet
-	 * 			The bullet to be added to this world.
-	 * @post	| this.getBullets().contains(bullet)
-	 */
-	public void addBullet(Bullet bullet) {
-		bullets.add(bullet);
-	}
-
-	/**
-	 * Removes a given ship object from this world.
-	 * @param 	bullet
-	 * 			The bullet to remove from this world.
-	 * @throws 	IllegalArgumentException
-	 * 			The argument contains no correct reference to an object of the Bullet class.
-	 * @throws	IllegalArgumentException
-	 * 			The list containing all bullets in this world does not contain the bullet provided as an argument.
-	 * @post	| ! bullets.contains(bullet)
-	 */
-	@Raw
-	public void removeBullet(Bullet bullet) throws IllegalArgumentException {
-		if (!(bullet instanceof Bullet)) 
-			throw new IllegalArgumentException("Trying to remove non bullet object.");
-
-		if (! bullets.contains(bullet))
-			throw new IllegalArgumentException("Trying to remove bullet that is not in this world.");
+		if (! this.entities.contains(entity))
+			throw new IllegalArgumentException("Trying to remove entity that is not in this world.");
 		
-		bullet.getParent().removeBullet(bullet);
-		bullet.setWorld(null);
-		bullets.remove(bullet);
+		entity.setWorld(null);
+		entities.remove(entity);
 	}
 	
 	/**
@@ -238,35 +172,24 @@ public class World extends GameObject {
 		return null;
 	}
 	
-	/**
-	 * Return the list of ships of a specific world.
-	 */
-	@Basic
-	public HashSet<Ship> getShips() {
-		return (HashSet<Ship>) ships;
+	public Set<? extends Entity> getEntitiesOfType(Class<? extends Entity> c) {
+		Set<Entity> result = new HashSet<Entity>();
+		
+		for (Entity e : this.getEntities()) {
+			if (e.getClass() == c)
+				result.add(e);	
+		}
+		return result;
 	}
 	
 	/**
-	 * Return the list of bullets of a specific world.
-	 */
-	@Basic
-	public HashSet<Bullet> getBullets() {
-		return (HashSet<Bullet>) bullets;
-	}
-	
-	/**
-	 * Returns a list of all ships and bullets in this world.
+	 * Returns a list of all entities in this world.
 	 * 
-	 * @return 	A list of all ships and bullets in this world.
+	 * @return 	A list of all entities in this world.
 	 * 			| { entity1, entity2, ..., entityN | entityI.getWorld() = this}
 	 */
-	public HashSet<Entity> getEntities() {
-		HashSet<Entity> entities = new HashSet();
-		for ( Ship s : ships) 
-			entities.add(s);
-		for ( Bullet b : bullets) 
-			entities.add(b);
-		return entities;
+	public Set<Entity> getEntities() {
+		return this.entities;
 	}
 	
 	/**
@@ -626,21 +549,27 @@ public class World extends GameObject {
 	 * 
 	 */
 	public void advance(double deltaTime) {
-		for (Ship ship : ships) {
-			ship.move(deltaTime);
-			if (ship.isThrusterEnabled()) 
-				ship.updateVelocity();
+//		for (Ship ship : ships) {
+//			ship.move(deltaTime);
+//			if (ship.isThrusterEnabled()) 
+//				ship.updateVelocity();
+//		}
+//		
+//		for (Bullet bullet : bullets) {
+//			if (bullet.isLoaded()) {	
+//				bullet.setXCoordinate(bullet.getParent().getXCoordinate());
+//				bullet.setYCoordinate(bullet.getParent().getYCoordinate());
+//			}
+//			else {
+//				bullet.move(deltaTime);
+//			}
+//		}
+		
+		for (Entity e : entities) {
+			e.advance(deltaTime);
 		}
 		
-		for (Bullet bullet : bullets) {
-			if (bullet.isLoaded()) {	
-				bullet.setXCoordinate(bullet.getParent().getXCoordinate());
-				bullet.setYCoordinate(bullet.getParent().getYCoordinate());
-			}
-			else {
-				bullet.move(deltaTime);
-			}
-		}
+		
 	}
 	
 	/**
@@ -664,8 +593,7 @@ public class World extends GameObject {
 		for (Entity e : this.getEntities()) {
 			e.setWorld(null);
 		}
-		bullets.clear();
-		ships.clear();
+		entities.clear();
 		this.finalized = true;
 	}
 }
