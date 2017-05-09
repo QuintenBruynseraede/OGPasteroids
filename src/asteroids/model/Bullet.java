@@ -96,8 +96,10 @@ public class Bullet extends Entity {
 	public void setParent(Ship ship) {
 		if (this.getParent() == ship)
 			return;
+		/**
 		if (! (this.getParent() == null))
 			this.getParent().removeBullet(this);
+			*/
 		if (ship == null)
 			this.isLoaded = false;
 		else
@@ -236,8 +238,8 @@ public class Bullet extends Entity {
 	}
 
 	@Override
-	public void collideWith(GameObject object2, int collisiontype) throws IllegalArgumentException {
-		if (collisiontype == Constants.BOUNDARYCOLLISION) {
+	public void collideWith(GameObject object2, int collisionType) throws IllegalArgumentException {
+		if (collisionType == Constants.BOUNDARYCOLLISION) {
 			Boundary boundary = (Boundary) object2;
 			Bullet bullet = (Bullet) this;
 			
@@ -248,7 +250,7 @@ public class Bullet extends Entity {
 			bullet.addBounce();
 			return;
 		}
-		else if (collisiontype == Constants.ENTITYCOLLISION) {
+		else if (collisionType == Constants.ENTITYCOLLISION) {
 			if (object2 instanceof Ship) {
 				Ship ship = (Ship) object2;
 				

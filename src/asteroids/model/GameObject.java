@@ -34,5 +34,4 @@ public abstract class GameObject {
 	public int getType() {
 		return this.type;
 	}
-
 }

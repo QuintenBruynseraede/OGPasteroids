@@ -1,5 +1,7 @@
 package asteroids.model;
 
+import java.util.Random;
+
 import be.kuleuven.cs.som.annotate.Basic;
 
 public class Planetoid extends MinorPlanet {
@@ -52,6 +54,20 @@ public class Planetoid extends MinorPlanet {
 	 * @see implementation
 	 */
 	public void finalize() {
+		if (this.getWorld() != null && this.getRadius() >= 30) {
+			Random r = new Random();
+			double child1XVelocity = Math.random()*(9/4)*(this.getXVelocity()*this.getXVelocity()+this.getYVelocity()*this.getYVelocity());
+			double child1YVelocity = Math.sqrt((9/4)*(this.getXVelocity()*this.getXVelocity()+this.getYVelocity()*this.getYVelocity()) - child1XVelocity*child1XVelocity);
+			
+			
+			Asteroid a1 = new Asteroid(this.getXCoordinate() + this.getRadius()/2, this.getYCoordinate(), child1XVelocity, child1YVelocity, this.getRadius()/2);
+			Asteroid a2 = new Asteroid(this.getXCoordinate() - this.getRadius()/2, this.getYCoordinate(), -child1XVelocity, -child1YVelocity, this.getRadius()/2);
+			this.getWorld().addEntity(a1);
+			this.getWorld().addEntity(a2);
+			
+			a1.setWorld(this.getWorld());
+			a2.setWorld(this.getWorld());
+		}
 		this.finalized = true;
 	}
 

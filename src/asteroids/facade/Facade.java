@@ -206,7 +206,8 @@ public class Facade implements asteroids.part2.facade.IFacade {
 
 	@Override
 	public boolean isTerminatedBullet(Bullet bullet) throws ModelException {
-		if (bullet == null) throw new ModelException("Trying to terminate null bullet.");
+		if (bullet == null) 
+			return true;
 		return bullet.isFinalized();
 	}
 
@@ -418,7 +419,11 @@ public class Facade implements asteroids.part2.facade.IFacade {
 
 	@Override
 	public void evolve(World world, double dt, CollisionListener collisionListener) throws ModelException {
-		world.evolve(dt, collisionListener);
+		try {
+			world.evolve(dt, collisionListener);
+		} catch (IllegalArgumentException e) {
+			throw new ModelException(" ");
+		}
 		
 	}
 

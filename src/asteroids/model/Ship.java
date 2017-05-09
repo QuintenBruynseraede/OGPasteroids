@@ -2,6 +2,7 @@ package asteroids.model;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Random;
 
 import be.kuleuven.cs.som.annotate.Basic;
 
@@ -55,12 +56,13 @@ public class Ship extends Entity {
 		super(x, y, xVelocity, yVelocity, radius);
 		
 		setOrientation(orientation);
-		
-		if (massDensity < 1.42E12)
-			this.massDensity = 1.42E12;
+		if (massDensity < 1.42E12 || !Double.isFinite(massDensity) ) {
+			System.out.println("massDensity -> 1.42");
+			setMassDensity(1.42E12);
+		}
 		else
-			this.massDensity = massDensity;
-		
+			setMassDensity(massDensity);
+				
 		this.massShip = (4/3)*Math.PI*Math.pow(radius, 3)*massDensity;
 		
 		if (! isValidRadius(radius))  
@@ -261,13 +263,20 @@ public class Ship extends Entity {
 	 * @post	| bulletsLoaded.contains(bullet) == false
 	 */
 	public void removeBullet(Bullet bullet) {
-		for (Entity b : this.getWorld().getEntitiesOfType(Bullet.class)) {
-			if (b.equals(bullet)) {
-				bulletsLoaded.remove(b);
-				((Bullet) b).setLoaded(false);
-				return;
-			}
-		}
+		//for (Entity b : this.getWorld().getEntitiesOfType(Bullet.class)) {
+		//	if (b == bullet) {
+		//		bulletsLoaded.remove(b);
+		//		((Bullet) b).setLoaded(false);
+		//		return;
+		//	}
+		//}
+		
+		bulletsLoaded.remove(bullet);
+		bullet.setLoaded(false);
+		bullet.setWorld(null);
+		bullet.setParent(null);
+		
+		return;
 		
 	}
 	
@@ -376,8 +385,8 @@ public class Ship extends Entity {
 	}
 
 	@Override
-	public void collideWith(GameObject object2, int collisiontype) {
-		if (collisiontype == Constants.BOUNDARYCOLLISION) {
+	public void collideWith(GameObject object2, int collisionType) {
+		if (collisionType == Constants.BOUNDARYCOLLISION) {
 			Boundary boundary = (Boundary) object2;
 			
 			if (boundary.getBoundaryType() == Constants.BOTTOM || boundary.getBoundaryType() == Constants.TOP)
@@ -386,7 +395,7 @@ public class Ship extends Entity {
 				this.setXVelocity(-this.getXVelocity());
 			return;
 		}
-		else if (collisiontype == Constants.ENTITYCOLLISION) {
+		else if (collisionType == Constants.ENTITYCOLLISION) {
 			if (object2 instanceof Ship) {
 				Ship ship1 = this;
 				Ship ship2 = (Ship) object2;
@@ -421,17 +430,30 @@ public class Ship extends Entity {
 				b.collideWith(this, Constants.ENTITYCOLLISION);
 				return;
 			}
-			//TODO implement these collisions
 			if (object2 instanceof Asteroid) {
+				this.finalize();
 				return;
 			}
 			if (object2 instanceof Planetoid) {
+				this.teleport();
 				return;
 			}
 			
 		}
 		else
 			throw new IllegalArgumentException("Invalid Collision type");
+	}
+
+	private void teleport() {
+		Random r = new Random();
+
+		this.setXCoordinate(this.getRadius() + r.nextInt() % (this.getWorld().getWidth() - 2 * this.getRadius()));
+		this.setYCoordinate(this.getRadius() + r.nextInt() % (this.getWorld().getHeight() - 2 * this.getRadius()));
+		
+		for (Entity i : this.getWorld().getEntities()) {
+			if(i.overlap(this))
+				this.finalize();
+		}		
 	}
 	
 }

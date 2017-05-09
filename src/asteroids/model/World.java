@@ -325,12 +325,15 @@ public class World extends GameObject {
 				c = new Collision(objects[0], objects[1], pos[0], pos[1], time, type);
 				return c;
 			} catch (Exception e) {
+				/**
 				System.out.println(objects[0]);
 				System.out.println(objects[1]);
 				System.out.println(pos[0]);
 				System.out.println(pos[1]);
 				System.out.println(time);
 				System.out.println(type);
+				
+				*/
 				return null;
 			}
 			
@@ -363,7 +366,10 @@ public class World extends GameObject {
 	 * 			|	this.evolve(deltaTime - nextCollision.getTime())
 	 *
 	 */
-	public void evolve(double deltaTime, CollisionListener collisionListener) {
+	public void evolve(double deltaTime, CollisionListener collisionListener) throws IllegalArgumentException {
+		if (!Double.isFinite(deltaTime))
+			throw new IllegalArgumentException();
+		
 		Collision nextCollision = getNextCollisionData();
 		
 		if (nextCollision.getTime() > deltaTime) 

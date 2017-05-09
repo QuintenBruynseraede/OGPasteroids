@@ -56,13 +56,5 @@ public class Asteroid extends MinorPlanet {
 	@Override
 	public void advance(double deltaTime) {
 		move(deltaTime);
-	}
-
-	@Override
-	public void collideWith(GameObject object2, int collisiontype) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	
+	}	
 }

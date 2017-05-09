@@ -31,7 +31,7 @@ public class Part1And2Test {
   private static final double BIG_EPSILON = 1.0E14;
   private static final double VERY_BIG_EPSILON = 1.0E34;
 
-  static int nbStudentsInTeam;
+  static int nbStudentsInTeam = 2;
   IFacade facade;
   World filledWorld;
   Ship ship1, ship2, ship3;
@@ -1157,12 +1157,16 @@ public class Part1And2Test {
     Bullet bullet = facade.createBullet(100, 120, -10, 0, 20);
     facade.loadBulletOnShip(ship, bullet);
     facade.terminateBullet(bullet);
+
     assertTrue(facade.isTerminatedBullet(bullet));
     assertNull(facade.getBulletShip(bullet));
     assertTrue(facade.getBulletsOnShip(ship).isEmpty());
     score += 5;
   }
 
+  
+  
+  
   @Test
   public void testTerminateWorld() throws ModelException {
     max_score += 7;

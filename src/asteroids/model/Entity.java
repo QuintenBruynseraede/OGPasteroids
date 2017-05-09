@@ -71,7 +71,7 @@ public abstract class Entity extends GameObject {
 	void setXCoordinate(double x) throws IllegalArgumentException {
 		if (Double.isNaN(x) || Double.isInfinite(x))
 			throw new IllegalArgumentException("Non valid x");
-		if (isValidYCoordinate(y))
+		if (isValidXCoordinate(x))
 			this.x = x;
 					
 	}
@@ -162,7 +162,9 @@ public abstract class Entity extends GameObject {
 	 * 
 	 */
 	protected void setXVelocity(double xVelocity){
-		if (! isValidVelocity(xVelocity) && xVelocity < VELOCITYLOWERBOUND)
+		if (!Double.isFinite(xVelocity))
+			this.xVelocity = 0;
+		else if (! isValidVelocity(xVelocity) && xVelocity < VELOCITYLOWERBOUND)
 			this.xVelocity = VELOCITYLOWERBOUND;
 		else if(! isValidVelocity(xVelocity) && xVelocity > VELOCITYUPPERBOUND)
 			this.xVelocity = VELOCITYUPPERBOUND;
@@ -189,7 +191,9 @@ public abstract class Entity extends GameObject {
 	 * 
 	 */
 	protected void setYVelocity(double yVelocity){
-		if (! isValidVelocity(yVelocity) && yVelocity < VELOCITYLOWERBOUND)
+		if (!Double.isFinite(yVelocity))
+			this.yVelocity = 0;
+		else if (! isValidVelocity(yVelocity) && yVelocity < VELOCITYLOWERBOUND)
 			this.yVelocity = VELOCITYLOWERBOUND;
 		else if(! isValidVelocity(yVelocity) && yVelocity > VELOCITYUPPERBOUND)
 			this.yVelocity = VELOCITYUPPERBOUND;
@@ -208,7 +212,9 @@ public abstract class Entity extends GameObject {
 	 * 			| result == (velocity > this.velocityLowerBound && velocity < this.velocityUpperBound)
 	 */
 	private boolean isValidVelocity(double velocity) {
-		return ( velocity > VELOCITYLOWERBOUND && velocity < VELOCITYUPPERBOUND );
+		if  (!Double.isFinite(velocity))
+			return false;
+		return ( velocity > VELOCITYLOWERBOUND && velocity < VELOCITYUPPERBOUND);
 	}
 	
 	/**
@@ -457,8 +463,8 @@ public abstract class Entity extends GameObject {
 	public boolean overlap(Entity otherEntity) throws IllegalArgumentException {
 		if (otherEntity == null) 
 			throw new IllegalArgumentException("Invalid argument object (null).");
-		
-		if ( this.getDistanceBetween(otherEntity) > 0.99 * (this.getRadius()+otherEntity.getRadius())  && this.getDistanceBetween(otherEntity) < 1.01 * (this.getRadius()+otherEntity.getRadius()))
+		System.out.println(this.getDistanceBetween(otherEntity));
+		if ( this.getDistanceBetween(otherEntity) < 0.01)
 			return true;
 		else
 			return false;
@@ -525,6 +531,7 @@ public abstract class Entity extends GameObject {
 			
 			if ( this.overlap(otherEntity) ) {
 				double[] collision = {this.getXCoordinate(), this.getYCoordinate()};
+				System.out.println("HALOOOOOOOOOO:" + collision[0]);
 				return collision; 
 			}
 			
