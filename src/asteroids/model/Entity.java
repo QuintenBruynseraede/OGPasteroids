@@ -2,7 +2,7 @@ package asteroids.model;
 
 import be.kuleuven.cs.som.annotate.Basic;
 
-//TODO collisionPosition symmetrie
+//TODO collisionPosition symmetrie !!!!!!!!
 
 public abstract class Entity extends GameObject {
 	
@@ -279,9 +279,9 @@ public abstract class Entity extends GameObject {
 	 * 			| time < 0
 	 */
 	public void move(double time) throws IllegalArgumentException {
-		if (time < 0.01 && time > 0)
+		if (time < 0.000001 && time > -0.000001)
 			return;
-		if (time < 0)
+		if (time < -0.000001)
 			throw new IllegalArgumentException("Argument time must be positive");
 		else {
 			setXCoordinate(this.getXCoordinate() + time * this.getXVelocity());
@@ -531,8 +531,24 @@ public abstract class Entity extends GameObject {
 			if ( this.getTimeToCollision(otherEntity) == Double.POSITIVE_INFINITY)
 				return null;
 			
-			double collisionX = this.getXCoordinate() + this.getTimeToCollision(otherEntity) * this.getXVelocity()  + radius*(this.getXCoordinate()-otherEntity.getXCoordinate())/ (this.getRadius() + otherEntity.getRadius());
-			double collisionY = this.getYCoordinate() + this.getTimeToCollision(otherEntity) * this.getYVelocity()  + radius*(this.getYCoordinate()-otherEntity.getYCoordinate())/ (this.getRadius() + otherEntity.getRadius());
+			double collisionXSelf = this.getXCoordinate() + this.getTimeToCollision(otherEntity) * this.getXVelocity();
+			double collisionYSelf = this.getYCoordinate() + this.getTimeToCollision(otherEntity) * this.getYVelocity();
+
+			double collisionXOther = otherEntity.getXCoordinate() + otherEntity.getTimeToCollision(this) * otherEntity.getXVelocity();
+			double collisionYOther = otherEntity.getYCoordinate() + otherEntity.getTimeToCollision(this) * otherEntity.getYVelocity();
+			
+			double collisionX;
+			double collisionY;
+			
+			if (this.getXCoordinate() > otherEntity.getXCoordinate()) {
+				collisionX = collisionXSelf - Math.cos(Math.atan((collisionYOther - collisionYSelf) / (collisionXOther - collisionXSelf))) * radius;
+				collisionY = collisionYSelf - Math.sin(Math.atan((collisionYOther - collisionYSelf) / (collisionXOther - collisionXSelf))) * radius;
+				
+			}
+			else {
+				collisionX = collisionXSelf + Math.cos(Math.atan((collisionYOther - collisionYSelf) / (collisionXOther - collisionXSelf))) * radius;
+				collisionY = collisionYSelf + Math.sin(Math.atan((collisionYOther - collisionYSelf) / (collisionXOther - collisionXSelf))) * radius;
+			}
 			
 			double[] collision = {collisionX, collisionY};
 			return collision;
@@ -540,5 +556,10 @@ public abstract class Entity extends GameObject {
 	}
 
 	public abstract void advance(double deltaTime);
+
+	public abstract void collideWith(GameObject object2, int collisiontype);
 	
+	public abstract void finalize();
+	
+	public boolean finalized = false;
 }

@@ -4,16 +4,10 @@ OGP project: Asteroids
 Quinten Bruynseraede & Tom de Backer
 
 ## Cumulative working hours
-14/3 1 hour 45 minutes
+14/5 1 hour 45 minutes
 
-14/3 4 hours 30 minutes
+14/5 4 hours 30 minutes
 
-16/3 6 hours 30 minutes
+16/5 6 hours 30 minutes
 
-16/3 7 hours 30 minutes
-
-21/3 9 hours 55 minutes
-
-21/3 11 hours 45 minutes
-
-22/3 13 hours
+16/5 7 hours 30 minutes

@@ -185,10 +185,7 @@ public class Bullet extends Entity {
 		this.isLoaded = loaded;
 	}
 
-	/**
-	 * Variable representing whether this bullet has been finalized already.	
-	 */
-	private boolean finalized = false;
+	
 	
 	/**
 	 * Finalizes the bullet, preparing it to be removed by the garbage collector.
@@ -197,6 +194,7 @@ public class Bullet extends Entity {
 	 * @post	| new.isFinalized() == true
 	 * @see implementation
 	 */
+	@Override
 	public void finalize() {
 		
 		if (this.getParent() != null)
@@ -235,6 +233,45 @@ public class Bullet extends Entity {
 	@Override
 	public void advance(double deltaTime) {
 		move(deltaTime);
+	}
+
+	@Override
+	public void collideWith(GameObject object2, int collisiontype) throws IllegalArgumentException {
+		if (collisiontype == Constants.BOUNDARYCOLLISION) {
+			Boundary boundary = (Boundary) object2;
+			Bullet bullet = (Bullet) this;
+			
+			if (boundary.getBoundaryType() == Constants.BOTTOM || boundary.getBoundaryType() == Constants.TOP)
+				bullet.setYVelocity(-bullet.getYVelocity());
+			else 
+				bullet.setXVelocity(-bullet.getXVelocity());
+			bullet.addBounce();
+			return;
+		}
+		else if (collisiontype == Constants.ENTITYCOLLISION) {
+			if (object2 instanceof Ship) {
+				Ship ship = (Ship) object2;
+				
+				if (this.getParent() == ship) {
+					ship.bulletsLoaded.add(this);
+					this.setParent(ship);
+					
+				}
+				else {
+					ship.finalize();
+					this.finalize();	
+				}
+				return;
+			}
+			else {
+				this.finalize();
+				
+				Entity otherEntity = (Entity) object2;
+				otherEntity.finalize();
+			}
+		}
+		else
+			throw new IllegalArgumentException("Invalid gameObject type");
 	}
 	
 }

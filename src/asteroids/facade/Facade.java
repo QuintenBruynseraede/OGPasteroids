@@ -293,13 +293,13 @@ public class Facade implements asteroids.part2.facade.IFacade {
 	@Override
 	public Set<? extends Ship> getWorldShips(World world) throws ModelException {
 		if (world == null) throw new ModelException("Querying list of ships in null world");
-		return world.getShips();
+		return (Set<? extends Ship>) world.getEntitiesOfType(Ship.class);
 	}
 
 	@Override
 	public Set<? extends Bullet> getWorldBullets(World world) throws ModelException {
 		if (world == null) throw new ModelException("Querying list of bullets in null world");
-		return world.getBullets();
+		return (Set<? extends Bullet>) world.getEntitiesOfType(Bullet.class);
 	}
 
 	@Override
@@ -307,25 +307,34 @@ public class Facade implements asteroids.part2.facade.IFacade {
 		if (world == null) throw new ModelException("Null reference to world when adding ship to world");
 		if (ship == null) throw new ModelException("Null reference to ship when adding ship to world");
 		ship.setWorld(world);
-		world.addShip(ship);
+		world.addEntity(ship);
 	}
 
 	@Override
 	public void removeShipFromWorld(World world, Ship ship) throws ModelException {
 		if (world == null || ship == null) throw new ModelException("Null reference removing ship");
-		world.removeShip(ship);
+		try {
+			world.removeEntity(ship);
+			ship.setWorld(null);
+		} catch (IllegalArgumentException e) {
+			throw new ModelException(" ");
+		} catch (IllegalStateException e) {
+			throw new ModelException(" ");
+			
+		}
 	}
 
 	@Override
 	public void addBulletToWorld(World world, Bullet bullet) throws ModelException {
 		if (world == null || bullet == null) throw new ModelException("Null reference adding bullet");
 		bullet.setWorld(world);
+		world.addEntity(bullet);
 	}
 
 	@Override
 	public void removeBulletFromWorld(World world, Bullet bullet) throws ModelException {
 		if (world == null || bullet == null) throw new ModelException("Null reference removing bullet");
-		world.removeBullet(bullet);
+		world.removeEntity(bullet);
 	}
 
 	@Override

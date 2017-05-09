@@ -18,5 +18,9 @@ public abstract class MinorPlanet extends Entity {
 	}
 
 	
-	
+	@Override
+	public void finalize(){
+		this.getWorld().removeEntity(this);
+		this.finalized = true;
+	}
 }

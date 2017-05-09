@@ -378,7 +378,7 @@ public class World extends GameObject {
 			}
 			
 			resolveCollision(nextCollision);
-			advance(0.1);
+			advance(0.05);
 			evolve(deltaTime - nextCollision.getTime(), collisionListener);
 		}
 	}
@@ -426,10 +426,14 @@ public class World extends GameObject {
 	public void resolveCollision(Collision collision) throws IllegalStateException {
 		GameObject object1 = collision.getObject1();
 		GameObject object2 = collision.getObject2();
+		int collisiontype = collision.getType();
+		
 		
 		if (object1 == null || object2 == null) 
 			throw new IllegalStateException("This world does not have any collisions.");
 
+		((Entity) object1).collideWith(object2, collisiontype);
+		
 		if (object1 instanceof Ship && object2 instanceof Ship) {	
 			System.out.println("ship ship");
 			Ship ship1 = (Ship) object1;
