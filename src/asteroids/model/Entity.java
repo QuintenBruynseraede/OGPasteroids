@@ -2,7 +2,6 @@ package asteroids.model;
 
 import be.kuleuven.cs.som.annotate.Basic;
 
-//TODO collisionPosition symmetrie !!!!!!!!
 
 public abstract class Entity extends GameObject {
 	
@@ -69,7 +68,7 @@ public abstract class Entity extends GameObject {
 	 * 			| Double.isNaN(x) || Double.isInfinite(x)
 	 */
 	void setXCoordinate(double x) throws IllegalArgumentException {
-		if (Double.isNaN(x) || Double.isInfinite(x))
+		if (Double.isNaN(x))
 			throw new IllegalArgumentException("Non valid x");
 		if (isValidXCoordinate(x))
 			this.x = x;
@@ -87,7 +86,7 @@ public abstract class Entity extends GameObject {
 	 * 			| Double.isNaN(y) || Double.isInfinite(y)
 	 */
 	void setYCoordinate(double y) throws IllegalArgumentException {
-		if (Double.isNaN(y) || Double.isInfinite(y)) 
+		if (Double.isNaN(y)) 
 			throw new IllegalArgumentException("Non valid y");
 		if (isValidYCoordinate(y))
 			this.y = y;
@@ -463,7 +462,7 @@ public abstract class Entity extends GameObject {
 	public boolean overlap(Entity otherEntity) throws IllegalArgumentException {
 		if (otherEntity == null) 
 			throw new IllegalArgumentException("Invalid argument object (null).");
-		System.out.println(this.getDistanceBetween(otherEntity));
+		//System.out.println(this.getDistanceBetween(otherEntity));
 		if ( this.getDistanceBetween(otherEntity) < 0.01)
 			return true;
 		else
@@ -531,7 +530,7 @@ public abstract class Entity extends GameObject {
 			
 			if ( this.overlap(otherEntity) ) {
 				double[] collision = {this.getXCoordinate(), this.getYCoordinate()};
-				System.out.println("HALOOOOOOOOOO:" + collision[0]);
+				//System.out.println("HALOOOOOOOOOO:" + collision[0]);
 				return collision; 
 			}
 			

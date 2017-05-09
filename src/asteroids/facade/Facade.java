@@ -20,7 +20,7 @@ public class Facade implements asteroids.part2.facade.IFacade {
 	public Facade(){}
 	
 	
-	@Override
+	/**@Override
 	public Ship createShip(double x, double y, double xVelocity, double yVelocity, double radius, double orientation)
 			throws ModelException {
 		try {
@@ -32,6 +32,7 @@ public class Facade implements asteroids.part2.facade.IFacade {
 			throw new ModelException("Orientation invalid");
 		}
 	}
+	**/
 
 	@Override
 	public double[] getShipPosition(Ship ship) throws ModelException {
@@ -359,7 +360,11 @@ public class Facade implements asteroids.part2.facade.IFacade {
 	@Override
 	public void loadBulletsOnShip(Ship ship, Collection<Bullet> bullets) throws ModelException {
 		if (ship == null || bullets == null) throw new ModelException("Null reference adding bullets to ship");
-		ship.addBulletToLoaded(bullets);
+		try {
+			ship.addBulletToLoaded(bullets);
+		} catch (IllegalArgumentException e) {
+			throw new ModelException("");
+		}
 	}
 
 	@Override
@@ -384,8 +389,8 @@ public class Facade implements asteroids.part2.facade.IFacade {
 
 	@Override
 	public double[] getPositionCollisionBoundary(Object object) throws ModelException {
-		Entity e = (Entity) object;
-		return e.getCollisionPosition(e.getFirstCollisionBoundary());
+		Entity entity = (Entity) object;
+		return entity.getCollisionPosition(entity.getFirstCollisionBoundary());
 		
 	}
 
@@ -442,7 +447,7 @@ public class Facade implements asteroids.part2.facade.IFacade {
 	public Ship createShip(double x, double y, double xVelocity, double yVelocity, double radius, double direction,
 			double mass) throws ModelException {
 		try {
-			Ship ship1 = new Ship(x, y, xVelocity, yVelocity, radius, direction,  (3 * mass) / (4 * Math.PI * Math.pow(radius, 3)));
+			Ship ship1 = new Ship(x, y, xVelocity, yVelocity, radius, direction, mass);
 			return ship1;
 		} catch (IllegalArgumentException e) {
 			throw new ModelException("IllegalArgumentException thrown in createShip()");

@@ -45,7 +45,7 @@ public class Bullet extends Entity {
 	 */
 	public Bullet (double x, double y, double xVelocity, double yVelocity, double radius, Ship parent) {
 		super(x, y, xVelocity, yVelocity, radius);
-		this.mass = (4/3) * Math.PI * Math.pow(this.getRadius(), 3) * Bullet.MASSDENSITY;
+		this.mass = 4 * Math.PI * Math.pow(this.getRadius(), 3) * Bullet.MASSDENSITY / 3.0;
 		this.setParent(parent);	
 		
 		if (! isValidRadius(radius))  

@@ -11,7 +11,7 @@ import be.kuleuven.cs.som.annotate.Basic;
  *  
  * @author Tom De Backer and Quinten Bruynseraede
  */
-//TODO if the bullet’s initial position is already
+//TODO if the bullet's initial position is already
 // (partially) occupied by another entity, then the bullet immediately collides
 // with that entity
 
@@ -52,23 +52,26 @@ public class Ship extends Entity {
 	 * @post	The mass for this ship is set.
 	 * 			| new.massShip = (4/3)*Math.PI*Math.pow(radius, 3)*massDensity
 	 */
-	public Ship (double x, double y, double xVelocity, double yVelocity, double radius, double orientation, double massDensity) throws IllegalArgumentException {
+	public Ship (double x, double y, double xVelocity, double yVelocity, double radius, double orientation, double mass) throws IllegalArgumentException {
 		super(x, y, xVelocity, yVelocity, radius);
-		
 		setOrientation(orientation);
-		if (massDensity < 1.42E12 || !Double.isFinite(massDensity) ) {
-			System.out.println("massDensity -> 1.42");
-			setMassDensity(1.42E12);
-		}
-		else
-			setMassDensity(massDensity);
-				
-		this.massShip = (4/3)*Math.PI*Math.pow(radius, 3)*massDensity;
 		
 		if (! isValidRadius(radius))  
 			throw new IllegalArgumentException("Non valid radius when initializing ship");
 		this.radius = radius;
 		
+		if (Double.isNaN(mass) || Double.isInfinite(mass)) {
+			//System.out.println("Modified mass");
+			this.massShip = (4*Math.PI*Math.pow(radius, 3)*1.42E12)/3.0;
+		}
+		else {
+			double minimalMass = Math.PI * 4 / 3.0 * Math.pow(radius, 3) * 1.42E12;
+			if (mass < minimalMass)
+				this.massShip = (4.0*Math.PI*Math.pow(radius, 3)*1.42E12/3.0);
+			else
+				this.massShip = mass;
+			
+		}
 		
 	}
 	
@@ -178,6 +181,7 @@ public class Ship extends Entity {
 	 */
 	@Basic
 	public double getMassShip(){
+		//System.out.println("MassShip: " + massShip);
 		return this.massShip;
 	}
 	
@@ -196,20 +200,21 @@ public class Ship extends Entity {
 	/**
 	 * variable registering the mass density of this ship.
 	 */
-	private double massDensity;
+	//private double massDensity;
 	
 	/**
 	 * Returns the mass density of this ship.
 	 */
 	@Basic
 	public double getmassDensity(){
-		return this.massDensity;
+		return (3*this.getMassShip()/(4*Math.PI*Math.pow(this.getRadius(), 3)));
 	}
 	
-	public void setMassDensity(double massDensity) {
+	/**public void setMassDensity(double massDensity) {
 		this.massDensity = massDensity;
 		this.massShip = (4/3)*Math.PI*Math.pow(this.getRadius(), 3)*massDensity;
 	}
+	*/
 	
 	/**
 	 *  A HashSet registering the bullets that are currently loaded by this ship.
@@ -253,7 +258,10 @@ public class Ship extends Entity {
 	 * @see implementation
 	 */
 	public double getAcceleration() {
-		return THRUSTERFORCE / this.getMassTotal();
+		if (this.isThrusterEnabled())
+			return THRUSTERFORCE / this.getMassTotal();
+		else
+			return 0;
 	}
 	
 	/**
@@ -301,8 +309,10 @@ public class Ship extends Entity {
 	 * @post	| For each Bullet b in bullets
 	 * 			| 	b.getParent() == this
 	 */
-	public void addBulletToLoaded(Collection<Bullet> bullets) {
+	public void addBulletToLoaded(Collection<Bullet> bullets) throws IllegalArgumentException {
 		for (Bullet bullet : bullets) {
+			if (bullet == null)
+				throw new IllegalArgumentException("List of bullets contains null bullet");
 			if (! this.bulletsLoaded.contains(bullet)) {
 				bulletsLoaded.add(bullet);
 				bullet.setParent(this);
@@ -332,8 +342,8 @@ public class Ship extends Entity {
 		bullet.setYVelocity(FIRINGSPEED * Math.sin(getOrientation()));
 		
 		
-		bullet.setXCoordinate(this.getXCoordinate() + (this.getRadius() + bullet.getRadius() + 50) * Math.cos(this.getOrientation()));
-		bullet.setYCoordinate(this.getYCoordinate() + (this.getRadius() + bullet.getRadius() + 50) * Math.sin(this.getOrientation()));
+		bullet.setXCoordinate(this.getXCoordinate() + (this.getRadius() + bullet.getRadius()) * Math.cos(this.getOrientation()));
+		bullet.setYCoordinate(this.getYCoordinate() + (this.getRadius() + bullet.getRadius()) * Math.sin(this.getOrientation()));
 		
 	}
 	

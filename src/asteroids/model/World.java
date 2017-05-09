@@ -34,6 +34,14 @@ public class World extends GameObject {
 	 */
 	public World (double width, double height) {
 		super(Constants.WORLD);
+		
+		if (Double.isNaN(width) || Double.isNaN(height)) {
+			if (Double.isNaN(width))
+				width = 0;
+			if (Double.isNaN(height))
+				height = 0;
+		}
+		
 		if (width < 0 )
 			this.width = 0;
 		else if (width > WIDTHUPPERBOUND)
@@ -367,9 +375,11 @@ public class World extends GameObject {
 	 *
 	 */
 	public void evolve(double deltaTime, CollisionListener collisionListener) throws IllegalArgumentException {
-		if (!Double.isFinite(deltaTime))
+		if (!Double.isFinite(deltaTime)) {
+			System.out.println("Invalid deltaTime " + deltaTime);
 			throw new IllegalArgumentException();
-		
+		}
+					
 		Collision nextCollision = getNextCollisionData();
 		
 		if (nextCollision.getTime() > deltaTime) 
@@ -436,12 +446,12 @@ public class World extends GameObject {
 		
 		
 		if (object1 == null || object2 == null) 
-			throw new IllegalStateException("This world does not have any collisions.");
+			throw new IllegalStateException("This world does not have any collisions."); //getObjectsNextCollision returns [null, null] when no objects will ever collide in this world
 
 		((Entity) object1).collideWith(object2, collisiontype);
 		
 		if (object1 instanceof Ship && object2 instanceof Ship) {	
-			System.out.println("ship ship");
+			//System.out.println("ship ship");
 			Ship ship1 = (Ship) object1;
 			Ship ship2 = (Ship) object2;
 			 
@@ -472,7 +482,7 @@ public class World extends GameObject {
 		}
 		
 		if ((object1 instanceof Bullet && object2 instanceof Ship) || (object1 instanceof Ship && object2 instanceof Bullet)) {
-			System.out.println("bullet ship");
+			//System.out.println("bullet ship");
 
 			Bullet bullet = null;
 			Ship ship = null;
@@ -499,7 +509,7 @@ public class World extends GameObject {
 		}
 		
 		if (object1 instanceof Bullet && object2 instanceof Bullet) {
-			System.out.println("bullet bullet");
+			//System.out.println("bullet bullet");
 
 			Bullet bullet1 = (Bullet) object1;
 			Bullet bullet2 = (Bullet) object2;
@@ -512,7 +522,7 @@ public class World extends GameObject {
 		
 		
 		if (object1 instanceof Ship && object2 instanceof Boundary) {
-			System.out.println("ship boundary");
+			//System.out.println("ship boundary");
 
 			Boundary boundary = (Boundary) object2;
 			Ship ship = (Ship) object1;
@@ -525,7 +535,7 @@ public class World extends GameObject {
 		}
 		
 		if (object1 instanceof Bullet && object2 instanceof Boundary) {
-			System.out.println("bullet boundary");
+			//System.out.println("bullet boundary");
 
 			Boundary boundary = (Boundary) object2;
 			Bullet bullet = (Bullet) object1;
