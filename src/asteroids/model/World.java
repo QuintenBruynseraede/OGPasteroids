@@ -197,7 +197,12 @@ public class World extends GameObject {
 	 * 			| { entity1, entity2, ..., entityN | entityI.getWorld() = this}
 	 */
 	public Set<Entity> getEntities() {
-		return this.entities;
+		Set<Entity> copy = new HashSet<Entity>();
+		for (Entity e : entities) {
+			copy.add(e);
+		}
+		return copy;
+		
 	}
 	
 	/**
