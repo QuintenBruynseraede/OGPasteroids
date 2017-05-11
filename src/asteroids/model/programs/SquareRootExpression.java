@@ -1,5 +1,18 @@
 package asteroids.model.programs;
 
-public class SquareRootExpression {
+import asteroids.part3.programs.SourceLocation;
+
+public class SquareRootExpression extends Expression<Double> {
+	Expression<Double> expression;
+	
+	public SquareRootExpression(Expression<Double> e, SourceLocation sourceLocation) {
+		super(sourceLocation);
+		this.expression = e;
+	}
+
+	@Override
+	public Double eval() {
+		return Math.sqrt(expression.eval());
+	}
 
 }

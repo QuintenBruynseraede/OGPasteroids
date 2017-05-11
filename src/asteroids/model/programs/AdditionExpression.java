@@ -3,14 +3,16 @@ package asteroids.model.programs;
 
 
 import asteroids.model.Program;
+import asteroids.part3.programs.SourceLocation;
 import be.kuleuven.cs.som.annotate.Basic;
 
-public class AdditionExpression implements Expression<Double> {
+public class AdditionExpression extends Expression<Double> {
 	private Expression<Double> leftTerm;
 	private Expression<Double> rightTerm;
 	
 	
-	public AdditionExpression(Expression<Double> leftTerm, Expression<Double> rightTerm) {
+	public AdditionExpression(Expression<Double> leftTerm, Expression<Double> rightTerm, SourceLocation sourceLocation) {
+		super(sourceLocation);
 		setLeftTerm(leftTerm);
 		setRightTerm(rightTerm);
 	}
@@ -37,6 +39,6 @@ public class AdditionExpression implements Expression<Double> {
 
 	@Override
 	public Double eval() {
-		return ((Double) getLeftTerm().eval()).doubleValue() +  (((Double) getRightTerm().eval()).doubleValue());
+		return getLeftTerm().eval() + getRightTerm().eval();
 	}
 }

@@ -2,9 +2,9 @@ package asteroids.model;
 
 import java.util.List;
 
+import asteroids.model.programs.Expression;
 import asteroids.model.programs.Function;
 import asteroids.model.programs.Statement;
-import asteroids.model.programs.Variable;
 import asteroids.part3.programs.SourceLocation;
 import be.kuleuven.cs.som.annotate.Basic;
 
@@ -13,7 +13,7 @@ public class Program {
 	private double timeLeft;
 	private List<Function> functions;
 	private List<Object> returns;
-	private List<Variable> variables;
+	private List<Expression> variables;
 	private Statement main;
 	private SourceLocation sourceLocation = new SourceLocation(0, 0);
 	
@@ -62,5 +62,15 @@ public class Program {
 	@Basic
 	private void setFunctions(List<Function> functions) {
 		this.functions = functions;
+	}
+	
+	public Function getFunctionByName(String name) {
+		for (Function f : this.getFunctions()) {
+			if (f.getName() == name) {
+				return f;
+			}
+		}
+		//TODO map filter return
+		return null;
 	}
 }

@@ -3,12 +3,12 @@ package asteroids.model.programs;
 import asteroids.model.Entity;
 import asteroids.part3.programs.SourceLocation;
 
-public class EntityExpression extends Expression<Entity> {
+public class SelfExpression extends Expression<Entity> {
 	Entity entity;
 	
-	public EntityExpression(Entity e, SourceLocation sourceLocation) {
+	public SelfExpression(SourceLocation sourceLocation) {
 		super(sourceLocation);
-		this.setEntity(e);
+		this.setEntity(this.getStatement().getProgram().getShip());
 	}
 	
 	private void setEntity(Entity e) {
