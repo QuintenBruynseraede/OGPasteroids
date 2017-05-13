@@ -9,7 +9,6 @@ public class FireStatement extends Statement{
 
 	@Override
 	public void eval() {
-		// TODO Auto-generated method stub
-		
+		this.getProgram().getShip().fire();
 	}
 }

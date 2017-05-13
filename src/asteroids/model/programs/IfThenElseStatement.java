@@ -41,7 +41,16 @@ public class IfThenElseStatement extends Statement{
 
 	@Override
 	public void eval() {
-		// TODO Auto-generated method stub
+		boolean ex;
+		try {
+			ex = (boolean) condition.eval();
+		} catch (Exception e) {
+			throw new ClassCastException("Expression within if statement must evaluate to a boolean value");
+		}
 		
+		if (ex)
+			ifBody.eval();
+		else
+			elseBody.eval();
 	}
 }

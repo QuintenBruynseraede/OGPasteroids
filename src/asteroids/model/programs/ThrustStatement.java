@@ -13,8 +13,10 @@ public class ThrustStatement extends Statement {
 
 	@Override
 	public void eval() {
-		// TODO Auto-generated method stub
-		
+		if (state)
+			this.getProgram().getShip().thrustOn();
+		else
+			this.getProgram().getShip().thrustOff();
 	}
 
 	public Boolean getState() {

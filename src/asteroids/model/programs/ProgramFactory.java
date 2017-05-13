@@ -21,14 +21,12 @@ public class ProgramFactory implements IProgramFactory<Expression, Statement, Fu
 
 	@Override
 	public Statement createAssignmentStatement(String variableName, Expression value, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new AssignmentStatement(variableName, value, sourceLocation);
 	}
 
 	@Override
 	public Statement createWhileStatement(Expression condition, Statement body, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new WhileStatement(condition, body, sourceLocation);
 	}
 
 	@Override
@@ -46,20 +44,17 @@ public class ProgramFactory implements IProgramFactory<Expression, Statement, Fu
 	@Override
 	public Statement createIfStatement(Expression condition, Statement ifBody, Statement elseBody,
 			SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new IfThenElseStatement(condition, ifBody, elseBody, sourceLocation);
 	}
 
 	@Override
 	public Statement createPrintStatement(Expression value, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PrintStatement(value, sourceLocation);
 	}
 
 	@Override
 	public Statement createSequenceStatement(List<Statement> statements, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new BlockStatement(statements, sourceLocation);
 	}
 
 	@Override
@@ -193,32 +188,27 @@ public class ProgramFactory implements IProgramFactory<Expression, Statement, Fu
 
 	@Override
 	public Statement createThrustOnStatement(SourceLocation location) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ThrustStatement(location, true);
 	}
 
 	@Override
 	public Statement createThrustOffStatement(SourceLocation location) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ThrustStatement(location, false);
 	}
 
 	@Override
 	public Statement createFireStatement(SourceLocation location) {
-		// TODO Auto-generated method stub
-		return null;
+		return new FireStatement(location);
 	}
 
 	@Override
 	public Statement createTurnStatement(Expression angle, SourceLocation location) {
-		// TODO Auto-generated method stub
-		return null;
+		return new TurnStatement(angle, location);
 	}
 
 	@Override
 	public Statement createSkipStatement(SourceLocation location) {
-		// TODO Auto-generated method stub
-		return null;
+		return new SkipStatement(location);
 	}
 
 }

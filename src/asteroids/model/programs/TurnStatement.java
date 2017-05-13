@@ -20,7 +20,12 @@ public class TurnStatement extends Statement{
 
 	@Override
 	public void eval() {
-		// TODO Auto-generated method stub
-		
+		double a;
+		try {
+			a = (Double) angle.eval();
+		} catch (Exception e) {
+			throw new ClassCastException("Expression within while statement must evaluate to a boolean value");
+		}
+		this.getProgram().getShip().turn(a);
 	}
 }
