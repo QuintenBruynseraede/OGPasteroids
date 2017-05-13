@@ -8,7 +8,7 @@ import be.kuleuven.cs.som.annotate.Basic;
 public class Function<R> {
 	private Statement body;
 	private Program program;
-	private List<Expression> variables;
+	private List<Expression<?>> variables;
 	private String name;
 	
 	public Function(Statement body, String name) {
@@ -16,7 +16,7 @@ public class Function<R> {
 		this.setName(name);
 	}
 	
-	public R eval(){
+	public R eval(List<Expression> arguments){
 		return null;		
 	}
 	

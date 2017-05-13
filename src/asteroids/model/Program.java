@@ -1,6 +1,8 @@
 package asteroids.model;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import asteroids.model.programs.Expression;
 import asteroids.model.programs.Function;
@@ -13,14 +15,14 @@ public class Program {
 	private double timeLeft;
 	private List<Function> functions;
 	private List<Object> returns;
-	private List<Expression> variables;
+	private Map<Object, Expression<?>> variables = new HashMap<Object, Expression<?>>();
 	private Statement main;
 	private SourceLocation sourceLocation = new SourceLocation(0, 0);
 	
 	public Program(List<Function> functions, Statement main) {
 		setMain(main);
 		setFunctions(functions);
-	
+		
 	}
 	
 	public void loadOnShip(Ship ship) {
@@ -31,7 +33,7 @@ public class Program {
 		//this.sourceLocation = main.getSourceLocation();
 		//while (isValidsourceLocation(this.sourcelocation + 1 lijn))
 		//	statement.execute(sourcelocation + 1lijn)
-		return null;
+		return this.returns;
 	}
 	
 	@Basic
@@ -72,5 +74,17 @@ public class Program {
 		}
 		//TODO map filter return
 		return null;
+	}
+	
+	public void addReturnItem(Object o) {
+		this.returns.add(o);
+	}
+
+	public Map<Object, Expression<?>> getVariables() {
+		return variables;
+	}
+
+	public void addVariable(String varName, Expression<?> value) {
+		this.variables.put(varName, value);
 	}
 }

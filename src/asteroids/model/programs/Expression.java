@@ -10,7 +10,7 @@ public abstract class Expression<T> {
 		setStatement(statement);
 	}
 	
-	private void setStatement(Statement statement2) {
+	private void setStatement(Statement statement) {
 		this.statement = statement;
 		
 	}

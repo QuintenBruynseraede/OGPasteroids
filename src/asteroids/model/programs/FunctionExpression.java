@@ -1,18 +1,22 @@
 package asteroids.model.programs;
 
+import java.util.List;
+
 import asteroids.part3.programs.SourceLocation;
 
 public class FunctionExpression extends Expression {
-
-	public FunctionExpression(SourceLocation sourceLocation) {
+	private String name;
+	private List<Expression> arguments;
+	
+	public FunctionExpression(String functionName, List<Expression> actualArgs, SourceLocation sourceLocation) {
 		super(sourceLocation);
-		// TODO Auto-generated constructor stub
+		this.name = functionName;
+		this.arguments = actualArgs;
 	}
 
 	@Override
 	public Object eval() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.getStatement().getProgram().getFunctionByName(name).eval(arguments);
 	}
 	
 	

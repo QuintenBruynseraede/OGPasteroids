@@ -13,6 +13,8 @@ public abstract class Statement {
 		this.setSourceLocation(s);	
 	}
 	
+	public abstract void eval(); //TODO not sure about void
+		
 	@Basic
 	private void setSourceLocation(SourceLocation s) {
 		this.sourceLocation = s;

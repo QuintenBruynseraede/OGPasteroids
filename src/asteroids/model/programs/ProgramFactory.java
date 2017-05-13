@@ -168,7 +168,7 @@ public class ProgramFactory implements IProgramFactory<Expression, Statement, Fu
 
 	@Override
 	public Expression createEqualityExpression(Expression e1, Expression e2, SourceLocation location) {
-		return new IsEqualToExpression(); //TODO
+		return new IsEqualToExpression(location, e1, e2);
 	}
 
 	@Override
