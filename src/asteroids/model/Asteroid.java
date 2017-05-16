@@ -11,7 +11,7 @@ public class Asteroid extends MinorPlanet {
 	}
 
 	/**
-	 * variable registering the mass of an asteroid in kilogrammes. The mass can be calculated as m = (4/3)pi*radius^3*massDensity
+	 * Variable registering the mass of an asteroid in kilogrammes. The mass can be calculated as m = (4/3)pi*radius^3*massDensity
 	 */
 	private double mass;
 
@@ -35,24 +35,54 @@ public class Asteroid extends MinorPlanet {
 	public double getMassDensity() {
 		return Asteroid.MASSDENSITY;
 	}
-
+	
+	/**
+	 * 	Returns whether a given radius is valid for this Asteroid
+	 * 	@param	radius
+	 * 			The radius to check 
+	 *  @see 	implementation
+	 */
 	@Override
 	public boolean isValidRadius(double radius) {
 		return (radius >= this.getRadiusLowerBound());
 	}
 
+	/**
+	 * 	Sets the radius of this asteroid to a given radius
+	 *  @param	radius
+	 *  		The radius to check if valid
+	 *  @post	|this.radius = radius
+	 *  @throws	IllegalArgumentException
+	 *  		| !isValidRadius(radius)
+	 * 
+	 */
 	@Override
-	public void setRadius(double radius) {
+	public void setRadius(double radius) throws IllegalArgumentException {
 		if (! isValidRadius(radius))  
 			throw new IllegalArgumentException("Non valid radius when initializing bullet");
 		this.radius = radius;
 	}
 
+	/**
+	 * 	Returns the lower bound of this Asteroid
+	 * 	@returns	
+	 * 		| Asteroid.RADIUSLOWERBOUND
+	 */
 	@Override
 	public double getRadiusLowerBound() {
-		return 5;
+		return RADIUSLOWERBOUND;
 	}
+	
+	/**
+	 * 	The smallest radius an instance of the Asteroid class can have
+	 */
+	private static double RADIUSLOWERBOUND;
 
+	/**
+	 * 	Moves the Asteroid during a given time
+	 * 	@param 	deltaTime
+	 * 			The time during which the Asteroid is moved.
+	 */
 	@Override
 	public void advance(double deltaTime) {
 		move(deltaTime);

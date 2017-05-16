@@ -4,6 +4,7 @@ import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import asteroids.part2.CollisionListener;
 
@@ -181,13 +182,7 @@ public class World extends GameObject {
 	}
 	
 	public Set<? extends Entity> getEntitiesOfType(Class<? extends Entity> c) {
-		Set<Entity> result = new HashSet<Entity>();
-		
-		for (Entity e : this.getEntities()) {
-			if (e.getClass() == c)
-				result.add(e);	
-		}
-		return result;
+		return entities.stream().filter(p -> p.getClass() == c).collect(Collectors.toSet());
 	}
 	
 	/**
@@ -611,7 +606,7 @@ public class World extends GameObject {
 	}
 	
 	/**
-	 * A method prepares this world to be removed by the garbage collector.
+	 * A method that prepares this world to be removed by the garbage collector.
 	 * @see implementation
 	 */
 	public void finalize() {

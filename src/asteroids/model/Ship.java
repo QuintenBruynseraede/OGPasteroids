@@ -62,7 +62,9 @@ public class Ship extends Entity {
 		
 		if (Double.isNaN(mass) || Double.isInfinite(mass)) {
 			//System.out.println("Modified mass");
+
 			this.massShip = (4*Math.PI*Math.pow(radius, 3)*1.42E12)/3.0;
+			
 		}
 		else {
 			double minimalMass = Math.PI * 4 / 3.0 * Math.pow(radius, 3) * 1.42E12;
@@ -465,5 +467,4 @@ public class Ship extends Entity {
 				this.finalize();
 		}		
 	}
-	
 }

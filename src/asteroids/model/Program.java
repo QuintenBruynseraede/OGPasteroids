@@ -26,7 +26,12 @@ public class Program {
 	}
 	
 	public void loadOnShip(Ship ship) {
-		setShip(ship);
+		if (canLoadOnShip(ship))
+			setShip(ship);
+	}
+	
+	private boolean canLoadOnShip(Ship ship) {
+		return (ship != null);
 	}
 	
 	public List<Object> execute() {
@@ -47,7 +52,7 @@ public class Program {
 	}
 	
 	@Basic
-	public Statement getMain() {
+	public Statement getMainStatement() {
 		return this.main;
 	}
 	
@@ -62,12 +67,12 @@ public class Program {
 	}
 	
 	@Basic
-	private void setFunctions(List<Function> functions) {
-		this.functions = functions;
+	private void setFunctions(List<Function> functions2) {
+		this.functions = functions2;
 	}
 	
-	public Function getFunctionByName(String name) {
-		for (Function f : this.getFunctions()) {
+	public Function<?> getFunctionByName(String name) {
+		for (Function<?> f : this.getFunctions()) {
 			if (f.getName() == name) {
 				return f;
 			}

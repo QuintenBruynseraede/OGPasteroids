@@ -253,15 +253,30 @@ public abstract class Entity extends GameObject {
 	private World world = null;
 	
 	public void setWorld(World world) throws IllegalStateException {
-		if (this.getXCoordinate() < 0 || this.getXCoordinate() > world.WIDTHUPPERBOUND || this.getXCoordinate() < 0 || this.getYCoordinate() > world.HEIGHTUPPERBOUND)
-			throw new IllegalStateException("Ship's position is invalid the world it is being assigned to.");
-
+		if (!canHaveAsWorld(world))
+			throw new IllegalStateException("Invalid position in the world trying to assign this entity to.");
+		
+		
+		//If current world is null, don't try to remove 'this' from it
+		//If world is null, don't try to add anything to it
 		if (! (this.getWorld() == null || world == null)) {
 			this.getWorld().removeEntity(this);
 			world.addEntity(this);
 		}
-		
+
 		this.world = world;
+	}
+	
+	/**
+	 * 	Returns whether it is possible to set this Entity's world to the world specified as a parameter
+	 * 	@param 	world
+	 * 	@see implementation
+	 */
+	public boolean canHaveAsWorld(World world) {
+		return (this.getXCoordinate() >= 0 
+				&& this.getXCoordinate() < world.WIDTHUPPERBOUND 
+				&& this.getXCoordinate() >= 0 
+				&& this.getYCoordinate() < world.HEIGHTUPPERBOUND);
 	}
 	
 	/**
@@ -561,11 +576,32 @@ public abstract class Entity extends GameObject {
 		}
 	}
 
+	/**
+	 * 	Updates the entity based on a few parameters.
+	 * 	@param 	deltaTime
+	 * 			Time units to advance this entity.
+	 * 	@note	See implementation in subclass for specification.
+	 */
 	public abstract void advance(double deltaTime);
 
+	/**
+	 * 	Updates a few properties of this entity to simulate a collision with another object.
+	 * 	@param 	object2
+	 * 			Object to collide with.
+	 * 	@param 	collisiontype
+	 * 			Type of collision to simulate. Collision types are defined in constants.java.
+	 *  @note	See implementation in subclass for specification.
+	 */
 	public abstract void collideWith(GameObject object2, int collisiontype);
 	
+	/**
+	 * 	Prepares the instance to be removed by the Garbage Collector.
+	 * 	@note	See implementation in subclass for specification.
+	 */
 	public abstract void finalize();
 	
+	/**
+	 * 	Variable representing whether this entity has been finalized already.
+	 */
 	public boolean finalized = false;
 }
