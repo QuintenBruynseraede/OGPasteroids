@@ -7,7 +7,7 @@ import asteroids.part3.programs.SourceLocation;
 public class GetRadiusExpression extends Expression<Double> {
 	private Entity entity;
 	
-	public GetRadiusExpression(Expression<Entity> e, SourceLocation sourceLocation) {
+	public GetRadiusExpression(Expression<Entity> e, SourceLocation sourceLocation) throws Exception {
 		super(sourceLocation);
 		setEntity(e.eval());
 		

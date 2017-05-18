@@ -1,5 +1,7 @@
 package asteroids.model.programs;
 
+import java.util.List;
+
 import asteroids.part3.programs.SourceLocation;
 
 public class AssignmentStatement extends Statement {
@@ -30,8 +32,14 @@ public class AssignmentStatement extends Statement {
 
 	@Override
 	public void eval() {
+		this.setLastStatement();
 		//TODO doesn't check whether this variable exists already.
 		this.getProgram().addVariable(variableName, value);
+	}
+
+	@Override
+	public void addStatementsToList(List<Statement> statements) {
+		statements.add(this);
 	}
 	
 	

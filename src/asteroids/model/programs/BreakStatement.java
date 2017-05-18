@@ -1,5 +1,7 @@
 package asteroids.model.programs;
 
+import java.util.List;
+
 import asteroids.part3.programs.SourceLocation;
 
 public class BreakStatement extends Statement {
@@ -10,6 +12,12 @@ public class BreakStatement extends Statement {
 
 	@Override
 	public void eval() {
-				ERROR ERROR ERROR
+		this.setLastStatement();
+		throw new BreakException();
+	}
+
+	@Override
+	public void addStatementsToList(List<Statement> statements) {
+		statements.add(this);
 	}
 }

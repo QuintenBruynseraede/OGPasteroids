@@ -21,8 +21,15 @@ public class BlockStatement extends Statement{
 	}
 
 	@Override
-	public void eval() {
+	public void eval() throws Exception {
 		for (Statement s : statements)
 			s.eval();
+	}
+
+	@Override
+	public void addStatementsToList(List<Statement> listStatements) {
+		for (Statement s : getStatements()) {
+			s.addStatementsToList(listStatements);
+		}
 	}
 }

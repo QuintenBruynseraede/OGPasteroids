@@ -1,5 +1,7 @@
 package asteroids.model.programs;
 
+import java.util.List;
+
 import asteroids.part3.programs.SourceLocation;
 
 public class WhileStatement extends Statement {
@@ -29,7 +31,8 @@ public class WhileStatement extends Statement {
 	}
 
 	@Override
-	public void eval() {
+	public void eval() throws Exception {
+		this.setLastStatement();
 		boolean ex;
 		try {
 			ex = (boolean) condition.eval();
@@ -37,13 +40,21 @@ public class WhileStatement extends Statement {
 			throw new ClassCastException("Expression within while statement must evaluate to a boolean value");
 		}
 		while(ex) {
-			body.eval();
-			
+			try {
+				body.eval();
+			} catch (BreakException e1) {
+				break;
+			}
 			try {
 				ex = (boolean) condition.eval();
 			} catch (Exception e) {
 				throw new ClassCastException("Expression within while statement must evaluate to a boolean value");
 			}
 		}
+	}
+
+	@Override
+	public void addStatementsToList(List<Statement> statements) {
+		statements.add(this);
 	}
 }

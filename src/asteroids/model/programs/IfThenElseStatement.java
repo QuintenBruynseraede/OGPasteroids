@@ -1,5 +1,7 @@
 package asteroids.model.programs;
 
+import java.util.List;
+
 import asteroids.part3.programs.SourceLocation;
 
 public class IfThenElseStatement extends Statement{
@@ -13,6 +15,7 @@ public class IfThenElseStatement extends Statement{
 		setCondition(condition);
 		setIfBody(ifBody);
 		setElseBody(elseBody);	
+		
 	}
 
 	public Expression getCondition() {
@@ -40,7 +43,7 @@ public class IfThenElseStatement extends Statement{
 	}
 
 	@Override
-	public void eval() {
+	public void eval() throws Exception {
 		boolean ex;
 		try {
 			ex = (boolean) condition.eval();
@@ -48,9 +51,21 @@ public class IfThenElseStatement extends Statement{
 			throw new ClassCastException("Expression within if statement must evaluate to a boolean value");
 		}
 		
-		if (ex)
+		if (ex) {
+			ifBody.addStatementsToList(this.getProgram().getStatementList());
+			this.getProgram().getStatementList().remove(elseBody);
 			ifBody.eval();
-		else
+		}
+		else {
+			elseBody.addStatementsToList(this.getProgram().getStatementList());
+			this.getProgram().getStatementList().remove(ifBody);
 			elseBody.eval();
+		}
+	}
+
+	@Override
+	public void addStatementsToList(List<Statement> statements) {
+		statements.add(ifBody);
+		statements.add(elseBody);
 	}
 }

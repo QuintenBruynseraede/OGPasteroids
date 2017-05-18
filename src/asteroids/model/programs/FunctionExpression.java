@@ -15,8 +15,14 @@ public class FunctionExpression extends Expression {
 	}
 
 	@Override
-	public Object eval() {
-		return this.getStatement().getProgram().getFunctionByName(name).eval(arguments);
+	public Object eval()  {
+		try {
+			return this.getStatement().getProgram().getFunctionByName(name).eval(arguments);
+		} catch (Exception e) {
+			//Won't happen, as Exceptions are only thrown by actionstatements, and functions can not contain actions statements.
+			//To make Java happy, we return null, but this will never happen.
+			return null;
+		}
 	}
 	
 	

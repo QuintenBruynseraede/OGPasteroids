@@ -1,5 +1,7 @@
 package asteroids.model.programs;
 
+import java.util.List;
+
 import asteroids.part3.programs.SourceLocation;
 
 public class ReturnStatement extends Statement{
@@ -12,14 +14,24 @@ public class ReturnStatement extends Statement{
 
 	@Override
 	public void eval() {
-		
+		//
+	}
+	
+	public Expression<?> evaluate() {
+		this.setLastStatement();
+		return (Expression<?>) value.eval();
 	}
 
 	public Expression getValue() {
 		return value;
 	}
-			ffff
+	
 	public void setValue(Expression value) {
 		this.value = value;
+	}
+
+	@Override
+	public void addStatementsToList(List<Statement> statements) {
+		statements.add(this);
 	}
 }

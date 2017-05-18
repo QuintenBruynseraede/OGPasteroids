@@ -1,12 +1,16 @@
 package asteroids.model;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import asteroids.model.programs.Expression;
 import asteroids.model.programs.Function;
+import asteroids.model.programs.OutOfTimeException;
 import asteroids.model.programs.Statement;
+import asteroids.model.programs.Variable;
 import asteroids.part3.programs.SourceLocation;
 import be.kuleuven.cs.som.annotate.Basic;
 
@@ -15,14 +19,22 @@ public class Program {
 	private double timeLeft;
 	private List<Function> functions;
 	private List<Object> returns;
-	private Map<Object, Expression<?>> variables = new HashMap<Object, Expression<?>>();
+	private List<Variable> globalVariables;
 	private Statement main;
 	private SourceLocation sourceLocation = new SourceLocation(0, 0);
+	private Statement lastExecutedStatement;
+	private List<Statement> statements;
+	private boolean hasBeenExecuted;
+	/**
+	 * 	Expresses the name of the function that is being executed right now. 
+	 * 	Holds a value of null is this program is currently not executing any function. 
+	 */
+	private Function currentFunction = null;
 	
 	public Program(List<Function> functions, Statement main) {
 		setMain(main);
 		setFunctions(functions);
-		
+		main.addStatementsToList(statements);
 	}
 	
 	public void loadOnShip(Ship ship) {
@@ -34,11 +46,28 @@ public class Program {
 		return (ship != null);
 	}
 	
-	public List<Object> execute() {
-		//this.sourceLocation = main.getSourceLocation();
-		//while (isValidsourceLocation(this.sourcelocation + 1 lijn))
-		//	statement.execute(sourcelocation + 1lijn)
-		return this.returns;
+	public List<Object> execute(double time) {
+		this.timeLeft = time;
+		//main.eval();
+		int start = (hasBeenExecuted? this.statements.indexOf(lastExecutedStatement)+1 : 0);
+		
+		Iterator<Statement> i = statements.iterator();
+		
+		for(; start>1;--start) {
+			i.next();
+		}
+		
+		
+		while(i.hasNext()) {
+			try {
+				i.next().eval();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				//e.printStackTrace();
+			}
+		
+		}
+		return returns;
 	}
 	
 	@Basic
@@ -71,25 +100,58 @@ public class Program {
 		this.functions = functions2;
 	}
 	
-	public Function<?> getFunctionByName(String name) {
-		for (Function<?> f : this.getFunctions()) {
-			if (f.getName() == name) {
-				return f;
-			}
-		}
-		//TODO map filter return
-		return null;
+	public Function getFunctionByName(String name) {
+		return this.getFunctions().stream().filter(f -> f.getName().equals(name)).collect(Collectors.toList()).get(0);
+		//The collected list will always contain just one element, thus taking the first element yields the correct result.
 	}
 	
 	public void addReturnItem(Object o) {
 		this.returns.add(o);
 	}
 
-	public Map<Object, Expression<?>> getVariables() {
-		return variables;
+	
+	public Function getCurrentFunction() {
+		return this.currentFunction;
+	}
+	
+	public void setCurrentFunction(Function func) {
+		this.currentFunction = func;
+	}
+	
+	public void addVariable(String varName, Expression value) {
+		this.globalVariables.add(new Variable(varName, value));
+	}
+	public Object getVariableValue(String varName) {
+		for (Variable v : this.getVariables()) {
+			if (v.getName().equals(varName))
+				return v.eval();
+		}
+		throw new IllegalArgumentException("Non-existent variable.");
+	}
+	
+	public List<Variable> getVariables() {
+		return this.globalVariables;
+	}
+	
+	public double getTimeLeft() {
+		return this.timeLeft;
+	}
+	
+	public void setTimeLeft(double time) {
+		this.timeLeft = time;
 	}
 
-	public void addVariable(String varName, Expression<?> value) {
-		this.variables.put(varName, value);
+	public List<Statement> getStatementList() {
+		return this.statements;
 	}
+
+	public Statement getLastExecutedStatement() {
+		return lastExecutedStatement;
+	}
+
+	public void setLastExecutedStatement(Statement lastExecutedStatement) {
+		this.lastExecutedStatement = lastExecutedStatement;
+	}
+	
+	
 }

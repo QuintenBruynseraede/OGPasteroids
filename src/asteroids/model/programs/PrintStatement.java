@@ -1,5 +1,7 @@
 package asteroids.model.programs;
 
+import java.util.List;
+
 import asteroids.part3.programs.SourceLocation;
 
 public class PrintStatement extends Statement {
@@ -19,9 +21,15 @@ public class PrintStatement extends Statement {
 	}
 
 	@Override
-	public void eval() {
+	public void eval() throws Exception {
+		this.setLastStatement();
 		System.out.println(value.eval());
 		this.getProgram().addReturnItem(value.eval());
 		
+	}
+
+	@Override
+	public void addStatementsToList(List<Statement> statements) {
+		statements.add(this);
 	}
 }
