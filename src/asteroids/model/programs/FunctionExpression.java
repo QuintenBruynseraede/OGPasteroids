@@ -20,7 +20,7 @@ public class FunctionExpression extends Expression {
 			return this.getStatement().getProgram().getFunctionByName(name).eval(arguments);
 		} catch (Exception e) {
 			//Won't happen, as Exceptions are only thrown by actionstatements, and functions can not contain actions statements.
-			//To make Java happy, we return null, but this will never happen.
+			//To make Java happy, we return null.
 			return null;
 		}
 	}

@@ -6,7 +6,7 @@ import asteroids.part3.programs.SourceLocation;
 public class GetXExpression extends Expression<Double> {
 	Entity entity;
 	
-	public GetXExpression(Expression<Entity> e, SourceLocation sourceLocation) throws Exception {
+	public GetXExpression(Expression<Entity> e, SourceLocation sourceLocation) {
 		super(sourceLocation);
 		this.entity = e.eval();
 	}

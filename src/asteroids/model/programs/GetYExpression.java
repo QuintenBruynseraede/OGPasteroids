@@ -6,7 +6,7 @@ import asteroids.part3.programs.SourceLocation;
 public class GetYExpression extends Expression<Double> {
 	Entity entity;
 	
-	public GetYExpression(Expression<Entity> e, SourceLocation sourceLocation) throws Exception {
+	public GetYExpression(Expression<Entity> e, SourceLocation sourceLocation) {
 		super(sourceLocation);
 		this.entity = e.eval();
 	}

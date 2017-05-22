@@ -2,6 +2,8 @@ package asteroids.facade;
 
 import asteroids.model.Ship;
 import asteroids.model.World;
+import asteroids.model.*;
+import asteroids.model.programs.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -158,7 +160,7 @@ public class Facade implements asteroids.part3.facade.IFacade {
 	@Override
 	public boolean isTerminatedShip(Ship ship) throws ModelException {
 		if (ship == null) throw new ModelException("Trying to terminate null ship.");
-		return ship.isTerminated();
+		return ship.isFinalized();
 		
 	}
 
@@ -464,49 +466,44 @@ public class Facade implements asteroids.part3.facade.IFacade {
 
 	@Override
 	public int getNbStudentsInTeam() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 2;
 	}
 
 
 	@Override
 	public Set<? extends Asteroid> getWorldAsteroids(World world) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return (Set<? extends Asteroid>) world.getEntitiesOfType(Asteroid.class);
 	}
 
 
 	@Override
 	public void addAsteroidToWorld(World world, Asteroid asteroid) throws ModelException {
-		// TODO Auto-generated method stub
-		
+		world.addEntity(asteroid);
 	}
 
 
 	@Override
 	public void removeAsteroidFromWorld(World world, Asteroid asteroid) throws ModelException {
-		// TODO Auto-generated method stub
-		
+		world.removeEntity(asteroid);
 	}
 
 
 	@Override
 	public Set<? extends Planetoid> getWorldPlanetoids(World world) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return (Set<? extends Planetoid>) world.getEntitiesOfType(Planetoid.class);
 	}
 
 
 	@Override
 	public void addPlanetoidToWorld(World world, Planetoid planetoid) throws ModelException {
-		// TODO Auto-generated method stub
+		world.addEntity(planetoid);
 		
 	}
 
 
 	@Override
 	public void removePlanetoidFromWorld(World world, Planetoid planetoid) throws ModelException {
-		// TODO Auto-generated method stub
+		world.removeEntity(planetoid);
 		
 	}
 
@@ -514,149 +511,130 @@ public class Facade implements asteroids.part3.facade.IFacade {
 	@Override
 	public Asteroid createAsteroid(double x, double y, double xVelocity, double yVelocity, double radius)
 			throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return new Asteroid(x,y, xVelocity, yVelocity, radius);
 	}
 
 
 	@Override
 	public void terminateAsteroid(Asteroid asteroid) throws ModelException {
-		// TODO Auto-generated method stub
-		
+		asteroid.finalize();
 	}
 
 
 	@Override
 	public boolean isTerminatedAsteroid(Asteroid asteroid) throws ModelException {
-		// TODO Auto-generated method stub
-		return false;
+		return asteroid.isFinalized();
 	}
 
 
 	@Override
 	public double[] getAsteroidPosition(Asteroid asteroid) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return new double[] {asteroid.getXCoordinate(), asteroid.getYCoordinate()};
 	}
 
 
 	@Override
 	public double[] getAsteroidVelocity(Asteroid asteroid) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return new double[] {asteroid.getXVelocity(), asteroid.getYVelocity()};
 	}
 
 
 	@Override
 	public double getAsteroidRadius(Asteroid asteroid) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		return asteroid.getRadius();
 	}
 
 
 	@Override
 	public double getAsteroidMass(Asteroid asteroid) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		return asteroid.getMass();
 	}
 
 
 	@Override
 	public World getAsteroidWorld(Asteroid asteroid) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return asteroid.getWorld();
 	}
 
 
 	@Override
 	public Planetoid createPlanetoid(double x, double y, double xVelocity, double yVelocity, double radius,
 			double totalTraveledDistance) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		Planetoid p = new Planetoid(x, y, xVelocity, yVelocity, radius);
+		p.addToDistanceTravelled(totalTraveledDistance);
+		return p;
 	}
 
 
 	@Override
 	public void terminatePlanetoid(Planetoid planetoid) throws ModelException {
-		// TODO Auto-generated method stub
-		
+		planetoid.finalize();
 	}
 
 
 	@Override
 	public boolean isTerminatedPlanetoid(Planetoid planetoid) throws ModelException {
-		// TODO Auto-generated method stub
-		return false;
+		return planetoid.isFinalized();
 	}
 
 
 	@Override
 	public double[] getPlanetoidPosition(Planetoid planetoid) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return new double[] {planetoid.getXCoordinate(), planetoid.getYCoordinate()};
 	}
 
 
 	@Override
 	public double[] getPlanetoidVelocity(Planetoid planetoid) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return new double[] {planetoid.getXVelocity(), planetoid.getYVelocity()};
 	}
 
 
 	@Override
 	public double getPlanetoidRadius(Planetoid planetoid) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		return planetoid.getRadius();
 	}
 
 
 	@Override
 	public double getPlanetoidMass(Planetoid planetoid) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		return planetoid.getMass();
 	}
 
 
 	@Override
 	public double getPlanetoidTotalTraveledDistance(Planetoid planetoid) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		return planetoid.getDistanceTravelled();
 	}
 
 
 	@Override
 	public World getPlanetoidWorld(Planetoid planetoid) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return planetoid.getWorld();
 	}
 
 
 	@Override
 	public Program getShipProgram(Ship ship) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return ship.getProgramLoaded();
 	}
 
 
 	@Override
 	public void loadProgramOnShip(Ship ship, Program program) throws ModelException {
-		// TODO Auto-generated method stub
-		
+		ship.setProgramLoaded(program);
 	}
 
 
 	@Override
 	public List<Object> executeProgram(Ship ship, double dt) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return ship.executeProgram(dt);
 	}
 
 
 	@Override
 	public IProgramFactory<?, ?, ?, ? extends Program> createProgramFactory() throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return new ProgramFactory();
 	}
 
 

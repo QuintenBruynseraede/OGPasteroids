@@ -2,6 +2,7 @@ package asteroids.model;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 import be.kuleuven.cs.som.annotate.Basic;
@@ -367,9 +368,9 @@ public class Ship extends Entity {
 		this.finalized = true;
 	}
 	
-	public boolean isTerminated() {
-		return this.finalized;
-	}
+	//public boolean isTerminated() {
+	//	return this.finalized;
+	//}
 
 	@Override
 	public boolean isValidRadius(double radius) {
@@ -466,5 +467,37 @@ public class Ship extends Entity {
 			if(i.overlap(this))
 				this.finalize();
 		}		
+	}
+	
+	/**
+	 * 	Variable holding the program this ship has currently loaded. A null value means no program is loaded at the moment.
+	 */
+	private Program program = null;
+	
+	/**
+	 * 	Loads a program on this ship.
+	 */
+	@Basic
+	public void setProgramLoaded(Program program) {
+		this.program = program;
+	}
+	
+	/**
+	 * 	Return the program loaded on this ship
+	 */
+	@Basic
+	public Program getProgramLoaded() {
+		return this.program;
+	}
+	
+	/**
+	 * 	Executes the program loaded on this ship
+	 * 
+	 */
+	
+	public List<Object> executeProgram(double dt) throws IllegalStateException {
+		List<Object> r = this.getProgramLoaded().execute(dt);
+		System.out.println(r);
+		return r;
 	}
 }

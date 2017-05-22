@@ -101,9 +101,9 @@ public class Bullet extends Entity {
 			this.getParent().removeBullet(this);
 			*/
 		if (ship == null)
-			this.isLoaded = false;
+			this.setLoaded(false);
 		else
-			this.isLoaded = true;
+			this.setLoaded(true);
 		this.parent = ship;
 		
 	}
@@ -210,9 +210,9 @@ public class Bullet extends Entity {
 	 * Returns whether this bullet has been finalized.
 	 */
 	@Basic
-	public boolean isFinalized() {
-		return this.finalized;
-	}
+	//public boolean isFinalized() {
+	//	return this.finalized;
+	//}
 
 	@Override
 	public boolean isValidRadius(double radius) {

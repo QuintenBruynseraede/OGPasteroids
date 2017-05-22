@@ -603,5 +603,9 @@ public abstract class Entity extends GameObject {
 	/**
 	 * 	Variable representing whether this entity has been finalized already.
 	 */
-	public boolean finalized = false;
+	protected boolean finalized = false;
+	
+	public boolean isFinalized() {
+		return this.finalized;
+	}
 }

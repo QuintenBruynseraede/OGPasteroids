@@ -5,6 +5,7 @@ import java.util.List;
 import java.lang.Character;
 
 import asteroids.model.Program;
+import asteroids.part3.programs.SourceLocation;
 import be.kuleuven.cs.som.annotate.Basic;
 
 public class Function {
@@ -13,8 +14,9 @@ public class Function {
 	private List<Variable> variables;
 	private String name;
 	private List<Expression> arguments;
+	private SourceLocation sourceLocation;
 	
-	public Function(Statement body, String name) throws Exception {
+	public Function(Statement body, String name, SourceLocation sourceLocation) throws Exception {
 		if (body instanceof BlockStatement) {
 			List<Statement> statements = ((BlockStatement) body).getStatements();
 			Iterator <Statement> i = statements.iterator();
@@ -41,6 +43,7 @@ public class Function {
 		
 		this.setBody(body);
 		this.setName(name);
+		this.sourceLocation = sourceLocation;
 	}
 	
 	public Expression eval(List<Expression> arguments) throws Exception{

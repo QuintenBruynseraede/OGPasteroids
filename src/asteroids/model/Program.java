@@ -101,8 +101,15 @@ public class Program {
 	}
 	
 	public Function getFunctionByName(String name) {
-		return this.getFunctions().stream().filter(f -> f.getName().equals(name)).collect(Collectors.toList()).get(0);
+		List<Function> result = getFunctions().stream().filter(f -> f.getName().equals(name)).collect(Collectors.toList());
+
+		if (result.isEmpty()) 
+			return null;
+		return result.get(0);
+		
+		
 		//The collected list will always contain just one element, thus taking the first element yields the correct result.
+	
 	}
 	
 	public void addReturnItem(Object o) {

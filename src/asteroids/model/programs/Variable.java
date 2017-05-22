@@ -10,7 +10,7 @@ public class Variable<T> {
 	}
 	
 	public T eval(){
-		return (T) this.expression.eval();	
+		return (T) this.expression.eval();		
 	}
 
 	public String getName() {

@@ -10,6 +10,11 @@ public class Asteroid extends MinorPlanet {
 
 	}
 
+	public Asteroid() {
+		super(100, 100, 0, 0, 30);
+		this.mass = (4/3) * Math.PI * Math.pow(this.getRadius(), 3) * Asteroid.MASSDENSITY;
+	}
+
 	/**
 	 * Variable registering the mass of an asteroid in kilogrammes. The mass can be calculated as m = (4/3)pi*radius^3*massDensity
 	 */
@@ -76,7 +81,7 @@ public class Asteroid extends MinorPlanet {
 	/**
 	 * 	The smallest radius an instance of the Asteroid class can have
 	 */
-	private static double RADIUSLOWERBOUND;
+	private static double RADIUSLOWERBOUND = 5;
 
 	/**
 	 * 	Moves the Asteroid during a given time
