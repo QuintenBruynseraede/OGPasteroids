@@ -6,6 +6,7 @@ import be.kuleuven.cs.som.annotate.Basic;
 public abstract class Entity extends GameObject {
 	
 	/**
+	 * 	Abstract class containing an entity.
 	 * 
 	 * @param 	x
 	 * 			The X coordinate for this new entity.
@@ -16,10 +17,42 @@ public abstract class Entity extends GameObject {
 	 * @param 	yVelocity
 	 * 			The velocity in the y direction of this new entity.
 	 * @param 	radius
-	 * 			The radius for this enw entity.	 * 
+	 * 			The radius for this entity.	 * 
 	 * @throws	IllegalArgumentException
-	 * 			The given radius is not a valid radius for this bullet.
+	 * 			The given radius is not a valid radius for this entity.
 	 * 			| ! isValidRadius(radius)
+	 * 
+	 * @throws	IllegalArgumentException
+	 * 			|!isValidXCoordinate(x)
+	 * 
+	 * @throws	IllegalArgumentException
+	 * 			|!isValidYCoordinate(y)
+	 * 
+	 * @post	|new.getXCoordinate() == x
+	 * 
+	 * @post	|new.getYCoordinate() == y
+	 * @post	| if (!isValidVelocity(xVelocity) &&  xVelocity < VELOCITYLOWERBOUND)
+	 * 			|	new.getXVelocity() == VELOCITYLOWERBOUND
+	 * 			| else if(!isValidVelocity(xVelocity) &&  xVelocity > VELOCITYUPPERBOUND)
+	 * 			|	new.getXVelocity() == VELOCITYUPPERBOUND
+	 * 
+	 * @post	| if (!isValidVelocity(yVelocity) &&  yVelocity < VELOCITYLOWERBOUND)
+	 * 			|	new.getYVelocity() == VELOCITYLOWERBOUND
+	 * 			| else if(!isValidVelocity(yVelocity) &&  yVelocity > VELOCITYUPPERBOUND)
+	 * 			|	new.getYVelocity() == VELOCITYUPPERBOUND
+	 * 
+	 * @invar	The radius of this entity will always be a valid radius.
+	 * 			| isValidRadius(this.getRadius())
+	 * @invar	The X Velocity of this entity will always be a valid velocity
+	 * 			| isValidVelocity(this.getXVelocity())
+	 * @invar	The Y Velocity of this entity will always be a valid velocity
+	 * 			| isValidVelocity(this.getYVelocity())
+	 * @invar	The world this entity is associated with will always be a proper world
+	 * 			| canHaveAsWorld(this.getWorld())
+	 * @invar	The X position of this entity will always be a valid position in the current world
+	 * 			| isValidXCoordinate(this.getXCoordinate())
+	 * @invar	The Y position of this entity will always be a valid position in the current world
+	 * 			| isValidYCoordinate(this.getYCoordinate())
 	 */
 	public Entity(double x, double y, double xVelocity, double yVelocity, double radius) throws IllegalArgumentException {
 		super(Constants.ENTITY);
@@ -67,12 +100,11 @@ public abstract class Entity extends GameObject {
 	 * 			The given x coordinate is not a valid coordinate for a entity.
 	 * 			| Double.isNaN(x) || Double.isInfinite(x)
 	 */
-	void setXCoordinate(double x) throws IllegalArgumentException {
+	protected void setXCoordinate(double x) throws IllegalArgumentException {
 		if (Double.isNaN(x))
 			throw new IllegalArgumentException("Non valid x");
 		if (isValidXCoordinate(x))
-			this.x = x;
-					
+			this.x = x;			
 	}
 	
 	
@@ -85,7 +117,7 @@ public abstract class Entity extends GameObject {
 	 * 			The given y coordinate is not a valid coordinate for a entity.
 	 * 			| Double.isNaN(y) || Double.isInfinite(y)
 	 */
-	void setYCoordinate(double y) throws IllegalArgumentException {
+	protected void setYCoordinate(double y) throws IllegalArgumentException {
 		if (Double.isNaN(y)) 
 			throw new IllegalArgumentException("Non valid y");
 		if (isValidYCoordinate(y))
@@ -98,7 +130,7 @@ public abstract class Entity extends GameObject {
 	 * 			The x coordinate
 	 * @see implementation
 	 */
-	boolean isValidXCoordinate(double x) {
+	private boolean isValidXCoordinate(double x) {
 		if (this.getWorld() == null)
 			return true;
 		return (x < this.getWorld().getWidth() && x >= 0);
@@ -110,7 +142,7 @@ public abstract class Entity extends GameObject {
 	 * 			The y coordinate	
 	 * @see implementation
 	 */
-	boolean isValidYCoordinate(double y) {
+	private boolean isValidYCoordinate(double y) {
 		if (this.getWorld() == null)
 			return true;
 		return (y < this.getWorld().getHeight() && y >= 0);
@@ -200,7 +232,14 @@ public abstract class Entity extends GameObject {
 			this.yVelocity = yVelocity;
 	}
 	
+	/**
+	 * Constant holding the highest possible velocity for an Entity object
+	 */
 	protected final static double VELOCITYLOWERBOUND = -300000;
+	
+	/**
+	 * Constant holding the lowest possible velocity for an Entity object
+	 */
 	protected final static double VELOCITYUPPERBOUND = 300000;
 	
 	/**
@@ -252,13 +291,33 @@ public abstract class Entity extends GameObject {
 	 */
 	private World world = null;
 	
+	/**
+	 * 	Sets the world this entity is associated with.
+	 * 	@param world
+	 * 		The world this entity is to be associated with.
+	 * 	@throws IllegalStateException
+	 * 		| !canHaveAsWorld(world)
+	 * 	@post
+	 * 		The new world for this entity is set.
+	 * 		| new.getWorld() == world
+	 * 		This entity is removed from a previous world
+	 * 		| old.getWorld().removeEntity(this)
+	 * 		This entity is added to the new world
+	 * 		| new.getWorld().getEntitiesOfType(this.getClass()).contains(this) == true
+	 *  
+	 *  @note 	To allow the user to 'reset' this association, providing null as 
+	 *  		an argument is allowed. In this case, the last two post-conditions
+	 *  		are not executed, to prevent NullPointerExceptions.
+	 */
 	public void setWorld(World world) throws IllegalStateException {
 		if (!canHaveAsWorld(world))
 			throw new IllegalStateException("Invalid position in the world trying to assign this entity to.");
 		
 		
 		//If current world is null, don't try to remove 'this' from it
-		//If world is null, don't try to add anything to it
+		//If world is null, don't try to add anything to it\
+		//This allows us to provide 'null' as an argument in case we want to 
+		//undo the association for this entity.
 		if (! (this.getWorld() == null || world == null)) {
 			this.getWorld().removeEntity(this);
 			world.addEntity(this);
@@ -274,9 +333,9 @@ public abstract class Entity extends GameObject {
 	 */
 	public boolean canHaveAsWorld(World world) {
 		return (this.getXCoordinate() >= 0 
-				&& this.getXCoordinate() < world.WIDTHUPPERBOUND 
+				&& this.getXCoordinate() < World.WIDTHUPPERBOUND 
 				&& this.getXCoordinate() >= 0 
-				&& this.getYCoordinate() < world.HEIGHTUPPERBOUND);
+				&& this.getYCoordinate() < World.HEIGHTUPPERBOUND);
 	}
 	
 	/**
@@ -605,6 +664,11 @@ public abstract class Entity extends GameObject {
 	 */
 	protected boolean finalized = false;
 	
+	
+	/**
+	 * 	Returns whether this entity has been finalized already.
+	 */
+	@Basic
 	public boolean isFinalized() {
 		return this.finalized;
 	}

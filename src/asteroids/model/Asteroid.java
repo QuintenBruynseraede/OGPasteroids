@@ -4,10 +4,23 @@ import be.kuleuven.cs.som.annotate.Basic;
 
 public class Asteroid extends MinorPlanet {
 
+	/**
+	 * 	Class containing an Asteroid
+	 * 	@param 	x
+	 * 			The x position for this Asteroid.
+	 * 	@param 	y
+	 * 			The y position for this Asteroid.
+	 * 	@param 	xVelocity
+	 * 			The x velocity for this Asteroid.
+	 * 	@param 	yVelocity
+	 * 			The y velocity for this Asteroid.
+	 * 	@param 	radius
+	 * 			The radius for this Asteroid.
+	 *  @post	
+	 */
 	public Asteroid(double x, double y, double xVelocity, double yVelocity, double radius) {
 		super(x, y, xVelocity, yVelocity, radius);
 		this.mass = (4/3) * Math.PI * Math.pow(this.getRadius(), 3) * Asteroid.MASSDENSITY;
-
 	}
 
 	public Asteroid() {

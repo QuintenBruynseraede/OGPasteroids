@@ -597,6 +597,7 @@ public class World extends GameObject {
 	 */
 	private boolean finalized = false;
 	
+	
 	/**
 	 * Returns whether this world is finalized.
 	 */
@@ -604,6 +605,7 @@ public class World extends GameObject {
 	public boolean isFinalized() {
 		return this.finalized;
 	}
+	
 	
 	/**
 	 * A method that prepares this world to be removed by the garbage collector.

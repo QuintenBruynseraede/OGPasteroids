@@ -623,6 +623,7 @@ public class Facade implements asteroids.part3.facade.IFacade {
 	@Override
 	public void loadProgramOnShip(Ship ship, Program program) throws ModelException {
 		ship.setProgramLoaded(program);
+		program.loadOnShip(ship);
 	}
 
 

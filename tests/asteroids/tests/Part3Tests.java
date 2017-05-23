@@ -2,15 +2,19 @@ package asteroids.tests;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import asteroids.model.Asteroid;
 import asteroids.model.Bullet;
+import asteroids.model.Program;
 import asteroids.model.Ship;
 import asteroids.model.World;
 import asteroids.facade.Facade;
 import asteroids.part2.facade.IFacade;
+import asteroids.part3.programs.internal.ProgramParser;
 import asteroids.util.ModelException;
 
 public class Part3Tests {
@@ -42,4 +46,16 @@ public class Part3Tests {
 	    assertTrue(world.getEntitiesOfType(Ship.class).contains(ship));
 	    assertEquals(world.getEntitiesOfType(Ship.class).size(), 1);
 	}
+	
+	@Test
+	public void TestGetY_LegalCase() throws ModelException {
+	    max_score += 3;
+	    String code = "print 5; ";
+	    Program program = ProgramParser.parseProgramFromString(code, programFactory);
+	    System.out.println(program.toString());
+	    System.out.println(program == null);
+	    facade.loadProgramOnShip(ship1, program);
+	    List<Object> results = facade.executeProgram(ship1, 1.0);
+	    System.out.println(results.size());
+	  }
 }

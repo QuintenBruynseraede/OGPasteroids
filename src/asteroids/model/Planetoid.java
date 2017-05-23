@@ -4,6 +4,11 @@ import java.util.Random;
 
 import be.kuleuven.cs.som.annotate.Basic;
 
+/**
+ * 	Class 
+ * @author quinten
+ *
+ */
 public class Planetoid extends MinorPlanet {
 	
 	public Planetoid(double x, double y, double xVelocity, double yVelocity, double radius) {

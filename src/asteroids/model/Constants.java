@@ -1,7 +1,8 @@
 package asteroids.model;
 
 /**
-* Class containing the game's basic constants in a readable way. Class-specific constants are defined in their respective class
+* 	Class containing the game's basic constants in a readable way. 
+* 	Class-specific constants are defined in their respective class
 **/
 public abstract class Constants {
 	/*

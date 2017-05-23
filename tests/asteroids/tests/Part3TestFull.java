@@ -34,7 +34,7 @@ public class Part3TestFull {
   private static final double BIG_EPSILON = 1.0E14;
   private static final double VERY_BIG_EPSILON = 1.0E34;
 
-  static int nbStudentsInTeam;
+  static int nbStudentsInTeam = 2;
   IFacade facade;
   IProgramFactory<?, ?, ?, Program> programFactory = new ProgramFactory();
   World filledWorld;
