@@ -2,6 +2,7 @@ package asteroids.model.programs;
 
 import java.util.List;
 
+import asteroids.model.Program;
 import asteroids.part3.programs.SourceLocation;
 
 public class WhileStatement extends Statement {
@@ -12,6 +13,7 @@ public class WhileStatement extends Statement {
 		super(sourceLocation);
 		setBody(body);
 		setCondition(condition);
+		condition.setStatement(this);
 	}
 
 	public Statement getBody() {
@@ -56,5 +58,11 @@ public class WhileStatement extends Statement {
 	@Override
 	public void addStatementsToList(List<Statement> statements) {
 		statements.add(this);
+	}
+	
+	@Override
+	public void setProgram(Program program) {
+		this.program = program;
+		this.body.setProgram(program);
 	}
 }

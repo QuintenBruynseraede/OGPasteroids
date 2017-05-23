@@ -105,4 +105,9 @@ public class Asteroid extends MinorPlanet {
 	public void advance(double deltaTime) {
 		move(deltaTime);
 	}	
+	
+	@Override
+	public String toString() {
+		return "[Asteroid] " + this;
+	}
 }

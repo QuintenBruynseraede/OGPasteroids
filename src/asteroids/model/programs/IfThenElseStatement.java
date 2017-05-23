@@ -2,6 +2,7 @@ package asteroids.model.programs;
 
 import java.util.List;
 
+import asteroids.model.Program;
 import asteroids.part3.programs.SourceLocation;
 
 public class IfThenElseStatement extends Statement{
@@ -15,7 +16,7 @@ public class IfThenElseStatement extends Statement{
 		setCondition(condition);
 		setIfBody(ifBody);
 		setElseBody(elseBody);	
-		
+		condition.setStatement(this);
 	}
 
 	public Expression getCondition() {
@@ -67,5 +68,11 @@ public class IfThenElseStatement extends Statement{
 	public void addStatementsToList(List<Statement> statements) {
 		statements.add(ifBody);
 		statements.add(elseBody);
+	}
+	
+	public void setProgram(Program program) {
+		this.program = program;
+		this.getIfBody().setProgram(program);
+		this.getElseBody().setProgram(program);
 	}
 }

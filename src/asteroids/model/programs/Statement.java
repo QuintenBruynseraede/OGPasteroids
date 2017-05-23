@@ -9,7 +9,7 @@ import be.kuleuven.cs.som.annotate.Basic;
 public abstract class Statement {
 	private double timeToExecute;
 	private SourceLocation sourceLocation = new SourceLocation(0, 0);
-	private Program program;
+	protected Program program;
 	
 	public Statement(SourceLocation s) {
 		this.setSourceLocation(s);	
@@ -29,7 +29,7 @@ public abstract class Statement {
 	}
 	
 	@Basic
-	private void setProgram(Program program) {
+	public void setProgram(Program program) {
 		this.program = program;
 	}
 	

@@ -618,4 +618,9 @@ public class World extends GameObject {
 		entities.clear();
 		this.finalized = true;
 	}
+	
+	@Override
+	public String toString() {
+		return "[World] " + this;
+	}
 }

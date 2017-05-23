@@ -6,7 +6,7 @@ import be.kuleuven.cs.som.annotate.Basic;
 
 /**
  * 	Class 
- * @author quinten
+ * 
  *
  */
 public class Planetoid extends MinorPlanet {
@@ -38,6 +38,7 @@ public class Planetoid extends MinorPlanet {
 	 * variable registering the mass density of an asteroid in kilogrammes 
 	 */
 	private static final double MASSDENSITY = 0.917E12;
+	private static final double RADIUSLOWERBOUND = 5;
 	
 	/**
 	 * Returns the mass density of this planetoid.
@@ -99,8 +100,11 @@ public class Planetoid extends MinorPlanet {
 
 	@Override
 	public double getRadiusLowerBound() {
-		return 5;
+		return RADIUSLOWERBOUND;
 	}
+	
+	
+	
 
 	/**
 	 * Variable registering the initial radius of a planetoid.	
@@ -148,6 +152,9 @@ public class Planetoid extends MinorPlanet {
 		this.setRadius(this.getInitialRadius() - 1E-6*this.getDistanceTravelled());
 	}
 	
-	
+	@Override
+	public String toString() {
+		return "[Planetoid] " + this;
+	}
 	
 }

@@ -12,6 +12,7 @@ public class AssignmentStatement extends Statement {
 		super(sourceLocation);
 		setValue(value);
 		setVariableName(variableName);
+		value.setStatement(this);
 	}
 
 	public Expression<?> getValue() {

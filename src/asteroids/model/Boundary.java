@@ -29,5 +29,9 @@ public class Boundary extends GameObject {
 		return this.boundaryType;
 	}
 	
+	@Override
+	public String toString() {
+		return "[Boundary] " + this;
+	}
 }
 

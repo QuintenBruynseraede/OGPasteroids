@@ -276,4 +276,9 @@ public class Bullet extends Entity {
 			throw new IllegalArgumentException("Invalid gameObject type");
 	}
 	
+	@Override
+	public String toString() {
+		return "[Bullet] " + this;
+	}
+	
 }

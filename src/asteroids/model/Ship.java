@@ -500,4 +500,9 @@ public class Ship extends Entity {
 		System.out.println(r);
 		return r;
 	}
+	
+	@Override
+	public String toString() {
+		return "[Ship] " + this;
+	}
 }

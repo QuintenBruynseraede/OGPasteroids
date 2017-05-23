@@ -2,6 +2,7 @@ package asteroids.model.programs;
 
 import java.util.List;
 
+import asteroids.model.Program;
 import asteroids.part3.programs.SourceLocation;
 
 public class BlockStatement extends Statement{
@@ -30,6 +31,14 @@ public class BlockStatement extends Statement{
 	public void addStatementsToList(List<Statement> listStatements) {
 		for (Statement s : getStatements()) {
 			s.addStatementsToList(listStatements);
+		}
+	}
+	
+	public void setProgram(Program program) {
+		this.program = program;
+		
+		for (Statement s : getStatements()) {
+			s.setProgram(this.getProgram());
 		}
 	}
 }

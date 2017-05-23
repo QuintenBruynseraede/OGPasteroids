@@ -81,4 +81,9 @@ public abstract class MinorPlanet extends Entity {
 				throw new IllegalArgumentException("undefined collision in MinorPlanet.java");
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return "[MinorPlanet] " + this;
+	}
 }

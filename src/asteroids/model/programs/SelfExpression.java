@@ -8,7 +8,6 @@ public class SelfExpression extends Expression<Entity> {
 	
 	public SelfExpression(SourceLocation sourceLocation) {
 		super(sourceLocation);
-		this.setEntity(this.getStatement().getProgram().getShip());
 	}
 	
 	private void setEntity(Entity e) {
@@ -21,7 +20,7 @@ public class SelfExpression extends Expression<Entity> {
 
 	@Override
 	public Entity eval() {
-		return this.entity;
+		return (this.getStatement().getProgram().getShip());
 	}
 
 }

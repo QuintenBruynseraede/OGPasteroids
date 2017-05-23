@@ -10,6 +10,7 @@ public class PrintStatement extends Statement {
 	public PrintStatement(Expression value, SourceLocation sourceLocation) {
 		super(sourceLocation);
 		setValue(value);
+		value.setStatement(this);
 	}
 
 	public Expression getValue() {

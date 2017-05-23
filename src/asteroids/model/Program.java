@@ -1,5 +1,6 @@
 package asteroids.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -18,12 +19,12 @@ public class Program {
 	private Ship ship;
 	private double timeLeft;
 	private List<Function> functions;
-	private List<Object> returns;
+	private List<Object> returns = new ArrayList<Object>();
 	private List<Variable> globalVariables;
 	private Statement main;
 	private SourceLocation sourceLocation = new SourceLocation(0, 0);
 	private Statement lastExecutedStatement;
-	private List<Statement> statements;
+	private List<Statement> statements = new ArrayList<Statement>();
 	private boolean hasBeenExecuted;
 	/**
 	 * 	Expresses the name of the function that is being executed right now. 
@@ -35,6 +36,7 @@ public class Program {
 		setMain(main);
 		setFunctions(functions);
 		main.addStatementsToList(statements);
+		main.setProgram(this);
 	}
 	
 	public void loadOnShip(Ship ship) {
@@ -134,6 +136,8 @@ public class Program {
 				return v.eval();
 		}
 		throw new IllegalArgumentException("Non-existent variable.");
+		
+		//TODO: functional programming
 	}
 	
 	public List<Variable> getVariables() {

@@ -10,6 +10,7 @@ public class ReturnStatement extends Statement{
 	public ReturnStatement (Expression value, SourceLocation sourceLocation) {
 		super(sourceLocation);
 		setValue(value);
+		value.setStatement(this);
 	}
 
 	@Override

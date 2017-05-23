@@ -2,12 +2,25 @@ package asteroids.model;
 
 import be.kuleuven.cs.som.annotate.Basic;
 
-
+/**
+* Abstract class containing an entity.
+* 
+* @invar	The radius of this entity will always be a valid radius.
+* 			| isValidRadius(this.getRadius())
+* @invar	The X Velocity of this entity will always be a valid velocity
+* 			| isValidVelocity(this.getXVelocity())
+* @invar	The Y Velocity of this entity will always be a valid velocity
+* 			| isValidVelocity(this.getYVelocity())
+* @invar	The world this entity is associated with will always be a proper world
+* 			| canHaveAsWorld(this.getWorld())
+* @invar	The X position of this entity will always be a valid position in the current world
+* 			| isValidXCoordinate(this.getXCoordinate())
+* @invar	The Y position of this entity will always be a valid position in the current world
+* 			| isValidYCoordinate(this.getYCoordinate())
+*/
 public abstract class Entity extends GameObject {
 	
 	/**
-	 * 	Abstract class containing an entity.
-	 * 
 	 * @param 	x
 	 * 			The X coordinate for this new entity.
 	 * @param 	y
@@ -41,18 +54,6 @@ public abstract class Entity extends GameObject {
 	 * 			| else if(!isValidVelocity(yVelocity) &&  yVelocity > VELOCITYUPPERBOUND)
 	 * 			|	new.getYVelocity() == VELOCITYUPPERBOUND
 	 * 
-	 * @invar	The radius of this entity will always be a valid radius.
-	 * 			| isValidRadius(this.getRadius())
-	 * @invar	The X Velocity of this entity will always be a valid velocity
-	 * 			| isValidVelocity(this.getXVelocity())
-	 * @invar	The Y Velocity of this entity will always be a valid velocity
-	 * 			| isValidVelocity(this.getYVelocity())
-	 * @invar	The world this entity is associated with will always be a proper world
-	 * 			| canHaveAsWorld(this.getWorld())
-	 * @invar	The X position of this entity will always be a valid position in the current world
-	 * 			| isValidXCoordinate(this.getXCoordinate())
-	 * @invar	The Y position of this entity will always be a valid position in the current world
-	 * 			| isValidYCoordinate(this.getYCoordinate())
 	 */
 	public Entity(double x, double y, double xVelocity, double yVelocity, double radius) throws IllegalArgumentException {
 		super(Constants.ENTITY);
@@ -106,7 +107,6 @@ public abstract class Entity extends GameObject {
 		if (isValidXCoordinate(x))
 			this.x = x;			
 	}
-	
 	
 	/**
 	 * 
@@ -604,7 +604,6 @@ public abstract class Entity extends GameObject {
 			
 			if ( this.overlap(otherEntity) ) {
 				double[] collision = {this.getXCoordinate(), this.getYCoordinate()};
-				//System.out.println("HALOOOOOOOOOO:" + collision[0]);
 				return collision; 
 			}
 			
@@ -671,5 +670,10 @@ public abstract class Entity extends GameObject {
 	@Basic
 	public boolean isFinalized() {
 		return this.finalized;
+	}
+	
+	@Override
+	public String toString() {
+		return "[Entity] " + this;
 	}
 }
