@@ -16,7 +16,7 @@ public abstract class GameObject {
 	* @param 	type
 	* 			The GameObject's type. GameObject types are defined in Constants.java
 	**/
-	public GameObject(int type) {
+	protected GameObject(int type) {
 		this.type = type;
 	}
 	
@@ -35,6 +35,11 @@ public abstract class GameObject {
 		return this.type;
 	}
 	
+	/**
+	 * Returns a string representation of a gameObject.
+	 * 
+	 * @return	A string representation of a gameObject.
+	 */
 	public String toString() {
 		return "[GameObject] " + this;
 	}

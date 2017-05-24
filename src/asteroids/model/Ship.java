@@ -6,18 +6,26 @@ import java.util.List;
 import java.util.Random;
 
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  *  A class of ships with some properties.
  *  
  * @author Tom De Backer and Quinten Bruynseraede
+ * 
+ * @invar	The orientation of this ship is always a valid orientation for a ship.
+ * 			| isValidOrientation(getOrientation())
+ * @invar	The radius of this ship is always a valid radius for a ship.
+ * 			| isValidRadius(getRadius())
+ * @invar	The mass density of this ship is always greater than the minimum mass density specified.
+ * 			| this.massDensity >= 1.42E12
+ * @invar	The mass of a ship is always at least equal to the minimum mass for a certain radius.
+ * 			| this.massShip >= 4.0*Math.PI*Math.pow(radius, 3)*1.42E12/3.0
  */
-//TODO if the bullet's initial position is already
-// (partially) occupied by another entity, then the bullet immediately collides
-// with that entity
+
 
 public class Ship extends Entity {
-	
+
 	/**
 	 * 
 	 * Initialize a new ship with given x and y coordinate.
@@ -36,23 +44,24 @@ public class Ship extends Entity {
 	 * 			The orientation for this new ship.
 	 * @param	massDensity
 	 * 			The massDensity for this new ship.
-	 * @post   	The X coordinate of this new ship is equal to the given X coordinate.
-	 *       	| new.getXCoordinate() == x
-	 * @post   	The Y coordinate of this new ship is equal to the given Y coordinate.
-	 *       	| new.getYCoordinate() == y
-	 * @post   	The x velocity of this new ship is equal to the given X velocity.
-	 *       	| new.getXVelocity() == xVelocity
-	 * @post   	The Y velocity of this new ship is equal to the given Y velocity.
-	 *       	| new.getYVelocity() == yVelocity
-	 * @post	The radius of this new ship is set to the given radius if valid, or a predefined lower bound otherwise.
-	 * 			| new.getRadius() == max(Ship.RADIUSLOWERBOUND, radius)
+	 * @effect	Initializes this Ship as an Entity with a position, velocity and radius.
+	 * 			| super(x, y, xVelocity, yVelocity, radius)
 	 * @post	The orientation of this ship is set to the given orientation.
 	 *			| new.orientation == this.orientation
 	 * @post	The massdensity for this ship is set.
 	 * 			| new.massDensity = max(massDensity, 1.42E12)
-	 * @post	The mass for this ship is set.
-	 * 			| new.massShip = (4/3)*Math.PI*Math.pow(radius, 3)*massDensity
+	 * 
+	 * @post	If the provided mass for this ship is not a valid double value, a default value is applied.
+	 * 			| if (Double.isNaN(mass) || Double.isInfinite(mass)) 
+	 * 			| 	new.massShip = (4/3)*Math.PI*Math.pow(radius, 3)*massDensity
+	 * @post	If the provided mass is too small (assuming a ship has a minimum mass density of 1.42E12 kg/m^3),
+	 * 			the minimum possible value is applied.
+	 * 			| if (mass < Math.PI * 4 / 3.0 * Math.pow(radius, 3) * 1.42E12)
+	 *			| 	this.massShip = (4.0*Math.PI*Math.pow(radius, 3)*1.42E12/3.0);
+	 * @post	If the two other cases don't apply, set the mass to the provided value.
+	 * 			| this.massShip  = mass;
 	 */
+	@Raw
 	public Ship (double x, double y, double xVelocity, double yVelocity, double radius, double orientation, double mass) throws IllegalArgumentException {
 		super(x, y, xVelocity, yVelocity, radius);
 		setOrientation(orientation);
@@ -61,12 +70,9 @@ public class Ship extends Entity {
 			throw new IllegalArgumentException("Non valid radius when initializing ship");
 		this.radius = radius;
 		
-		if (Double.isNaN(mass) || Double.isInfinite(mass)) {
-			//System.out.println("Modified mass");
-
+		if (Double.isNaN(mass) || Double.isInfinite(mass)) 
 			this.massShip = (4*Math.PI*Math.pow(radius, 3)*1.42E12)/3.0;
 			
-		}
 		else {
 			double minimalMass = Math.PI * 4 / 3.0 * Math.pow(radius, 3) * 1.42E12;
 			if (mass < minimalMass)
@@ -90,6 +96,7 @@ public class Ship extends Entity {
 	 * @return	True if and only if the orientation is greater than or equal to 0 and lower than pi.
 	 * 			| result == orientation >= 0 && orientation < 2 * Math.PI
 	 */
+	@Raw
 	public boolean isValidOrientation(double orientation) {
 		return (orientation >= 0 && orientation < 2 * Math.PI);
 	}
@@ -102,6 +109,7 @@ public class Ship extends Entity {
 	 * @post	The new orientation of the ship is equal to the given argument orientation.
 	 * 			| new.orientation = orientation
 	 */
+	@Raw
 	private void setOrientation(double orientation) {
 		assert isValidOrientation(orientation);
 		this.orientation = orientation;
@@ -184,7 +192,6 @@ public class Ship extends Entity {
 	 */
 	@Basic
 	public double getMassShip(){
-		//System.out.println("MassShip: " + massShip);
 		return this.massShip;
 	}
 	
@@ -201,11 +208,6 @@ public class Ship extends Entity {
 	}
 	
 	/**
-	 * variable registering the mass density of this ship.
-	 */
-	//private double massDensity;
-	
-	/**
 	 * Returns the mass density of this ship.
 	 */
 	@Basic
@@ -213,16 +215,10 @@ public class Ship extends Entity {
 		return (3*this.getMassShip()/(4*Math.PI*Math.pow(this.getRadius(), 3)));
 	}
 	
-	/**public void setMassDensity(double massDensity) {
-		this.massDensity = massDensity;
-		this.massShip = (4/3)*Math.PI*Math.pow(this.getRadius(), 3)*massDensity;
-	}
-	*/
-	
 	/**
 	 *  A HashSet registering the bullets that are currently loaded by this ship.
 	 */
-	public HashSet<Bullet> bulletsLoaded = new HashSet();
+	public HashSet<Bullet> bulletsLoaded = new HashSet<Bullet>();
 
 	/**
 	 *  Variable registering whether this ship's thruster is currently on.
@@ -233,6 +229,7 @@ public class Ship extends Entity {
 	 * Returns whether the ship's thruster is currently on.
 	 * @return this.thrusterOn
 	 */
+	@Raw
 	public boolean isThrusterEnabled() {
 		return this.thrusterOn;
 	}
@@ -240,6 +237,7 @@ public class Ship extends Entity {
 	/**
 	 * Sets the ship's thruster state to on.
 	 */
+	@Raw
 	public void thrustOn() {
 		this.thrusterOn = true;
 	}
@@ -247,12 +245,13 @@ public class Ship extends Entity {
 	/**
 	 * Set the ship's thruster state to off.
 	 */
+	@Raw
 	public void thrustOff() {
 		this.thrusterOn = false;
 	}
 	
 	/**
-	 * Variable registering the force this ship's thruster exerts.
+	 * Constant registering the force this ship's thruster exerts.
 	 */
 	public final double THRUSTERFORCE = 1.1e18;
 	
@@ -260,6 +259,7 @@ public class Ship extends Entity {
 	 * Returns the acceleration this ship is subsceptible to, making use of Newton's second law of motion (F = ma).
 	 * @see implementation
 	 */
+	@Raw
 	public double getAcceleration() {
 		if (this.isThrusterEnabled())
 			return THRUSTERFORCE / this.getMassTotal();
@@ -272,23 +272,18 @@ public class Ship extends Entity {
 	 * @param 	bullet
 	 * 			The bullet to remove.
 	 * @post	| bulletsLoaded.contains(bullet) == false
+	 * @post	| bullet.setLoaded(false)
+	 * @post	| bullet.setWorld(null)
+	 * @post	| bullet.setParent(null)
 	 */
+	@Raw
 	public void removeBullet(Bullet bullet) {
-		//for (Entity b : this.getWorld().getEntitiesOfType(Bullet.class)) {
-		//	if (b == bullet) {
-		//		bulletsLoaded.remove(b);
-		//		((Bullet) b).setLoaded(false);
-		//		return;
-		//	}
-		//}
-		
 		bulletsLoaded.remove(bullet);
 		bullet.setLoaded(false);
 		bullet.setWorld(null);
 		bullet.setParent(null);
 		
 		return;
-		
 	}
 	
 	/**
@@ -298,6 +293,7 @@ public class Ship extends Entity {
 	 * @post	| bulletsLoaded.contains(bullet) == true
 	 * @post	| bullet.getParent() == this
 	 */
+	@Raw
 	public void addBulletToLoaded(Bullet bullet) {
 		bulletsLoaded.add(bullet);
 		bullet.setParent(this);
@@ -312,6 +308,7 @@ public class Ship extends Entity {
 	 * @post	| For each Bullet b in bullets
 	 * 			| 	b.getParent() == this
 	 */
+	@Raw
 	public void addBulletToLoaded(Collection<Bullet> bullets) throws IllegalArgumentException {
 		for (Bullet bullet : bullets) {
 			if (bullet == null)
@@ -324,8 +321,25 @@ public class Ship extends Entity {
 		}
 	}
 
+	/**
+	 * Constant registering the firingspeed of this ship.
+	 */
 	public final int FIRINGSPEED = 250;
 	
+	/**
+	 * Fires a bullet off this ship.
+	 * @post	| new.bulletsLoaded.size() = old.bulletsLoaded.size() - 1
+	 * @post	The position and velocity of one of the bullets are updated to reflect being launched.
+	 * 			| bullet.setXVelocity(FIRINGSPEED * Math.cos(getOrientation()))
+	 * 			| bullet.setYVelocity(FIRINGSPEED * Math.sin(getOrientation()))
+	 *			| bullet.setXCoordinate(this.getXCoordinate() + (this.getRadius() + bullet.getRadius()) * Math.cos(this.getOrientation()))
+	 *			| bullet.setYCoordinate(this.getYCoordinate() + (this.getRadius() + bullet.getRadius()) * Math.sin(this.getOrientation()))
+	 * 	@throws IllegalArgumentException
+	 * 			The bullet we're trying to fire is not loaded by this ship. For testing purposes, should never happen.
+	 * 		
+	 * 	@post	| bulletsLoaded.contains(bullet) == false
+	 *  @post	| bullet.isLoaded() == false
+	 */
 	public void fire() throws IllegalArgumentException {
 		if (this.getWorld() == null) return;
 		
@@ -350,12 +364,23 @@ public class Ship extends Entity {
 		
 	}
 	
+	/**
+	 * Updates the velocity to the current acceleration.
+	 * @post	this.thrust(getAcceleration())
+	 */
 	public void updateVelocity() {
 		this.thrust(getAcceleration());
 	}
 	
-	
+	/**
+	 * Finalizes the bullet, preparing it to be removed by the garbage collector.
+	 * @post	| for each bullet: bulletLoaded
+	 * 			| 	bullet.parent == null
+	 * @post	| this.getWorld().removeEntity(this)
+	 * @post	| new.finalized == true
+	 */
 	@Override
+	@Raw
 	public void finalize() {
 		
 		if (! bulletsLoaded.isEmpty()) {
@@ -367,16 +392,29 @@ public class Ship extends Entity {
 		this.getWorld().removeEntity(this);
 		this.finalized = true;
 	}
-	
-	//public boolean isTerminated() {
-	//	return this.finalized;
-	//}
 
+	/**
+	 * Returns whether a given radius is a valid radius for a ship.
+	 * @param 	radius
+	 * 			The given radius to check.
+	 * @return	True if and only if the velocity is greater than the minimum value specified for a ship's radius.
+	 * 			| result == radius > this.getRadiusLowerBound()
+	 */
 	@Override
+	@Raw
 	public boolean isValidRadius(double radius) {
 		return (radius >= this.getRadiusLowerBound());
 	}
 
+	/**
+	 * Updates the radius of this ship.
+	 * @param 	radius
+	 * 			The new radius for this ship.
+	 * @post	The new radius of the ship is equal to the given argument radius.
+	 * 			| new.radius = radius
+	 * @throws	IllegalArgumentException
+	 * 			| !isValidRadius(radius)
+	 */
 	@Override
 	public void setRadius(double radius) {
 		if (isValidRadius(radius))
@@ -385,11 +423,25 @@ public class Ship extends Entity {
 			throw new IllegalArgumentException("Non valid radius.");
 	}
 
+	/**
+	 * Constant registering the radius lower bound of a ship.
+	 */
+	private static final double RADIUSLOWERBOUND = 1;
+	
 	@Override
+	@Raw
+	@Basic
 	public double getRadiusLowerBound() {
-		return 1;
+		return RADIUSLOWERBOUND;
 	}
-
+	
+	
+	/**
+	 * Moves this ship for a given delta time.
+	 * @effect	move(deltaTime)
+	 * @post	| if (this.isThrusterEnabled())
+	 * 			| 	this.updateVelocity()
+	 */
 	@Override
 	public void advance(double deltaTime) {
 		move(deltaTime);
@@ -397,6 +449,16 @@ public class Ship extends Entity {
 			this.updateVelocity();
 	}
 
+	/**
+	 * 	Updates a few properties of this ship to simulate a collision with another object.
+	 * 	@param 	object2
+	 * 			Object to collide with.
+	 * 	@param 	collisiontype
+	 * 			Type of collision to simulate. Collision types are defined in constants.java.
+	 *  @see	Implementation
+	 *  @throws	IllegalArgumentException
+	 *  		collisionType is not specified in the class Constants.	
+	 */
 	@Override
 	public void collideWith(GameObject object2, int collisionType) {
 		if (collisionType == Constants.BOUNDARYCOLLISION) {
@@ -457,6 +519,14 @@ public class Ship extends Entity {
 			throw new IllegalArgumentException("Invalid Collision type");
 	}
 
+	/**
+	 * Teleports this ship to a random place in its world and destroys all its entities.
+	 * @post	| new.setXCoordinate(this.getRadius() + r.nextInt() % (this.getWorld().getWidth() - 2 * this.getRadius()))
+	 * @post 	| new.setYCoordinate(this.getRadius() + r.nextInt() % (this.getWorld().getHeight() - 2 * this.getRadius()))
+	 * @effect	| for each entity i: getWorld().getEntities()
+	 * 			|	if(i.overlap(this))
+	 *			| 		this.finalize();
+	 */
 	private void teleport() {
 		Random r = new Random();
 
@@ -478,6 +548,7 @@ public class Ship extends Entity {
 	 * 	Loads a program on this ship.
 	 */
 	@Basic
+	@Raw
 	public void setProgramLoaded(Program program) {
 		this.program = program;
 	}
@@ -486,22 +557,29 @@ public class Ship extends Entity {
 	 * 	Return the program loaded on this ship
 	 */
 	@Basic
+	@Raw
 	public Program getProgramLoaded() {
 		return this.program;
 	}
 	
 	/**
 	 * 	Executes the program loaded on this ship
-	 * 
+	 * @return	List containing all objects printed out by the program.
 	 */
-	
+	@Raw
 	public List<Object> executeProgram(double dt) throws IllegalStateException {
 		List<Object> r = this.getProgramLoaded().execute(dt);
-		System.out.println(r);
 		return r;
 	}
 	
+
+	/**
+	 * Returns a string representation of a ship.
+	 * 
+	 * @return	A string representation of a ship.
+	 */
 	@Override
+	@Raw
 	public String toString() {
 		return "[Ship] " + this;
 	}

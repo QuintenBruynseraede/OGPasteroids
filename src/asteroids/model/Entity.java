@@ -1,6 +1,7 @@
 package asteroids.model;
 
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Raw;
 
 /**
 * Abstract class containing an entity.
@@ -30,7 +31,7 @@ public abstract class Entity extends GameObject {
 	 * @param 	yVelocity
 	 * 			The velocity in the y direction of this new entity.
 	 * @param 	radius
-	 * 			The radius for this entity.	 * 
+	 * 			The radius for this entity.	
 	 * @throws	IllegalArgumentException
 	 * 			The given radius is not a valid radius for this entity.
 	 * 			| ! isValidRadius(radius)
@@ -40,21 +41,15 @@ public abstract class Entity extends GameObject {
 	 * 
 	 * @throws	IllegalArgumentException
 	 * 			|!isValidYCoordinate(y)
-	 * 
-	 * @post	|new.getXCoordinate() == x
-	 * 
-	 * @post	|new.getYCoordinate() == y
-	 * @post	| if (!isValidVelocity(xVelocity) &&  xVelocity < VELOCITYLOWERBOUND)
-	 * 			|	new.getXVelocity() == VELOCITYLOWERBOUND
-	 * 			| else if(!isValidVelocity(xVelocity) &&  xVelocity > VELOCITYUPPERBOUND)
-	 * 			|	new.getXVelocity() == VELOCITYUPPERBOUND
-	 * 
-	 * @post	| if (!isValidVelocity(yVelocity) &&  yVelocity < VELOCITYLOWERBOUND)
-	 * 			|	new.getYVelocity() == VELOCITYLOWERBOUND
-	 * 			| else if(!isValidVelocity(yVelocity) &&  yVelocity > VELOCITYUPPERBOUND)
-	 * 			|	new.getYVelocity() == VELOCITYUPPERBOUND
-	 * 
+	 * @effect	| setXCoordinate(x)
+	 * @effect 	| setYCoordinate(y)
+	 * @effect	| setXVelocity(xVelocity)
+	 * @effect	| setYVelocity(yVelocity)
+	 * @effect	| setRadius(radius)
+	 * @effect	Initializes this entity as a GameObject, type Entity
+	 * 			| super(Constants.ENTITY);
 	 */
+	@Raw
 	public Entity(double x, double y, double xVelocity, double yVelocity, double radius) throws IllegalArgumentException {
 		super(Constants.ENTITY);
 		setXCoordinate(x);
@@ -101,6 +96,7 @@ public abstract class Entity extends GameObject {
 	 * 			The given x coordinate is not a valid coordinate for a entity.
 	 * 			| Double.isNaN(x) || Double.isInfinite(x)
 	 */
+	@Raw
 	protected void setXCoordinate(double x) throws IllegalArgumentException {
 		if (Double.isNaN(x))
 			throw new IllegalArgumentException("Non valid x");
@@ -117,6 +113,7 @@ public abstract class Entity extends GameObject {
 	 * 			The given y coordinate is not a valid coordinate for a entity.
 	 * 			| Double.isNaN(y) || Double.isInfinite(y)
 	 */
+	@Raw
 	protected void setYCoordinate(double y) throws IllegalArgumentException {
 		if (Double.isNaN(y)) 
 			throw new IllegalArgumentException("Non valid y");
@@ -130,6 +127,7 @@ public abstract class Entity extends GameObject {
 	 * 			The x coordinate
 	 * @see implementation
 	 */
+	@Raw
 	private boolean isValidXCoordinate(double x) {
 		if (this.getWorld() == null)
 			return true;
@@ -142,6 +140,7 @@ public abstract class Entity extends GameObject {
 	 * 			The y coordinate	
 	 * @see implementation
 	 */
+	@Raw
 	private boolean isValidYCoordinate(double y) {
 		if (this.getWorld() == null)
 			return true;
@@ -192,6 +191,7 @@ public abstract class Entity extends GameObject {
 	 * 			| 	new.xVelocity = velocityUpperBound
 	 * 
 	 */
+	@Raw
 	protected void setXVelocity(double xVelocity){
 		if (!Double.isFinite(xVelocity))
 			this.xVelocity = 0;
@@ -221,6 +221,7 @@ public abstract class Entity extends GameObject {
 	 * 			| 	new.yVelocity = velocityUpperBound
 	 * 
 	 */
+	@Raw
 	protected void setYVelocity(double yVelocity){
 		if (!Double.isFinite(yVelocity))
 			this.yVelocity = 0;
@@ -249,6 +250,7 @@ public abstract class Entity extends GameObject {
 	 * @return	True if and only if the velocity is greater than velocityLowerBound and lower than velocityLowerBound.
 	 * 			| result == (velocity > this.velocityLowerBound && velocity < this.velocityUpperBound)
 	 */
+	@Raw
 	private boolean isValidVelocity(double velocity) {
 		if  (!Double.isFinite(velocity))
 			return false;
@@ -259,6 +261,7 @@ public abstract class Entity extends GameObject {
 	 * This method returns the minimum velocity for this entity.
 	 */
 	@Basic
+	@Raw
 	public static double getVelocityLowerBound() {
 		return VELOCITYLOWERBOUND;
 	}
@@ -267,13 +270,14 @@ public abstract class Entity extends GameObject {
 	 * This method returns the minimum velocity for this entity.
 	 */
 	@Basic
+	@Raw
 	public static double getVelocityUpperBound() {
 		return VELOCITYUPPERBOUND;
 	}
 	
 	/**
 	 * 
-	 * Return the total velocity as a function of a velocity in the X and Y direction
+	 * Return the total velocity as a function of a velocity in the X and Y direction.
 	 * @param 	xVelocity
 	 * 			The velocity in the X direction.
 	 * @param 	yVelocity
@@ -293,7 +297,7 @@ public abstract class Entity extends GameObject {
 	
 	/**
 	 * 	Sets the world this entity is associated with.
-	 * 	@param world
+	 * 	@param 	world
 	 * 		The world this entity is to be associated with.
 	 * 	@throws IllegalStateException
 	 * 		| !canHaveAsWorld(world)
@@ -331,6 +335,7 @@ public abstract class Entity extends GameObject {
 	 * 	@param 	world
 	 * 	@see implementation
 	 */
+	@Raw
 	public boolean canHaveAsWorld(World world) {
 		return (this.getXCoordinate() >= 0 
 				&& this.getXCoordinate() < World.WIDTHUPPERBOUND 
@@ -358,10 +363,10 @@ public abstract class Entity extends GameObject {
 	 * 			| time < 0
 	 */
 	public void move(double time) throws IllegalArgumentException {
-		if (time < 0.000001 && time > -0.000001)
-			return;
 		if (time < -0.000001)
 			throw new IllegalArgumentException("Argument time must be positive");
+		if (time < 0.000001 && time > -0.000001)
+			return;
 		else {
 			setXCoordinate(this.getXCoordinate() + time * this.getXVelocity());
 			setYCoordinate(this.getYCoordinate() + time * this.getYVelocity());
@@ -392,12 +397,11 @@ public abstract class Entity extends GameObject {
 	 */
 	
 	public double getTimeToCollision(GameObject other) throws IllegalArgumentException {
+		if (other == null) 
+			throw new IllegalArgumentException("Invalid argument object (null).");
+		
 		if (other instanceof Entity) {
 			Entity otherEntity = (Entity) other;
-			
-			if (other == null) 
-				throw new IllegalArgumentException("Invalid argument object (null).");
-			
 			
 			double deltaVX = this.getXVelocity() - otherEntity.getXVelocity();
 			double deltaVY = this.getYVelocity() - otherEntity.getYVelocity();
@@ -474,39 +478,55 @@ public abstract class Entity extends GameObject {
 	/**
 	 * @param 	radius
 	 * 			The given radius to check.
-	 * @return	True if and only if the velocity is greater than the minimum value specified for a planetoid's radius.
-	 * 			| result == radius > this.radiusLowerBound
+	 * @return	True if and only if the velocity is greater than the minimum value specified for a entity's radius.
+	 * 			| result == (radius > this.radiusLowerBound)
 	 */
 	public abstract boolean isValidRadius(double radius);
 	
 	
 	/**
-	 * This method returns the radius of this planetoid.
+	 * This method returns the radius of this entity.
 	 */
 	@Basic
+	@Raw
 	public double getRadius() {
 		return this.radius;
 	}
 	
 	/**
 	 * @param 	radius
-	 * 			The new radius for this planetoid.
-	 * @post	The new radius of the planetoid is equal to the given argument radius.
+	 * 			The new radius for this entity.
+	 * @post	The new radius of the entity is equal to the given argument radius.
 	 * 			| new.radius = radius
 	 */
 	@Basic
 	public abstract void setRadius(double radius);
 	
 	/**
-	 * This method returns the minimum value for this planetoid's radius.
+	 * This method returns the minimum value for this entity's radius.
 	 */
 	@Basic
 	public abstract double getRadiusLowerBound();
 
+	/**
+	 * 	Returns the time to the first collision with one of the four boundaries of this entity's world
+	 * 
+	 * 	@return | min(a, b, c, d) where
+	 * 		    | a = time to boundary1
+	 * 		    | b = time to boundary2
+	 * 		    | c = time to boundary3
+	 * 	  	    | d = time to boundary4
+	 */
 	public double getTimeFirstCollisionBoundary() {
 		return Math.min(Math.min(this.getTimeToCollision(this.getWorld().getBoundaries()[0]), this.getTimeToCollision(this.getWorld().getBoundaries()[1])), Math.min(this.getTimeToCollision(this.getWorld().getBoundaries()[2]), this.getTimeToCollision(this.getWorld().getBoundaries()[3])));
 	}
 	
+	/**
+	 * Returns the time to the first collision with one of the four boundaries in this entity's world.
+	 * 
+	 * 	@return | BoundaryX 
+	 * 			| where for each BoundaryY: getTimeToCollision(BoundaryY) >= getTimeToCollision(BoundaryX)
+	 */
 	public Boundary getFirstCollisionBoundary() {
 		double minTime = Double.MAX_VALUE;
 		Boundary[] boundaries = this.getWorld().getBoundaries();
@@ -518,9 +538,7 @@ public abstract class Entity extends GameObject {
 				minBoundary = b;
 			}
 		}
-
-		return minBoundary;
-		
+		return minBoundary;	
 	}
 	
 		
@@ -528,15 +546,15 @@ public abstract class Entity extends GameObject {
 	 * This method checks whether two entities overlap.
 	 * @param 	otherEntities
 	 * 			An entity to check against whether the object invoking the method and the argument Entity overlap.
-	 * @return	True if and only if the distance between entity1 and entity2 is greater than 0.
+	 * @return	True if and only if the distance between entity1 and entity2 is smaller than 0.
 	 * 			| result == thisgetDistanceBetween(otherEntity) < 0
 	 * @throws 	IllegalArgumentException
 	 * 			The entity to check an overlap against is a null object.
+	 * @note	This method uses the notion of apparent overlap, to account for rounding errors.
 	 */
 	public boolean overlap(Entity otherEntity) throws IllegalArgumentException {
 		if (otherEntity == null) 
 			throw new IllegalArgumentException("Invalid argument object (null).");
-		//System.out.println(this.getDistanceBetween(otherEntity));
 		if ( this.getDistanceBetween(otherEntity) < 0.01)
 			return true;
 		else
@@ -544,7 +562,7 @@ public abstract class Entity extends GameObject {
 	}
 	
 	/**
-	 * 			Checks the distance in km between two entities.
+	 * Checks the distance in km between two entities.
 	 * @param 	otherEntity
 	 * 			The entity to which this method checks the distance.
 	 * @return  The distance between the two entities provided as arguments.
@@ -560,7 +578,7 @@ public abstract class Entity extends GameObject {
 		if (otherEntity == null) 
 			throw new IllegalArgumentException("Invalid argument object (null).");
 		
-		if (otherEntity == this )
+		if (otherEntity == this)
 			return 0;
 		return Math.sqrt( Math.pow(this.getXCoordinate()-otherEntity.getXCoordinate(), 2) + Math.pow(this.getYCoordinate()-otherEntity.getYCoordinate(), 2) ) - (this.getRadius() + otherEntity.getRadius());
 	}
@@ -576,15 +594,15 @@ public abstract class Entity extends GameObject {
 	 * 			the position of this collision.
 	 * 			| 	result == [ this.getXCoordinate() + this.getTimeToCollision(otherentity) * this.getXVelocity(), this.getYCoordinate() + this.getTimeToCollision(otherentity) * this.getYVelocity()]
 	 * @throws 	IllegalArgumentException
-	 * 			The two entities overlap already.
-	 * 			| this.overlap(otherEntity)
-	 * @throws 	IllegalArgumentException
 	 * 			The entity to check a collision against is a null object.
 	 * @note 	The position of a collision is returned from the viewpoint of the entity object calling the function.
 	 * 			The position returned represents the centerpoint of the entity at the moment of impact.
 	 * 			Therefore, calling a.getCollisionPosition(b) is not equal to b.getCollisionPosition(b)
 	 */
 	public double[] getCollisionPosition(GameObject gameObject) throws IllegalArgumentException {
+		if (gameObject == null) 
+			throw new IllegalArgumentException("Invalid argument object (null).");
+		
 		if ( gameObject.getType() == Constants.BOUNDARY ) {
 			double time = this.getTimeToCollision(((Boundary) gameObject));
 			
@@ -599,9 +617,7 @@ public abstract class Entity extends GameObject {
 		
 		else {
 			Entity otherEntity = (Entity) gameObject;
-			if (otherEntity == null) 
-				throw new IllegalArgumentException("Invalid argument object (null).");
-			
+
 			if ( this.overlap(otherEntity) ) {
 				double[] collision = {this.getXCoordinate(), this.getYCoordinate()};
 				return collision; 
@@ -637,7 +653,7 @@ public abstract class Entity extends GameObject {
 	/**
 	 * 	Updates the entity based on a few parameters.
 	 * 	@param 	deltaTime
-	 * 			Time units to advance this entity.
+	 * 			number of time units to advance this entity.
 	 * 	@note	See implementation in subclass for specification.
 	 */
 	public abstract void advance(double deltaTime);
@@ -668,11 +684,19 @@ public abstract class Entity extends GameObject {
 	 * 	Returns whether this entity has been finalized already.
 	 */
 	@Basic
+	@Raw
 	public boolean isFinalized() {
 		return this.finalized;
 	}
 	
+
+	/**
+	 * Returns a string representation of an entity.
+	 * 
+	 * @return	A string representation of an entity.
+	 */
 	@Override
+	@Raw
 	public String toString() {
 		return "[Entity] " + this;
 	}

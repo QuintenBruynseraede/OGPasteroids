@@ -1,11 +1,22 @@
 package asteroids.model;
 
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Raw;
 
+/**
+ * Class containing an asteroid with some properties.
+ * @author 	Tom De Backer and Quinten Bruynseraede
+ * 
+ *  @invar	The radius of this asteroid will always be a valid radius for a asteroid.
+ *  		| isValidRadius(getRadius())
+ *  @invar	The following correlation between a planetoid's radius and its weight always applies.
+ *  		| this.getMass() == (4/3) * Math.PI * Math.pow(this.getRadius(), 3) * Planetoid.MASSDENSITY
+ *
+ */
 public class Asteroid extends MinorPlanet {
 
 	/**
-	 * 	Class containing an Asteroid
+	 * 	Creates a new asteroid with a position, velocity, radius and mass.
 	 * 	@param 	x
 	 * 			The x position for this Asteroid.
 	 * 	@param 	y
@@ -16,16 +27,15 @@ public class Asteroid extends MinorPlanet {
 	 * 			The y velocity for this Asteroid.
 	 * 	@param 	radius
 	 * 			The radius for this Asteroid.
-	 *  @post	
+	 *  @post	new.getMass() = (4/3) * Math.PI * Math.pow(this.getRadius(), 3) * Asteroid.MASSDENSITY
+	 *  @effect	Initializes this Asteroid as a MinorPlanet with a position, velocity and radius.
+	 *  		| super (x, y, xVelocity, yVelocity, radius)
+	 *  @effect	| setMass((4/3) * Math.PI * Math.pow(this.getRadius(), 3) * Asteroid.MASSDENSITY)
 	 */
+	@Raw
 	public Asteroid(double x, double y, double xVelocity, double yVelocity, double radius) {
 		super(x, y, xVelocity, yVelocity, radius);
-		this.mass = (4/3) * Math.PI * Math.pow(this.getRadius(), 3) * Asteroid.MASSDENSITY;
-	}
-
-	public Asteroid() {
-		super(100, 100, 0, 0, 30);
-		this.mass = (4/3) * Math.PI * Math.pow(this.getRadius(), 3) * Asteroid.MASSDENSITY;
+		this.setMass((4/3) * Math.PI * Math.pow(this.getRadius(), 3) * Asteroid.MASSDENSITY);
 	}
 
 	/**
@@ -39,6 +49,14 @@ public class Asteroid extends MinorPlanet {
 	@Basic
 	public double getMass() {
 		return this.mass;
+	}
+
+	/**
+	 * 	Sets the mass for this asteroid.
+	 */
+	@Basic
+	private void setMass(double mass) {
+		this.mass = mass;
 	}
 	
 	/**
@@ -102,11 +120,18 @@ public class Asteroid extends MinorPlanet {
 	 * 			The time during which the Asteroid is moved.
 	 */
 	@Override
+	@Raw
 	public void advance(double deltaTime) {
 		move(deltaTime);
 	}	
 	
+	/**
+	 * Returns a string representation of an asteroid.
+	 * 
+	 * @return	A string representation of an asteroid.
+	 */
 	@Override
+	@Raw
 	public String toString() {
 		return "[Asteroid] " + this;
 	}

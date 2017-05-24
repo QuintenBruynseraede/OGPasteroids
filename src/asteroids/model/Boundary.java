@@ -29,6 +29,12 @@ public class Boundary extends GameObject {
 		return this.boundaryType;
 	}
 	
+
+	/**
+	 * Returns a string representation of a string.
+	 * 
+	 * @return	A string representation of a string.
+	 */
 	@Override
 	public String toString() {
 		return "[Boundary] " + this;

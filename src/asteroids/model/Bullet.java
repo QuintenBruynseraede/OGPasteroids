@@ -1,6 +1,7 @@
 package asteroids.model;
 
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Raw;
 
 
 /**
@@ -8,12 +9,19 @@ import be.kuleuven.cs.som.annotate.Basic;
  *  
  * @author Tom De Backer and Quinten Bruynseraede
  *
+ * @invar	The radius of this bullet is always a valid radius for a bullet.
+ * 			| isValidRadius(getRadius())
+ * @invar	The initial correlation between a bullet's radius and its weight is kept during its entire lifetime.
+ * 			| getMass() = 4 * Math.PI * Math.pow(this.getRadius(), 3) * Bullet.MASSDENSITY / 3.0
+ * @invar	A bullet has never withstood more bounces than its allowed number of bounces - 1
+ * 			| this.getBounces() <= MAXBOUNCES - 1
  */
 
 public class Bullet extends Entity {
 	 
 	/**
-	 *
+	 * Initializes a bullet with a position, velocity, radius, parent ship and mass.
+	 * 
 	 * @param 	x
 	 * 			The X coordinate for this new bullet.
 	 * @param 	y
@@ -26,31 +34,23 @@ public class Bullet extends Entity {
 	 * 			The radius for this new bullet.
 	 * @param	parent
 	 *			The parent for this new bullet.
-	 * 			
-	 * @post   	The X coordinate of this new bullet is equal to the given X coordinate.
-	 *       	| new.getXCoordinate() == xCoordinate
-	 * @post   	The Y coordinate of this new bullet is equal to the given Y coordinate.
-	 *       	| new.getYCoordinate() == yCoordinate
-	 * @post   	The x velocity of this new bullet is equal to the given X velocity.
-	 *       	| new.getXVelocity() == xVelocity
-	 * @post   	The Y velocity of this new bullet is equal to the given Y velocity.
-	 *       	| new.getYVelocity() == yVelocity
-	 * @post	The radius of this new bullet is set to the given radius if valid, or a predefined lower bound otherwise.
-	 * 			| new.getRadius() == max(Bullet.RADIUSLOWERBOUND, radius) 
-	 * @post	The mass for this bullet is set.
-	 * 			| new.mass = (4/3)*PI*radius^3*MASSDENSITY
-	 * @post	The parent of this new bullet is equal to the given ship.
-	 * 			| new.parent = parent
+	 * @effect	| setMass( 4 * Math.PI * Math.pow(this.getRadius(), 3) * Bullet.MASSDENSITY / 3.0 )
+	 * @effect	The parent of this new bullet is equal to the given ship.
+	 * 			| setParent(parent);
+	 * @effect	This bullet is initialized as an Entity with a position, velocity and radius
+	 * 			| super(x, y, xVelocity, yVelocity, radius)
+	 * @throws	IllegalArgumentException
+	 * 			| !isValidRadius(radius)
 	 * 
 	 */
-	public Bullet (double x, double y, double xVelocity, double yVelocity, double radius, Ship parent) {
+	@Raw
+	public Bullet (double x, double y, double xVelocity, double yVelocity, double radius, Ship parent) throws IllegalArgumentException {
 		super(x, y, xVelocity, yVelocity, radius);
-		this.mass = 4 * Math.PI * Math.pow(this.getRadius(), 3) * Bullet.MASSDENSITY / 3.0;
+		this.setMass(4 * Math.PI * Math.pow(this.getRadius(), 3) * Bullet.MASSDENSITY / 3.0);
 		this.setParent(parent);	
 		
 		if (! isValidRadius(radius))  
 			throw new IllegalArgumentException("Non valid radius when initializing bullet");
-		
 	}
 	
 	
@@ -66,6 +66,14 @@ public class Bullet extends Entity {
 	@Basic
 	public double getMass() {
 		return this.mass;
+	}
+	
+	/**
+	 * 	Sets the mass for this bullet.
+	 */
+	@Basic
+	private void setMass(double mass) {
+		this.mass = mass;
 	}
 	
 	/**
@@ -92,30 +100,30 @@ public class Bullet extends Entity {
 	 * @param 	ship
 	 * @post	| new.getParent() = this.getParent()
 	 */
-	
+	@Raw
 	public void setParent(Ship ship) {
 		if (this.getParent() == ship)
 			return;
-		/**
-		if (! (this.getParent() == null))
-			this.getParent().removeBullet(this);
-			*/
 		if (ship == null)
 			this.setLoaded(false);
 		else
 			this.setLoaded(true);
 		this.parent = ship;
-		
 	}
 	
 	/**
 	 * Return this ship's parent object.
 	 */
-	
 	@Basic
+	@Raw
 	public Ship getParent() {
 		return this.parent;
 	}
+	
+	/**
+	 * 	The smallest radius an instance of the bullet class can have.
+	 */
+	private static final double RADIUSLOWERBOUND = 1;
 	
 	/**
 	 * Variable registering the number of bounces against a boundary this bullet has made.
@@ -126,7 +134,7 @@ public class Bullet extends Entity {
 	 * The maximum number of bounces against a boundary a bullet can withstand.
 	 */
 	private final static int MAXBOUNCES = 3;
-	
+
 	/**
 	 * Returns the number of bounces against a boundary this bullet has made.
 	 */
@@ -134,6 +142,8 @@ public class Bullet extends Entity {
 	public int getBounces() {
 		return this.bounces;
 	}
+	
+	
 	
 	/**
 	 * Adds one to the amount of bounces if necessary. Finalizes the object if it has reached its maximum amount of bounces.
@@ -155,11 +165,9 @@ public class Bullet extends Entity {
 	 * 		  	The second bullet
 	 * @return	result == ((this.isBulletLoaded() && bullet.isBulletLoaded()) && (this.getParent() == bullet.getParent())
 	 */
+	@Raw
 	public boolean isLoadedOnSameShipAs(Bullet bullet) {
-		
-		if ((this.isLoaded() && bullet.isLoaded()) && (this.getParent() == bullet.getParent())) 
-			return true;
-		return false;
+		return ((this.isLoaded() && bullet.isLoaded()) && (this.getParent() == bullet.getParent()));
 	}
 	
 	/**
@@ -171,6 +179,7 @@ public class Bullet extends Entity {
 	 * Returns whether a bullet has been loaded on a ship.
 	 */
 	@Basic
+	@Raw
 	public boolean isLoaded() {
 		return this.isLoaded;
 	}
@@ -183,20 +192,20 @@ public class Bullet extends Entity {
 	 * @post	new.isBulletLoaded() == loaded
 	 */
 	@Basic
+	@Raw
 	public void setLoaded(boolean loaded) {
 		this.isLoaded = loaded;
 	}
 
-	
-	
 	/**
 	 * Finalizes the bullet, preparing it to be removed by the garbage collector.
 	 * @post	If this bullet has a parent, make it remove it from its list of bullets
 	 * @post	If this bullet has been added to a world, make the world remove it from its list of bullets
 	 * @post	| new.isFinalized() == true
-	 * @see implementation
+	 * @see 	implementation
 	 */
 	@Override
+	@Raw
 	public void finalize() {
 		
 		if (this.getParent() != null)
@@ -207,37 +216,69 @@ public class Bullet extends Entity {
 	}
 
 	/**
-	 * Returns whether this bullet has been finalized.
+	 * Returns whether a given radius is a valid radius for a bullet.
+	 * @param 	radius
+	 * 			The given radius to check.
+	 * @return	True if and only if the velocity is greater than the minimum value specified for a bullet's radius.
+	 * 			| result == radius > this.getRadiusLowerBound()
 	 */
-	@Basic
-	//public boolean isFinalized() {
-	//	return this.finalized;
-	//}
-
 	@Override
+	@Raw
 	public boolean isValidRadius(double radius) {
 		return (radius >= this.getRadiusLowerBound());
 	}
 
+	/**
+	 * Updates the radius of this bullet.
+	 * @param 	radius
+	 * 			The new radius for this bullet.
+	 * @post	The new radius of the bullet is equal to the given argument radius.
+	 * 			| new.radius = radius
+	 * @throws	IllegalArgumentException
+	 * 			| !isValidRadius(radius)
+	 */
 	@Override
-	public void setRadius(double radius) {
+	public void setRadius(double radius) throws IllegalArgumentException{
 		if (isValidRadius(radius))
 			this.radius = radius;
 		else
 			throw new IllegalArgumentException("Non valid radius.");
 	}
 
+	/**
+	 * Returns the lower bound for the radius of a bullet.
+	 * @return	 | Bullet.RADIUSLOWERBOUND
+	 */
 	@Override
+	@Raw
 	public double getRadiusLowerBound() {
-		return 1;
+		return Bullet.RADIUSLOWERBOUND;
 	}
 
+	/**
+	 * Advances the bullet during a given time duration deltaTime
+	 * @param	deltaTime
+	 * 			The time during which to advance this bullet.
+	 * @effect	| move(deltaTime)
+	 */
 	@Override
+	@Raw
 	public void advance(double deltaTime) {
 		move(deltaTime);
 	}
 
+	/**
+	 * 	Updates a few properties of this bullet to simulate a collision with another object.
+	 * 	@param 	object2
+	 * 			Object to collide with.
+	 * 	@param 	collisiontype
+	 * 			Type of collision to simulate. Collision types are defined in constants.java.
+	 *  @see	Implementation
+	 *  @throws	IllegalArgumentException
+	 *  		collisionType is not specified in the class Constants.	
+	 */
 	@Override
+	@Raw
 	public void collideWith(GameObject object2, int collisionType) throws IllegalArgumentException {
 		if (collisionType == Constants.BOUNDARYCOLLISION) {
 			Boundary boundary = (Boundary) object2;
@@ -273,10 +314,17 @@ public class Bullet extends Entity {
 			}
 		}
 		else
-			throw new IllegalArgumentException("Invalid gameObject type");
+			throw new IllegalArgumentException("Invalid collision type");
 	}
 	
+
+	/**
+	 * Returns a string representation of a bullet.
+	 * 
+	 * @return	A string representation of a bullet.
+	 */
 	@Override
+	@Raw
 	public String toString() {
 		return "[Bullet] " + this;
 	}

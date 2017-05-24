@@ -13,7 +13,17 @@ import asteroids.part2.CollisionListener;
  * A class of worlds with some properties.
  *  
  * @author Tom De Backer and Quinten Bruynseraede
- *
+ * @invar 	The height of this world is always less than or equal to the maximum value for the height of a world
+ * 			| this.height <= HEIGTHUPPERBOUND
+ * @invar	The height of this world is always larger than or equal 0.
+ * 			| this.height >= 0
+ * @invar	The width of this world is always smaller than or equal to the maximum value for the width of a world
+ * 			| this.width <= WIDTHUPPERBOUND
+ * @invar	The width of this world is always larger than or equal 0.
+ * 			| this.width >= 0
+ * @invar 	Each Entity kept in the list of entities belonging to this world is associated with this world.
+ * 			| for each Entity e in this.getEntities()
+ *  		|	 e.getWorld() == this
  */
 
 
@@ -25,14 +35,12 @@ public class World extends GameObject {
 	 * 			The width for this new world.
 	 * @param 	height	
 	 * 			The height for this new world.
-	 * @see		implementation
-	 * @invar 	| this.height <= HEIGTHUPPERBOUND
-	 * @invar	| this.width <= WIDTHUPPERBOUND
-	 * @invar 	| for each Ship s in ships
-	 * 			|	s.getWorld() == this
-	 * @invar 	| for each Bullet b in bullet
-	 * 			|	b.getWorld() == this
+	 * @effect	Initializes this world as a GameObject of type WORLD
+	 * 			| super(Constants.WORLD)
+	 * @see		Implementation
+	 * @post	This world now has 4 boundaries.
 	 */
+	@Raw
 	public World (double width, double height) {
 		super(Constants.WORLD);
 		
@@ -78,11 +86,18 @@ public class World extends GameObject {
 	 */
 	private final double height;
 	
+	/**
+	 * Constant registering the the maximum width of this world in kilometers.
+	 */
 	public final static double WIDTHUPPERBOUND = Double.MAX_VALUE;
+	
+	/**
+	 * Constant registering the the maximum height of this world in kilometers.
+	 */
 	public final static double HEIGHTUPPERBOUND = Double.MAX_VALUE;
 	
 	/**
-	 * Return the width of this ship expressed in kilometres.
+	 * Return the width of this world expressed in kilometres.
 	 */
 	@Basic
 	public double getWidth() {
@@ -90,41 +105,17 @@ public class World extends GameObject {
 	}
 	
 	/**
-	 * Return the height of this ship expressed in kilometres.
+	 * Return the height of this world expressed in kilometres.
 	 */
 	@Basic
 	public double getHeight() {
 		return this.height;
 	}
+	
 	/**
 	 * Set registering the entity contained by this world
 	 */	
 	private Set<Entity> entities = new HashSet<Entity>();
-	
-
-
-//	/**
-//	 * Removes a given ship object from this world.
-//	 * @param 	ship
-//	 * 			The ship to remove from this world.
-//	 * @throws 	IllegalArgumentException
-//	 * 			The argument contains no correct reference to an object of the Ship class.
-//	 * @throws	IllegalArgumentException
-//	 * 			The list containing all ships in this world does not contain the ship provided as an argument.
-//	 * @post	| ! ships.contains(ship)
-//	 */
-//	@Raw
-//	public void removeShip(Ship ship) throws IllegalArgumentException {
-//		if (!(ship instanceof Ship)) 
-//			throw new IllegalArgumentException("Trying to remove non ship object.");
-//
-//		if (! this.getShips().contains(ship))
-//			throw new IllegalArgumentException("Trying to remove ship that is not in this world.");
-//		
-//		
-//		entities.remove(ship);
-//	}
-	
 	
 	/**
 	 * 
@@ -140,17 +131,12 @@ public class World extends GameObject {
 	 * Removes a given entity from this world.
 	 * @param 	entity
 	 * 			The entity to remove from this world.
-	 * @throws 	IllegalArgumentException
-	 * 			The argument contains no correct reference to an object of the Entity class.
 	 * @throws	IllegalArgumentException
 	 * 			The list containing all entity in this world does not contain the entity provided as an argument.
 	 * @post	| ! entities.contains(entity)
 	 */
 	@Raw
 	public void removeEntity(Entity entity) throws IllegalArgumentException {
-		if (!(entity instanceof Entity)) 
-			throw new IllegalArgumentException("Trying to remove object that is no entity in removeEntity");
-		
 		if (! this.entities.contains(entity))
 			throw new IllegalArgumentException("Trying to remove entity that is not in this world.");
 		
@@ -165,11 +151,12 @@ public class World extends GameObject {
 	 * @param 	y
 	 * 			The Y coordinate to check for presence of ship and bullet.
 	 * @return	Returns the entity at position x, y.
-	 * 			| result == Entity e
-	 * 			| e.getXCoordinate() == x
-	 * 			| e.getYCoordinate() == y
-	 * @return	returns null, if there is no entity at position x,y
+	 * 			| result == Entity e where
+	 * 			| 	e.getXCoordinate() == x
+	 * 			| 	e.getYCoordinate() == y
+	 * @return	returns null, if there is no entity at position (x,y)
 	 * 			| result == null
+	 * @note	To account for rounding errors, a minimum of 99% correctness is handled in this method.
 	 * 			
 	 */
 	public Entity getInstanceAtPosition(double x, double y) {
@@ -181,6 +168,13 @@ public class World extends GameObject {
 		return null;
 	}
 	
+	/**
+	 * 	Returns all entities of a certain class associated with this world, determined in a functional way.
+	 * 	@param  c
+	 * 			Class of which we want to get instances of as a result.
+	 * 	@return | Set s where
+	 * 			| for each Object o in s: (o.getClass() == c)
+	 */
 	public Set<? extends Entity> getEntitiesOfType(Class<? extends Entity> c) {
 		return entities.stream().filter(p -> p.getClass() == c).collect(Collectors.toSet());
 	}
@@ -190,6 +184,7 @@ public class World extends GameObject {
 	 * 
 	 * @return 	A list of all entities in this world.
 	 * 			| { entity1, entity2, ..., entityN | entityI.getWorld() = this}
+	 * @note	A copy is made to prevent any changes in this world to be reflected in the list we return.
 	 */
 	public Set<Entity> getEntities() {
 		Set<Entity> copy = new HashSet<Entity>();
@@ -333,15 +328,6 @@ public class World extends GameObject {
 				c = new Collision(objects[0], objects[1], pos[0], pos[1], time, type);
 				return c;
 			} catch (Exception e) {
-				/**
-				System.out.println(objects[0]);
-				System.out.println(objects[1]);
-				System.out.println(pos[0]);
-				System.out.println(pos[1]);
-				System.out.println(time);
-				System.out.println(type);
-				
-				*/
 				return null;
 			}
 			
@@ -535,8 +521,6 @@ public class World extends GameObject {
 		}
 		
 		if (object1 instanceof Bullet && object2 instanceof Boundary) {
-			//System.out.println("bullet boundary");
-
 			Boundary boundary = (Boundary) object2;
 			Bullet bullet = (Bullet) object1;
 			
@@ -555,41 +539,15 @@ public class World extends GameObject {
 	 * Ships' velocities may be updated depending on its state(thruster on/off).
 	 * @param 	deltaTime
 	 * 			The time duration over which to update the entities' properties.
-	 * @post	Every ship in this world is moved during an interval deltaTime, if a ship's thruster is on, the velocity will be updated.
-	 * 			| if (ship.isThrustherEnabled())
-	 * 			|	ship.updateVelocity()
-	 * @post	Every loaded bullet will get the coordinates of his parent ship.
-	 * 			| if (this.isLoaded())
-	 * 			| 	this.setXCoordinate(this.getParent().getXCoordinate())
-	 * 			|	this.setYCoordinate(this.getParent().getYCoordinate())
-	 * @post	Every unloaded bullet in this world is moved during an interval deltaTime.
-	 * 			| bullet.move(deltaTime)
-	 * @post	Every ship is moved during an interval deltaTime.
-	 * 			| ship.move(deltaTime)
+	 * @post	| for each Entity e : this.getEntities()
+	 * 			|	e.advance()
+	 * @note	Specific behaviour in advance() is specified in detail at the level of each subclass.
 	 * 
 	 */
 	public void advance(double deltaTime) {
-//		for (Ship ship : ships) {
-//			ship.move(deltaTime);
-//			if (ship.isThrusterEnabled()) 
-//				ship.updateVelocity();
-//		}
-//		
-//		for (Bullet bullet : bullets) {
-//			if (bullet.isLoaded()) {	
-//				bullet.setXCoordinate(bullet.getParent().getXCoordinate());
-//				bullet.setYCoordinate(bullet.getParent().getYCoordinate());
-//			}
-//			else {
-//				bullet.move(deltaTime);
-//			}
-//		}
-		
 		for (Entity e : entities) {
 			e.advance(deltaTime);
 		}
-		
-		
 	}
 	
 	/**
@@ -602,6 +560,7 @@ public class World extends GameObject {
 	 * Returns whether this world is finalized.
 	 */
 	@Basic
+	@Raw
 	public boolean isFinalized() {
 		return this.finalized;
 	}
@@ -609,7 +568,10 @@ public class World extends GameObject {
 	
 	/**
 	 * A method that prepares this world to be removed by the garbage collector.
-	 * @see implementation
+	 * @post	| this.getEntites().getSize() == 0
+	 * @post	| for each Entity e : old.getEntities()
+	 * 			| 	e.getWorld() == null;
+	 * @post	| this.finalized = true
 	 */
 	public void finalize() {
 		for (Entity e : this.getEntities()) {
@@ -619,7 +581,14 @@ public class World extends GameObject {
 		this.finalized = true;
 	}
 	
+
+	/**
+	 * Returns a string representation of a world.
+	 * 
+	 * @return	A string representation of a world.
+	 */
 	@Override
+	@Raw
 	public String toString() {
 		return "[World] " + this;
 	}

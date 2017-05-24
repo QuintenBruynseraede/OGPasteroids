@@ -1,31 +1,65 @@
 package asteroids.model;
 
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Raw;
 
 /**
- * A class of Minor planets with some properties.
+ * 	A class of Minor planets with some properties.
  *  
- * @author Tom De Backer and Quinten Bruynseraede
+ * @author 	Tom De Backer and Quinten Bruynseraede
  *
  */
 
 
 public abstract class MinorPlanet extends Entity {
 	
-	
-	public MinorPlanet(double x, double y, double xVelocity, double yVelocity, double radius) {
+	/**
+	 * 	Creates a new MinorPlanet
+	 * @param 	x
+	 * 			The X position for this MinorPlanet
+	 * @param 	y
+	 * 			The Y position for this MinorPlanet
+	 * @param	xVelocity
+	 * 			The X velocity for this MinorPlanet
+	 * @param 	yVelocity
+	 * 			The Y velocity for this MinorPlanet
+	 * @param 	radius
+	 * 			The radius for this MinorPlanet
+	 * @effect	Initializes this MinorPlanet as an Entity with a position, velocity and radius.
+	 * 			| super(x, y, xVelocity, yVelocity, radius)
+	 * 			
+	 */
+	@Raw
+	protected MinorPlanet(double x, double y, double xVelocity, double yVelocity, double radius) {
 		super(x, y, xVelocity, yVelocity, radius);
 	}
 
-	
+	/**
+	 *  Finalizes this MinorPlanet, preparing it to be removed by the GC.
+	 *  @post	| ! new.getWorld().getEntities().contains(this)
+	 *  @post	| this.finalized == true
+	 */
 	@Override
 	public void finalize(){
 		this.getWorld().removeEntity(this);
 		this.finalized = true;
 	}
 	
+	/**
+	 * Returns this MinorPlanet's mass. Implemented by MinorPlanet's subclasses.
+	 */
 	public abstract double getMass();
 	
+	/**
+	 * 	Updates a few properties of this MinorPlanet to simulate a collision with another object.
+	 * 	@param 	object2
+	 * 			Object to collide with.
+	 * 	@param 	collisiontype
+	 * 			Type of collision to simulate. Collision types are defined in constants.java.
+	 *  @see	Implementation
+	 *  @throws	IllegalArgumentException
+	 *  		collisionType is not specified in the class Constants.	
+	 */
 	@Override
 	public void collideWith(GameObject object2, int collisionType) {
 		if (collisionType == Constants.BOUNDARYCOLLISION) {
@@ -82,7 +116,14 @@ public abstract class MinorPlanet extends Entity {
 		}
 	}
 	
+
+	/**
+	 * Returns a string representation of a minorplanet.
+	 * 
+	 * @return	A string representation of a minorplanet.
+	 */
 	@Override
+	@Raw
 	public String toString() {
 		return "[MinorPlanet] " + this;
 	}
