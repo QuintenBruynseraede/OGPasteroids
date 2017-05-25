@@ -4,6 +4,10 @@ import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Value;
 /**
 * Simple class to wrap information about a collision in a usable format. 
+* 
+* @version	1.0
+* @author Tom De Backer and Quinten Bruynseraede
+* 
 * @note Collision objects are only used to pass information about a certain collision to a next method, 
 * 	therefore no checking of the collisions' data has been implemented.
 */

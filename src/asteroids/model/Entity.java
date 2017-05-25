@@ -1,10 +1,14 @@
 package asteroids.model;
 
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Immutable;
 import be.kuleuven.cs.som.annotate.Raw;
 
 /**
 * Abstract class containing an entity.
+* 
+* @version	1.0
+* @author Tom De Backer and Quinten Bruynseraede
 * 
 * @invar	The radius of this entity will always be a valid radius.
 * 			| isValidRadius(this.getRadius())
@@ -262,6 +266,7 @@ public abstract class Entity extends GameObject {
 	 */
 	@Basic
 	@Raw
+	@Immutable
 	public static double getVelocityLowerBound() {
 		return VELOCITYLOWERBOUND;
 	}
@@ -271,6 +276,7 @@ public abstract class Entity extends GameObject {
 	 */
 	@Basic
 	@Raw
+	@Immutable
 	public static double getVelocityUpperBound() {
 		return VELOCITYUPPERBOUND;
 	}
@@ -373,25 +379,68 @@ public abstract class Entity extends GameObject {
 		}
 	}
 	
+	
+	
 	/**
-	 * Returns the time to a collision between the ship invoking the method and another ship.
-	 * @param 	otherShip
-	 * @return	The time to a collision based on the ships' position and orientation
-	 * 			| result ==  {deltaT | (ship1.move(deltaT) => ship1.overlap(ship2)) && (ship2.move(deltaT) => ship2.overlap(ship1))}
+	 * Variable registering the radius of this planetoid.
+	 */
+	protected double radius;
+	
+	/**
+	 * @param 	radius
+	 * 			The given radius to check.
+	 * @return	True if and only if the velocity is greater than the minimum value specified for a entity's radius.
+	 * 			| result == (radius > this.radiusLowerBound)
+	 */
+	public abstract boolean isValidRadius(double radius);
+	
+	
+	/**
+	 * This method returns the radius of this entity.
+	 */
+	@Basic
+	@Raw
+	public double getRadius() {
+		return this.radius;
+	}
+	
+	/**
+	 * @param 	radius
+	 * 			The new radius for this entity.
+	 * @post	The new radius of the entity is equal to the given argument radius.
+	 * 			| new.radius = radius
+	 */
+	@Basic
+	public abstract void setRadius(double radius);
+	
+	/**
+	 * This method returns the minimum value for this entity's radius.
+	 */
+	@Basic
+	@Immutable
+	public abstract double getRadiusLowerBound();
+
+	
+	
+	/**
+	 * Returns the time to a collision between the entity invoking the method and another entity.
+	 * @param 	otherEntity
+	 * @return	The time to a collision based on the entity's position and orientation
+	 * 			| result ==  {deltaT | (entity1.move(deltaT) => entity1.overlap(entity2)) && (entity1.move(deltaT) => entity2.overlap(entity1))}
 	 * @throws 	IllegalArgumentException
-	 * 			The ship to check a collision against is a null object.
-	 * @note	Knowing that a spaceship always moves in a straight line, a ship's position can
+	 * 			The entity to check a collision against is a null object.
+	 * @note	Knowing that an entity always moves in a straight line, a ship's position can
 	 * 			easily be calculated as a function of the current position and the ship's velocity 
 	 * 			| newPos = currPos + time * velocity (I)
-	 * 			This formula holds for ship1.x, ship1.y, ship2.x, ship2.y
-	 * 			A collision occurs if two spaceships are seperated by a distance equal to the sum of their radiuses
-	 * 			| getDistanceBetween(ship1, ship2) == ship1.radius + ship2.radius (II)
+	 * 			This formula holds for entity1.x, entity1.y, entity2.x, entity2.y
+	 * 			A collision occurs if two entities are seperated by a distance equal to the sum of their radiuses
+	 * 			| getDistanceBetween(entity1, entity2) == entity1.radius + entity2.radius (II)
 	 * 			Substituting the position functions (I) into the collision position (II) gives us a quadratic equation
-	 * 			that makes use of the ship's position, velocity, radius and the time to a collision.
+	 * 			that makes use of the entity's position, velocity, radius and the time to a collision.
 	 * 			We can now find an expression that returns this time as a function of all previously mentioned variables.
-	 * 			The roots of this quadratic equation are our solution.
+	 * 			The roots of this quadratic equation are our solutions.
 	 * 			Special cases include a divide by zero (no solutions => no collision => infinity time to collision)
-	 * 			and the case where two ships move in the same direction, the furthest one faster than the other ship,
+	 * 			and the case where two entities move in the same direction, the furthest one faster than the other entity,
 	 * 			resulting in a situation where the distance between them keeps increasing forever => no collision
 	 * 			=> infinity time to collision.
 	 */
@@ -470,44 +519,6 @@ public abstract class Entity extends GameObject {
 	}
 	
 	
-	/**
-	 * Variable registering the radius of this planetoid.
-	 */
-	protected double radius;
-	
-	/**
-	 * @param 	radius
-	 * 			The given radius to check.
-	 * @return	True if and only if the velocity is greater than the minimum value specified for a entity's radius.
-	 * 			| result == (radius > this.radiusLowerBound)
-	 */
-	public abstract boolean isValidRadius(double radius);
-	
-	
-	/**
-	 * This method returns the radius of this entity.
-	 */
-	@Basic
-	@Raw
-	public double getRadius() {
-		return this.radius;
-	}
-	
-	/**
-	 * @param 	radius
-	 * 			The new radius for this entity.
-	 * @post	The new radius of the entity is equal to the given argument radius.
-	 * 			| new.radius = radius
-	 */
-	@Basic
-	public abstract void setRadius(double radius);
-	
-	/**
-	 * This method returns the minimum value for this entity's radius.
-	 */
-	@Basic
-	public abstract double getRadiusLowerBound();
-
 	/**
 	 * 	Returns the time to the first collision with one of the four boundaries of this entity's world
 	 * 

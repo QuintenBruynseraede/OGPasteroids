@@ -4,6 +4,9 @@ import be.kuleuven.cs.som.annotate.Basic;
 
 /**
 * A class representing a GameObject, the most basic object in our game.
+* 
+* @version	1.0
+* @author Tom De Backer and Quinten Bruynseraede
 */
 public abstract class GameObject {
 	/**

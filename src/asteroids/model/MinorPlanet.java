@@ -1,6 +1,5 @@
 package asteroids.model;
 
-import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
 
 /**
@@ -8,6 +7,7 @@ import be.kuleuven.cs.som.annotate.Raw;
  *  
  * @author 	Tom De Backer and Quinten Bruynseraede
  *
+ * @version	1.0
  */
 
 
@@ -34,16 +34,6 @@ public abstract class MinorPlanet extends Entity {
 		super(x, y, xVelocity, yVelocity, radius);
 	}
 
-	/**
-	 *  Finalizes this MinorPlanet, preparing it to be removed by the GC.
-	 *  @post	| ! new.getWorld().getEntities().contains(this)
-	 *  @post	| this.finalized == true
-	 */
-	@Override
-	public void finalize(){
-		this.getWorld().removeEntity(this);
-		this.finalized = true;
-	}
 	
 	/**
 	 * Returns this MinorPlanet's mass. Implemented by MinorPlanet's subclasses.
@@ -116,6 +106,16 @@ public abstract class MinorPlanet extends Entity {
 		}
 	}
 	
+	/**
+	 *  Finalizes this MinorPlanet, preparing it to be removed by the GC.
+	 *  @post	| ! new.getWorld().getEntities().contains(this)
+	 *  @post	| this.finalized == true
+	 */
+	@Override
+	public void finalize(){
+		this.getWorld().removeEntity(this);
+		this.finalized = true;
+	}
 
 	/**
 	 * Returns a string representation of a minorplanet.
@@ -127,4 +127,7 @@ public abstract class MinorPlanet extends Entity {
 	public String toString() {
 		return "[MinorPlanet] " + this;
 	}
+
+
+	public abstract boolean isValidRadius(double radius);
 }

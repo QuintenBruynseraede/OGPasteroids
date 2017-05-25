@@ -1,17 +1,18 @@
 package asteroids.model;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Immutable;
 import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  *  A class of ships with some properties.
  *  
  * @author Tom De Backer and Quinten Bruynseraede
+ * @version	1.0
  * 
  * @invar	The orientation of this ship is always a valid orientation for a ship.
  * 			| isValidOrientation(getOrientation())
@@ -136,48 +137,6 @@ public class Ship extends Entity {
 		this.orientation += angle;
 	}
 	
-	/**
-	 * Change the ship's velocity based on the current velocity and a specified amount of thrust.
-	 * @param 	amount	
-	 * 			The amount of thrust the ship generates.
-	 * @post 	If the specified amount to thrust is an illegal value, that is a negative number, no thrust is generated
-	 * 			| if ( amount < 0 )
-	 *  		| 		this.thrust(0)
-	 * @post 	If the specified amount of thrust would result in a speed greater than allowed for this spaceship,
-	 * 			an adjusted amount of thrust is generated to ensure the ship's x and y velocity are maximised yet still valid.
-	 * 			| if (totalVelocity > velocityUpperBound)
-	 * 			|		new.xVelocity = this.xVelocity + amount * Math.cos(this.orientation)
-	 * 			| 		new.yVelocity = this.yVelocity + amount * Math.sin(this.orientation)
-	 * 			| 		double velocityRatio = this.getXVelocity()/this.getYVelocity()
-	 *			| 		this.setYVelocity( Math.sqrt( (this.velocityUpperBound*this.velocityUpperBound) / (velocityRatio * velocityRatio + 1)))
-	 *			| 		this.setXVelocity( velocityRatio * this.getYVelocity())
-	 * @note	If YVelocity is equal to zero, the velocityRatio can be calculated. Therefore we only set XVelocity to velocityUpperBound, 
-	 * 			as multiplying zero by a ratio would be redundant.
-	 * @post	If a valid amount of thrust is specified, the ship's x and y velocity are updated accordingly
-	 * 			| new.xVelocity = this.xVelocity + amount * Math.cos(this.orientation)
-	 * 			| new.yVelocity = this.yVelocity + amount * Math.sin(this.orientation) 
-	 */
-	public void thrust(double amount) {
-		if ( amount <= 0 )
-			return; 
-		else if (getTotalVelocity(this.getXVelocity() + amount * Math.cos(this.orientation), this.getYVelocity() + amount * Math.cos(this.orientation)) > VELOCITYUPPERBOUND) {
-		
-			this.setXVelocity(this.getXVelocity() + amount * Math.cos(this.orientation));
-			this.setYVelocity(this.getYVelocity() + amount * Math.sin(this.orientation));
-			
-			if(this.getYVelocity() == 0) 
-				this.setXVelocity(VELOCITYUPPERBOUND);
-			else {
-				double velocityRatio = this.getXVelocity()/this.getYVelocity();
-				this.setYVelocity( Math.sqrt( (VELOCITYUPPERBOUND*VELOCITYUPPERBOUND) / (velocityRatio * velocityRatio + 1)));
-				this.setXVelocity( velocityRatio * this.getYVelocity());
-			}
-		}
-		else {
-			this.setXVelocity(this.getXVelocity() + amount * Math.cos(this.orientation));
-			this.setYVelocity(this.getYVelocity() + amount * Math.sin(this.orientation));
-		}
-	}
 	
 	
 	
@@ -266,6 +225,58 @@ public class Ship extends Entity {
 		else
 			return 0;
 	}
+	
+	/**
+	 * Change the ship's velocity based on the current velocity and a specified amount of thrust.
+	 * @param 	amount	
+	 * 			The amount of thrust the ship generates.
+	 * @post 	If the specified amount to thrust is an illegal value, that is a negative number, no thrust is generated
+	 * 			| if ( amount < 0 )
+	 *  		| 		this.thrust(0)
+	 * @post 	If the specified amount of thrust would result in a speed greater than allowed for this spaceship,
+	 * 			an adjusted amount of thrust is generated to ensure the ship's x and y velocity are maximised yet still valid.
+	 * 			| if (totalVelocity > velocityUpperBound)
+	 * 			|		new.xVelocity = this.xVelocity + amount * Math.cos(this.orientation)
+	 * 			| 		new.yVelocity = this.yVelocity + amount * Math.sin(this.orientation)
+	 * 			| 		double velocityRatio = this.getXVelocity()/this.getYVelocity()
+	 *			| 		this.setYVelocity( Math.sqrt( (this.velocityUpperBound*this.velocityUpperBound) / (velocityRatio * velocityRatio + 1)))
+	 *			| 		this.setXVelocity( velocityRatio * this.getYVelocity())
+	 * @note	If YVelocity is equal to zero, the velocityRatio can be calculated. Therefore we only set XVelocity to velocityUpperBound, 
+	 * 			as multiplying zero by a ratio would be redundant.
+	 * @post	If a valid amount of thrust is specified, the ship's x and y velocity are updated accordingly
+	 * 			| new.xVelocity = this.xVelocity + amount * Math.cos(this.orientation)
+	 * 			| new.yVelocity = this.yVelocity + amount * Math.sin(this.orientation) 
+	 */
+	public void thrust(double amount) {
+		if ( amount <= 0 )
+			return; 
+		else if (getTotalVelocity(this.getXVelocity() + amount * Math.cos(this.orientation), this.getYVelocity() + amount * Math.cos(this.orientation)) > VELOCITYUPPERBOUND) {
+		
+			this.setXVelocity(this.getXVelocity() + amount * Math.cos(this.orientation));
+			this.setYVelocity(this.getYVelocity() + amount * Math.sin(this.orientation));
+			
+			if(this.getYVelocity() == 0) 
+				this.setXVelocity(VELOCITYUPPERBOUND);
+			else {
+				double velocityRatio = this.getXVelocity()/this.getYVelocity();
+				this.setYVelocity( Math.sqrt( (VELOCITYUPPERBOUND*VELOCITYUPPERBOUND) / (velocityRatio * velocityRatio + 1)));
+				this.setXVelocity( velocityRatio * this.getYVelocity());
+			}
+		}
+		else {
+			this.setXVelocity(this.getXVelocity() + amount * Math.cos(this.orientation));
+			this.setYVelocity(this.getYVelocity() + amount * Math.sin(this.orientation));
+		}
+	}
+	
+	/**
+	 * Updates the velocity to the current acceleration.
+	 * @post	this.thrust(getAcceleration())
+	 */
+	public void updateVelocity() {
+		thrust(getAcceleration());
+	}
+	
 	
 	/**
 	 * Removes a bullet from the list of bullets this ship is carrying.
@@ -364,34 +375,6 @@ public class Ship extends Entity {
 		
 	}
 	
-	/**
-	 * Updates the velocity to the current acceleration.
-	 * @post	this.thrust(getAcceleration())
-	 */
-	public void updateVelocity() {
-		this.thrust(getAcceleration());
-	}
-	
-	/**
-	 * Finalizes the bullet, preparing it to be removed by the garbage collector.
-	 * @post	| for each bullet: bulletLoaded
-	 * 			| 	bullet.parent == null
-	 * @post	| this.getWorld().removeEntity(this)
-	 * @post	| new.finalized == true
-	 */
-	@Override
-	@Raw
-	public void finalize() {
-		
-		if (! bulletsLoaded.isEmpty()) {
-			for (Bullet b : bulletsLoaded) {
-				b.setParent(null);
-			}
-		}
-
-		this.getWorld().removeEntity(this);
-		this.finalized = true;
-	}
 
 	/**
 	 * Returns whether a given radius is a valid radius for a ship.
@@ -428,9 +411,13 @@ public class Ship extends Entity {
 	 */
 	private static final double RADIUSLOWERBOUND = 1;
 	
+	/**
+	 * Returns the lower bound for the radius of a ship.	
+	 */
 	@Override
 	@Raw
 	@Basic
+	@Immutable
 	public double getRadiusLowerBound() {
 		return RADIUSLOWERBOUND;
 	}
@@ -572,7 +559,27 @@ public class Ship extends Entity {
 		return r;
 	}
 	
+	/**
+	 * Finalizes the bullet, preparing it to be removed by the garbage collector.
+	 * @post	| for each bullet: bulletLoaded
+	 * 			| 	bullet.parent == null
+	 * @post	| this.getWorld().removeEntity(this)
+	 * @post	| new.finalized == true
+	 */
+	@Override
+	@Raw
+	public void finalize() {
+		
+		if (! bulletsLoaded.isEmpty()) {
+			for (Bullet b : bulletsLoaded) {
+				b.setParent(null);
+			}
+		}
 
+		this.getWorld().removeEntity(this);
+		this.finalized = true;
+	}
+	
 	/**
 	 * Returns a string representation of a ship.
 	 * 

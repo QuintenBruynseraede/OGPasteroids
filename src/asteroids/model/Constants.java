@@ -3,6 +3,10 @@ package asteroids.model;
 /**
 * 	Class containing the game's basic constants in a readable way. 
 * 	Class-specific constants are defined in their respective class
+* 
+* @author Tom De Backer and Quinten Bruynseraede
+* @version	1.0
+* 
 **/
 public abstract class Constants {
 	/*

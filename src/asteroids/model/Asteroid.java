@@ -1,11 +1,13 @@
 package asteroids.model;
 
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Immutable;
 import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * Class containing an asteroid with some properties.
  * @author 	Tom De Backer and Quinten Bruynseraede
+ * @version	1.0
  * 
  *  @invar	The radius of this asteroid will always be a valid radius for a asteroid.
  *  		| isValidRadius(getRadius())
@@ -68,6 +70,7 @@ public class Asteroid extends MinorPlanet {
 	 * Returns the mass density of this asteroid.
 	 */
 	@Basic
+	@Immutable
 	public double getMassDensity() {
 		return Asteroid.MASSDENSITY;
 	}
@@ -78,9 +81,8 @@ public class Asteroid extends MinorPlanet {
 	 * 			The radius to check 
 	 *  @see 	implementation
 	 */
-	@Override
 	public boolean isValidRadius(double radius) {
-		return (radius >= this.getRadiusLowerBound());
+		return (radius >= getRadiusLowerBound());
 	}
 
 	/**
@@ -104,7 +106,7 @@ public class Asteroid extends MinorPlanet {
 	 * 	@returns	
 	 * 		| Asteroid.RADIUSLOWERBOUND
 	 */
-	@Override
+	@Immutable
 	public double getRadiusLowerBound() {
 		return RADIUSLOWERBOUND;
 	}

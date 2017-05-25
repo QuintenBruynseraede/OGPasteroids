@@ -4,6 +4,9 @@ import be.kuleuven.cs.som.annotate.Basic;
 
 /**
 * A Class wrapping the abstract concept of a world's boundary in a usable GameObject
+* 
+* @version	1.0
+* @author Tom De Backer and Quinten Bruynseraede
 */
 
 public class Boundary extends GameObject {

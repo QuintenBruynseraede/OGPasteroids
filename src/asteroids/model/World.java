@@ -11,6 +11,8 @@ import asteroids.part2.CollisionListener;
 
 /**
  * A class of worlds with some properties.
+ * @version	1.0
+ * @author Tom De Backer and Quinten Bruynseraede
  *  
  * @author Tom De Backer and Quinten Bruynseraede
  * @invar 	The height of this world is always less than or equal to the maximum value for the height of a world
@@ -24,6 +26,9 @@ import asteroids.part2.CollisionListener;
  * @invar 	Each Entity kept in the list of entities belonging to this world is associated with this world.
  * 			| for each Entity e in this.getEntities()
  *  		|	 e.getWorld() == this
+ * @invar	Every entity in this world lies fully within the bounds of this world.
+ * 			| for each Entity e in this.getEntities()
+ *  		|	 isEntityWithinBounds(e)
  */
 
 
@@ -113,6 +118,13 @@ public class World extends GameObject {
 	}
 	
 	/**
+	 *  
+	 */
+	private boolean isEntityWithinBounds(Entity e) {
+		return e.getXCoordinate() >= e.getRadius() && e.getYCoordinate() >= e.getRadius() && e.getXCoordinate() <= this.getWidth() - e.getRadius() && e.getYCoordinate() <= this.getHeight() - e.getRadius(); 
+	}
+	
+	/**
 	 * Set registering the entity contained by this world
 	 */	
 	private Set<Entity> entities = new HashSet<Entity>();
@@ -123,7 +135,9 @@ public class World extends GameObject {
 	 * 			The entity to be added to this world.
 	 * @post	| new.getEntities().contains(entity)
 	 */
-	public void addEntity(Entity e) {
+	public void addEntity(Entity e) throws IllegalArgumentException {
+		if (e == null)
+			throw new IllegalArgumentException("Null object");
 		entities.add(e);
 	}
 
@@ -192,7 +206,6 @@ public class World extends GameObject {
 			copy.add(e);
 		}
 		return copy;
-		
 	}
 	
 	/**
@@ -344,49 +357,6 @@ public class World extends GameObject {
 	
 	/**
 	 * 
-	 * @param 	deltaTime
-	 * 			The time to advance this world.
-	 * @param 	collisionListener
-	 * 
-	 * @post	If no collisions will occur within the timeframe [now, now + deltaTime], all objects' positions
-	 * 			are updated, according to their current position and velocity
-	 * 			| if (nextCollision.getTime() > deltaTime) {
-	 * 			|	this.advance()
-	 * @post	If a collision will occur within the timeframe [now, now + deltaTime], all objects' positions
-	 * 			are updated to the moment right before the next collision, the collision is resolved, and positions are updated again
-	 * 			| if (nextCollision.getTime() <= deltaTime) {
-	 * 			|	this.advance(nextCollision.getTime())
-	 * 			|	this.resolvecollision(nextCollision)
-	 * 			|	this.evolve(deltaTime - nextCollision.getTime())
-	 *
-	 */
-	public void evolve(double deltaTime, CollisionListener collisionListener) throws IllegalArgumentException {
-		if (!Double.isFinite(deltaTime)) {
-			System.out.println("Invalid deltaTime " + deltaTime);
-			throw new IllegalArgumentException();
-		}
-					
-		Collision nextCollision = getNextCollisionData();
-		
-		if (nextCollision.getTime() > deltaTime) 
-			advance(deltaTime);
-		else {
-			advance(nextCollision.getTime());
-			if (collisionListener != null) {
-				if (nextCollision.getType() == Constants.BOUNDARYCOLLISION) 
-					collisionListener.boundaryCollision(nextCollision.getObject1(), nextCollision.getX(), nextCollision.getY());
-				else 
-					collisionListener.objectCollision(nextCollision.getObject1(), nextCollision.getObject2(), nextCollision.getX(), nextCollision.getY());
-			}
-			
-			resolveCollision(nextCollision);
-			advance(0.05);
-			evolve(deltaTime - nextCollision.getTime(), collisionListener);
-		}
-	}
-	
-	/**
-	 * 
 	 * @param 	object1
 	 * 			The first object involved in the collision this method resolves.
 	 * @param 	object2
@@ -533,6 +503,51 @@ public class World extends GameObject {
 		}
 		throw new IllegalStateException("Undefined collision.");
 	}
+	
+	/**
+	 * 
+	 * @param 	deltaTime
+	 * 			The time to advance this world.
+	 * @param 	collisionListener
+	 * 
+	 * @post	If no collisions will occur within the timeframe [now, now + deltaTime], all objects' positions
+	 * 			are updated, according to their current position and velocity
+	 * 			| if (nextCollision.getTime() > deltaTime) {
+	 * 			|	this.advance()
+	 * @post	If a collision will occur within the timeframe [now, now + deltaTime], all objects' positions
+	 * 			are updated to the moment right before the next collision, the collision is resolved, and positions are updated again
+	 * 			| if (nextCollision.getTime() <= deltaTime) {
+	 * 			|	this.advance(nextCollision.getTime())
+	 * 			|	this.resolvecollision(nextCollision)
+	 * 			|	this.evolve(deltaTime - nextCollision.getTime())
+	 *
+	 */
+	public void evolve(double deltaTime, CollisionListener collisionListener) throws IllegalArgumentException {
+		if (!Double.isFinite(deltaTime)) {
+			//System.out.println("Invalid deltaTime " + deltaTime);
+			throw new IllegalArgumentException();
+		}
+					
+		Collision nextCollision = getNextCollisionData();
+		
+		if (nextCollision.getTime() > deltaTime) 
+			advance(deltaTime);
+		else {
+			advance(nextCollision.getTime());
+			if (collisionListener != null) {
+				if (nextCollision.getType() == Constants.BOUNDARYCOLLISION) 
+					collisionListener.boundaryCollision(nextCollision.getObject1(), nextCollision.getX(), nextCollision.getY());
+				else 
+					collisionListener.objectCollision(nextCollision.getObject1(), nextCollision.getObject2(), nextCollision.getX(), nextCollision.getY());
+			}
+			
+			resolveCollision(nextCollision);
+			advance(0.05);
+			evolve(deltaTime - nextCollision.getTime(), collisionListener);
+		}
+	}
+	
+	
 	
 	/**
 	 * Updates all entities' positions depending on their position and velocity. 

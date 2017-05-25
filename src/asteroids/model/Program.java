@@ -1,20 +1,22 @@
 package asteroids.model;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import asteroids.model.programs.Expression;
 import asteroids.model.programs.Function;
-import asteroids.model.programs.OutOfTimeException;
 import asteroids.model.programs.Statement;
 import asteroids.model.programs.Variable;
 import asteroids.part3.programs.SourceLocation;
 import be.kuleuven.cs.som.annotate.Basic;
 
+/**
+ * @version	1.0
+ * @author Tom De Backer and Quinten Bruynseraede
+ *
+ */
 public class Program {
 	private Ship ship;
 	private double timeLeft;

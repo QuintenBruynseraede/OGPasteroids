@@ -1,6 +1,7 @@
 package asteroids.model;
 
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Immutable;
 import be.kuleuven.cs.som.annotate.Raw;
 
 
@@ -8,6 +9,7 @@ import be.kuleuven.cs.som.annotate.Raw;
  * A class of bullets with some properties.
  *  
  * @author Tom De Backer and Quinten Bruynseraede
+ * @version	1.0
  *
  * @invar	The radius of this bullet is always a valid radius for a bullet.
  * 			| isValidRadius(getRadius())
@@ -85,6 +87,7 @@ public class Bullet extends Entity {
 	 * Returns the mass density of this bullet.
 	 */
 	@Basic
+	@Immutable
 	public double getMassDensity() {
 		return Bullet.MASSDENSITY;
 	}
@@ -119,11 +122,6 @@ public class Bullet extends Entity {
 	public Ship getParent() {
 		return this.parent;
 	}
-	
-	/**
-	 * 	The smallest radius an instance of the bullet class can have.
-	 */
-	private static final double RADIUSLOWERBOUND = 1;
 	
 	/**
 	 * Variable registering the number of bounces against a boundary this bullet has made.
@@ -197,24 +195,12 @@ public class Bullet extends Entity {
 		this.isLoaded = loaded;
 	}
 
+	
 	/**
-	 * Finalizes the bullet, preparing it to be removed by the garbage collector.
-	 * @post	If this bullet has a parent, make it remove it from its list of bullets
-	 * @post	If this bullet has been added to a world, make the world remove it from its list of bullets
-	 * @post	| new.isFinalized() == true
-	 * @see 	implementation
+	 * 	The smallest radius an instance of the bullet class can have.
 	 */
-	@Override
-	@Raw
-	public void finalize() {
-		
-		if (this.getParent() != null)
-			this.getParent().removeBullet(this);
-		if (this.getWorld() != null)
-			this.getWorld().removeEntity(this);
-		this.finalized = true;
-	}
-
+	private static final double RADIUSLOWERBOUND = 1;
+	
 	/**
 	 * Returns whether a given radius is a valid radius for a bullet.
 	 * @param 	radius
@@ -222,10 +208,9 @@ public class Bullet extends Entity {
 	 * @return	True if and only if the velocity is greater than the minimum value specified for a bullet's radius.
 	 * 			| result == radius > this.getRadiusLowerBound()
 	 */
-	@Override
 	@Raw
 	public boolean isValidRadius(double radius) {
-		return (radius >= this.getRadiusLowerBound());
+		return (radius >= getRadiusLowerBound());
 	}
 
 	/**
@@ -251,6 +236,7 @@ public class Bullet extends Entity {
 	 */
 	@Override
 	@Raw
+	@Immutable
 	public double getRadiusLowerBound() {
 		return Bullet.RADIUSLOWERBOUND;
 	}
@@ -317,6 +303,23 @@ public class Bullet extends Entity {
 			throw new IllegalArgumentException("Invalid collision type");
 	}
 	
+	/**
+	 * Finalizes the bullet, preparing it to be removed by the garbage collector.
+	 * @post	If this bullet has a parent, make it remove it from its list of bullets
+	 * @post	If this bullet has been added to a world, make the world remove it from its list of bullets
+	 * @post	| new.isFinalized() == true
+	 * @see 	implementation
+	 */
+	@Override
+	@Raw
+	public void finalize() {
+		
+		if (this.getParent() != null)
+			this.getParent().removeBullet(this);
+		if (this.getWorld() != null)
+			this.getWorld().removeEntity(this);
+		this.finalized = true;
+	}
 
 	/**
 	 * Returns a string representation of a bullet.

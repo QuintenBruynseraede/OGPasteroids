@@ -1,12 +1,14 @@
 package asteroids.model;
 
-import java.util.Random;
-
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Immutable;
 import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * 	Class representing a Planetoid with some properties. A planetoid shrinks based on the distance it has travelled during its lifetime.
+ * 
+ * @version	1.0
+ * @author	Tom De Backer and Quinten Bruynseraede
  * 
  *  @invar	The radius of this planetoid will always be a valid radius for a planetoid.
  *  		| isValidRadius(getRadius())
@@ -72,57 +74,23 @@ public class Planetoid extends MinorPlanet {
 	private static final double MASSDENSITY = 0.917E12;
 	
 	/**
-	 * Constant registering the lowest possible value for the radius of a planetoid.
-	 */
-	private static final double RADIUSLOWERBOUND = 5;
-	
-	/**
 	 * Returns the mass density of this planetoid.
 	 */
 	@Basic
 	@Raw
+	@Immutable
 	public double getMassDensity() {
 		return Planetoid.MASSDENSITY;
 	}
 	
 	
-	/**
-	 * Variable representing whether this planetoid has been finalized already.	
-	 */
-	private boolean finalized = false;
 	
-	/**
-	 * Finalizes the planetoid, preparing it to be removed by the garbage collector.
-	 * @post	| new.isFinalzed() == true
-	 * @see implementation
-	 */
-	public void finalize() {
-		if (this.getWorld() != null && this.getRadius() >= 30) {
-			Random r = new Random();
-			double child1XVelocity = Math.random()*(9/4)*(this.getXVelocity()*this.getXVelocity()+this.getYVelocity()*this.getYVelocity());
-			double child1YVelocity = Math.sqrt((9/4)*(this.getXVelocity()*this.getXVelocity()+this.getYVelocity()*this.getYVelocity()) - child1XVelocity*child1XVelocity);
-			
-			
-			Asteroid a1 = new Asteroid(this.getXCoordinate() + this.getRadius()/2, this.getYCoordinate(), child1XVelocity, child1YVelocity, this.getRadius()/2);
-			Asteroid a2 = new Asteroid(this.getXCoordinate() - this.getRadius()/2, this.getYCoordinate(), -child1XVelocity, -child1YVelocity, this.getRadius()/2);
-			this.getWorld().addEntity(a1);
-			this.getWorld().addEntity(a2);
-			
-			a1.setWorld(this.getWorld());
-			a2.setWorld(this.getWorld());
-		}
-		this.finalized = true;
-	}
 
 	/**
-	 * Returns whether this planetoid has been finalized.
+	 * Constant registering the lowest possible value for the radius of a planetoid.
 	 */
-	@Basic
-	@Raw
-	public boolean isFinalized() {
-		return this.finalized;
-	}
-
+	private static final double RADIUSLOWERBOUND = 5;
+	
 	/**
 	 * Returns whether a given radius is a valid radius for a planetoid.
 	 * @param 	radius
@@ -167,6 +135,7 @@ public class Planetoid extends MinorPlanet {
 	 */
 	@Override
 	@Basic
+	@Immutable
 	public double getRadiusLowerBound() {
 		return RADIUSLOWERBOUND;
 	}
@@ -241,6 +210,32 @@ public class Planetoid extends MinorPlanet {
 	}
 	
 
+	
+	/**
+	 * Finalizes the planetoid, preparing it to be removed by the garbage collector.
+	 * @post	| new.isFinalzed() == true
+	 * @see implementation
+	 */
+	public void finalize() {
+		if (this.getWorld() != null && this.getRadius() >= 30) {
+			double child1XVelocity = Math.random()*(9/4)*(this.getXVelocity()*this.getXVelocity()+this.getYVelocity()*this.getYVelocity());
+			double child1YVelocity = Math.sqrt((9/4)*(this.getXVelocity()*this.getXVelocity()+this.getYVelocity()*this.getYVelocity()) - child1XVelocity*child1XVelocity);
+			
+			
+			Asteroid a1 = new Asteroid(this.getXCoordinate() + this.getRadius()/2, this.getYCoordinate(), child1XVelocity, child1YVelocity, this.getRadius()/2);
+			Asteroid a2 = new Asteroid(this.getXCoordinate() - this.getRadius()/2, this.getYCoordinate(), -child1XVelocity, -child1YVelocity, this.getRadius()/2);
+			this.getWorld().addEntity(a1);
+			this.getWorld().addEntity(a2);
+			
+			a1.setWorld(this.getWorld());
+			a2.setWorld(this.getWorld());
+		}
+		this.finalized = true;
+	}
+
+
+
+	
 	/**
 	 * Returns a string representation of a planetoid.
 	 * 
