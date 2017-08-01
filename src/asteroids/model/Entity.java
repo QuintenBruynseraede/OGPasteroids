@@ -1,5 +1,7 @@
 package asteroids.model;
 
+import java.util.Random;
+
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
 import be.kuleuven.cs.som.annotate.Raw;
@@ -23,7 +25,7 @@ import be.kuleuven.cs.som.annotate.Raw;
 * @invar	The Y position of this entity will always be a valid position in the current world
 * 			| isValidYCoordinate(this.getYCoordinate())
 */
-public abstract class Entity extends GameObject {
+public abstract class Entity {
 	
 	/**
 	 * @param 	x
@@ -55,7 +57,6 @@ public abstract class Entity extends GameObject {
 	 */
 	@Raw
 	public Entity(double x, double y, double xVelocity, double yVelocity, double radius) throws IllegalArgumentException {
-		super(Constants.ENTITY);
 		setXCoordinate(x);
 		setYCoordinate(y);
 		setXVelocity(xVelocity);
@@ -445,77 +446,36 @@ public abstract class Entity extends GameObject {
 	 * 			=> infinity time to collision.
 	 */
 	
-	public double getTimeToCollision(GameObject other) throws IllegalArgumentException {
+	public double getTimeToCollision(Entity other) throws IllegalArgumentException {
 		if (other == null) 
 			throw new IllegalArgumentException("Invalid argument object (null).");
 		
-		if (other instanceof Entity) {
-			Entity otherEntity = (Entity) other;
-			
-			double deltaVX = this.getXVelocity() - otherEntity.getXVelocity();
-			double deltaVY = this.getYVelocity() - otherEntity.getYVelocity();
-			double deltaX = this.getXCoordinate() - otherEntity.getXCoordinate();
-			double deltaY = this.getYCoordinate() - otherEntity.getYCoordinate();
-			
-			if ((deltaVX * deltaX) + (deltaVY * deltaY) >= 0)
-				return Double.POSITIVE_INFINITY;
-			
-			double radius1 = this.getRadius();
-			double radius2 = otherEntity.getRadius();
-				
-			double part1 = deltaVX * deltaX + deltaVY * deltaY;
-			double part2 = deltaVX * deltaVX + deltaVY * deltaVY;
-			double part3 = deltaX * deltaX + deltaY * deltaY - (radius1 + radius2) * (radius1 + radius2);
-			double d = part1 * part1 - part2 * part3;
-			
-			if (part2 == 0) {
-				return Double.POSITIVE_INFINITY;
-			}
-			if (d <= 0)
-				return Double.POSITIVE_INFINITY;
-			return -( (part1 + Math.sqrt(d)) / (part2) );
-		}
 		
-		if (other instanceof Boundary) {
-			Boundary otherBoundary = (Boundary) other;
-			
-			if (otherBoundary.getBoundaryType() == Constants.LEFT) {
-				if (this.getXVelocity() == 0) return Double.POSITIVE_INFINITY;
-				if (this.getXVelocity() < 0) 
-					return Math.abs(this.getXCoordinate() / this.getXVelocity());	
-				else
-					return Double.MAX_VALUE;
-			}
-			
-			if (otherBoundary.getBoundaryType() == Constants.BOTTOM) {
-				if (this.getYVelocity() == 0) return Double.POSITIVE_INFINITY;
-				if (this.getYVelocity() < 0) 
-					return Math.abs(this.getYCoordinate() / this.getYVelocity());	
-				else
-					return Double.MAX_VALUE;
-			}
-			
-			if (otherBoundary.getBoundaryType() == Constants.RIGHT) {
-				if (this.getXVelocity() == 0) return Double.POSITIVE_INFINITY;
-				
-				if (this.getXVelocity() > 0) 
-					return Math.abs((this.getWorld().getWidth() - this.getXCoordinate()) / this.getXVelocity());	
-				else
-					return Double.MAX_VALUE;
-			}
-			
-			if (otherBoundary.getBoundaryType() == Constants.TOP) {
-				if (this.getYVelocity() == 0) return Double.POSITIVE_INFINITY;
-				if (this.getYVelocity() > 0) 
-					return Math.abs((this.getWorld().getHeight() - this.getYCoordinate()) / this.getYVelocity());	
-				else
-					return Double.MAX_VALUE;
-			}
-			
-			throw new IllegalArgumentException("No valid boundary.");
-		}
+		Entity otherEntity = (Entity) other;
 		
-		return Double.POSITIVE_INFINITY;
+		double deltaVX = this.getXVelocity() - otherEntity.getXVelocity();
+		double deltaVY = this.getYVelocity() - otherEntity.getYVelocity();
+		double deltaX = this.getXCoordinate() - otherEntity.getXCoordinate();
+		double deltaY = this.getYCoordinate() - otherEntity.getYCoordinate();
+		
+		if ((deltaVX * deltaX) + (deltaVY * deltaY) >= 0)
+			return Double.POSITIVE_INFINITY;
+		
+		double radius1 = this.getRadius();
+		double radius2 = otherEntity.getRadius();
+			
+		double part1 = deltaVX * deltaX + deltaVY * deltaY;
+		double part2 = deltaVX * deltaVX + deltaVY * deltaVY;
+		double part3 = deltaX * deltaX + deltaY * deltaY - (radius1 + radius2) * (radius1 + radius2);
+		double d = part1 * part1 - part2 * part3;
+		
+		if (part2 == 0) {
+			return Double.POSITIVE_INFINITY;
+		}
+		if (d <= 0)
+			return Double.POSITIVE_INFINITY;
+		return -( (part1 + Math.sqrt(d)) / (part2) );
+		
 	}
 	
 	
@@ -529,27 +489,30 @@ public abstract class Entity extends GameObject {
 	 * 	  	    | d = time to boundary4
 	 */
 	public double getTimeFirstCollisionBoundary() {
-		return Math.min(Math.min(this.getTimeToCollision(this.getWorld().getBoundaries()[0]), this.getTimeToCollision(this.getWorld().getBoundaries()[1])), Math.min(this.getTimeToCollision(this.getWorld().getBoundaries()[2]), this.getTimeToCollision(this.getWorld().getBoundaries()[3])));
-	}
-	
-	/**
-	 * Returns the time to the first collision with one of the four boundaries in this entity's world.
-	 * 
-	 * 	@return | BoundaryX 
-	 * 			| where for each BoundaryY: getTimeToCollision(BoundaryY) >= getTimeToCollision(BoundaryX)
-	 */
-	public Boundary getFirstCollisionBoundary() {
-		double minTime = Double.MAX_VALUE;
-		Boundary[] boundaries = this.getWorld().getBoundaries();
-		Boundary minBoundary = null;
+		if (getWorld() == null) return Double.POSITIVE_INFINITY;
+		double xTime = Double.POSITIVE_INFINITY;
+		double yTime = Double.POSITIVE_INFINITY;
 		
-		for (Boundary b : boundaries) {
-			if (this.getTimeToCollision(b) < minTime) {
-				minTime = this.getTimeToCollision(b);
-				minBoundary = b;
-			}
-		}
-		return minBoundary;	
+		if (this.getXVelocity() > 0)
+			xTime  = (getWorld().getWidth() - getXCoordinate() - getRadius()) / getXVelocity();
+		if (this.getXVelocity() < 0)
+			xTime = - ( getXCoordinate() - getRadius()) / getXVelocity();
+		if (this.getXVelocity() == 0)
+			xTime = Double.POSITIVE_INFINITY;
+			
+
+		
+		if (this.getYVelocity() > 0)
+			yTime = (getWorld().getHeight() - getYCoordinate()  -getRadius()) / getYVelocity();
+		if (this.getYVelocity() < 0)
+			yTime = - ( getYCoordinate() - getRadius()) / getYVelocity();
+		if (this.getYVelocity() == 0)
+			yTime = Double.POSITIVE_INFINITY;
+		
+		return Math.min(xTime, yTime);
+		
+		
+		
 	}
 	
 		
@@ -610,55 +573,41 @@ public abstract class Entity extends GameObject {
 	 * 			The position returned represents the centerpoint of the entity at the moment of impact.
 	 * 			Therefore, calling a.getCollisionPosition(b) is not equal to b.getCollisionPosition(b)
 	 */
-	public double[] getCollisionPosition(GameObject gameObject) throws IllegalArgumentException {
-		if (gameObject == null) 
+	public double[] getCollisionPosition(Entity otherEntity) throws IllegalArgumentException {
+		if (otherEntity == null) 
 			throw new IllegalArgumentException("Invalid argument object (null).");
 		
-		if ( gameObject.getType() == Constants.BOUNDARY ) {
-			double time = this.getTimeToCollision(((Boundary) gameObject));
-			
-			if (time == 0)
-				return null;
-			double collisionX = this.getXCoordinate() + time * this.getXVelocity();
-			double collisionY = this.getYCoordinate() + time * this.getYVelocity();
-			
-			double[] collision = {collisionX, collisionY};
-			return collision;
+
+		if ( this.overlap(otherEntity) ) {
+			double[] collision = {this.getXCoordinate(), this.getYCoordinate()};
+			return collision; 
 		}
 		
-		else {
-			Entity otherEntity = (Entity) gameObject;
+		if ( this.getTimeToCollision(otherEntity) == Double.POSITIVE_INFINITY)
+			return null;
+		
+		double collisionXSelf = this.getXCoordinate() + this.getTimeToCollision(otherEntity) * this.getXVelocity();
+		double collisionYSelf = this.getYCoordinate() + this.getTimeToCollision(otherEntity) * this.getYVelocity();
 
-			if ( this.overlap(otherEntity) ) {
-				double[] collision = {this.getXCoordinate(), this.getYCoordinate()};
-				return collision; 
-			}
+		double collisionXOther = otherEntity.getXCoordinate() + otherEntity.getTimeToCollision(this) * otherEntity.getXVelocity();
+		double collisionYOther = otherEntity.getYCoordinate() + otherEntity.getTimeToCollision(this) * otherEntity.getYVelocity();
+		
+		double collisionX;
+		double collisionY;
+		
+		if (this.getXCoordinate() > otherEntity.getXCoordinate()) {
+			collisionX = collisionXSelf - Math.cos(Math.atan((collisionYOther - collisionYSelf) / (collisionXOther - collisionXSelf))) * radius;
+			collisionY = collisionYSelf - Math.sin(Math.atan((collisionYOther - collisionYSelf) / (collisionXOther - collisionXSelf))) * radius;
 			
-			if ( this.getTimeToCollision(otherEntity) == Double.POSITIVE_INFINITY)
-				return null;
-			
-			double collisionXSelf = this.getXCoordinate() + this.getTimeToCollision(otherEntity) * this.getXVelocity();
-			double collisionYSelf = this.getYCoordinate() + this.getTimeToCollision(otherEntity) * this.getYVelocity();
-
-			double collisionXOther = otherEntity.getXCoordinate() + otherEntity.getTimeToCollision(this) * otherEntity.getXVelocity();
-			double collisionYOther = otherEntity.getYCoordinate() + otherEntity.getTimeToCollision(this) * otherEntity.getYVelocity();
-			
-			double collisionX;
-			double collisionY;
-			
-			if (this.getXCoordinate() > otherEntity.getXCoordinate()) {
-				collisionX = collisionXSelf - Math.cos(Math.atan((collisionYOther - collisionYSelf) / (collisionXOther - collisionXSelf))) * radius;
-				collisionY = collisionYSelf - Math.sin(Math.atan((collisionYOther - collisionYSelf) / (collisionXOther - collisionXSelf))) * radius;
-				
-			}
-			else {
-				collisionX = collisionXSelf + Math.cos(Math.atan((collisionYOther - collisionYSelf) / (collisionXOther - collisionXSelf))) * radius;
-				collisionY = collisionYSelf + Math.sin(Math.atan((collisionYOther - collisionYSelf) / (collisionXOther - collisionXSelf))) * radius;
-			}
-			
-			double[] collision = {collisionX, collisionY};
-			return collision;
 		}
+		else {
+			collisionX = collisionXSelf + Math.cos(Math.atan((collisionYOther - collisionYSelf) / (collisionXOther - collisionXSelf))) * radius;
+			collisionY = collisionYSelf + Math.sin(Math.atan((collisionYOther - collisionYSelf) / (collisionXOther - collisionXSelf))) * radius;
+		}
+		
+		double[] collision = {collisionX, collisionY};
+		return collision;
+		
 	}
 
 	/**
@@ -677,7 +626,6 @@ public abstract class Entity extends GameObject {
 	 * 			Type of collision to simulate. Collision types are defined in constants.java.
 	 *  @note	See implementation in subclass for specification.
 	 */
-	public abstract void collideWith(GameObject object2, int collisiontype);
 	
 	/**
 	 * 	Prepares the instance to be removed by the Garbage Collector.
@@ -711,4 +659,20 @@ public abstract class Entity extends GameObject {
 	public String toString() {
 		return "[Entity] " + this;
 	}
+
+	public void collideBoundary() {
+		System.out.println("collideBoundary");
+		if (getWorld() == null) return;
+		if (getXCoordinate() < 1.01*getRadius())
+			setXVelocity(-getXVelocity());
+		else if (getXCoordinate() > getWorld().getWidth()-1.01*getRadius())
+			setXVelocity(-getXVelocity());
+		else if (getYCoordinate() < 1.01 * getRadius())
+			setYVelocity(-getYVelocity());
+		else if (getYCoordinate() > getWorld().getHeight()-1.01*getRadius())
+			setYVelocity(-getYVelocity());
+	}
+
+	public abstract void collideWith(Entity entity);
+	
 }

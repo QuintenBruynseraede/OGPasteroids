@@ -44,7 +44,7 @@ public class Asteroid extends MinorPlanet {
 	 * Variable registering the mass of an asteroid in kilogrammes. The mass can be calculated as m = (4/3)pi*radius^3*massDensity
 	 */
 	private double mass;
-	//TEST
+
 	/**
 	 * Returns the mass of this asteroid.
 	 */

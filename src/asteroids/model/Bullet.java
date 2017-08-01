@@ -253,55 +253,7 @@ public class Bullet extends Entity {
 		move(deltaTime);
 	}
 
-	/**
-	 * 	Updates a few properties of this bullet to simulate a collision with another object.
-	 * 	@param 	object2
-	 * 			Object to collide with.
-	 * 	@param 	collisiontype
-	 * 			Type of collision to simulate. Collision types are defined in constants.java.
-	 *  @see	Implementation
-	 *  @throws	IllegalArgumentException
-	 *  		collisionType is not specified in the class Constants.	
-	 */
-	@Override
-	@Raw
-	public void collideWith(GameObject object2, int collisionType) throws IllegalArgumentException {
-		if (collisionType == Constants.BOUNDARYCOLLISION) {
-			Boundary boundary = (Boundary) object2;
-			Bullet bullet = (Bullet) this;
-			
-			if (boundary.getBoundaryType() == Constants.BOTTOM || boundary.getBoundaryType() == Constants.TOP)
-				bullet.setYVelocity(-bullet.getYVelocity());
-			else 
-				bullet.setXVelocity(-bullet.getXVelocity());
-			bullet.addBounce();
-			return;
-		}
-		else if (collisionType == Constants.ENTITYCOLLISION) {
-			if (object2 instanceof Ship) {
-				Ship ship = (Ship) object2;
-				
-				if (this.getParent() == ship) {
-					ship.bulletsLoaded.add(this);
-					this.setParent(ship);
-					
-				}
-				else {
-					ship.finalize();
-					this.finalize();	
-				}
-				return;
-			}
-			else {
-				this.finalize();
-				
-				Entity otherEntity = (Entity) object2;
-				otherEntity.finalize();
-			}
-		}
-		else
-			throw new IllegalArgumentException("Invalid collision type");
-	}
+	
 	
 	/**
 	 * Finalizes the bullet, preparing it to be removed by the garbage collector.
@@ -330,6 +282,11 @@ public class Bullet extends Entity {
 	@Raw
 	public String toString() {
 		return "[Bullet] " + this;
+	}
+
+	@Override
+	public void collideWith(Entity entity) {
+		finalize();
 	}
 	
 }

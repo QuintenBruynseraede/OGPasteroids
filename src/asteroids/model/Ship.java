@@ -212,7 +212,7 @@ public class Ship extends Entity {
 	/**
 	 * Constant registering the force this ship's thruster exerts.
 	 */
-	public final double THRUSTERFORCE = 1.1e18;
+	public final double THRUSTERFORCE = 1.1e20;
 	
 	/**
 	 * Returns the acceleration this ship is subsceptible to, making use of Newton's second law of motion (F = ma).
@@ -414,10 +414,7 @@ public class Ship extends Entity {
 	/**
 	 * Returns the lower bound for the radius of a ship.	
 	 */
-	@Override
-	@Raw
-	@Basic
-	@Immutable
+	@Override @Raw @Basic @Immutable
 	public double getRadiusLowerBound() {
 		return RADIUSLOWERBOUND;
 	}
@@ -432,79 +429,79 @@ public class Ship extends Entity {
 	@Override
 	public void advance(double deltaTime) {
 		move(deltaTime);
-		if (this.isThrusterEnabled()) 
-			this.updateVelocity();
+		if (isThrusterEnabled()) 
+			updateVelocity();
 	}
 
-	/**
-	 * 	Updates a few properties of this ship to simulate a collision with another object.
-	 * 	@param 	object2
-	 * 			Object to collide with.
-	 * 	@param 	collisiontype
-	 * 			Type of collision to simulate. Collision types are defined in constants.java.
-	 *  @see	Implementation
-	 *  @throws	IllegalArgumentException
-	 *  		collisionType is not specified in the class Constants.	
-	 */
-	@Override
-	public void collideWith(GameObject object2, int collisionType) {
-		if (collisionType == Constants.BOUNDARYCOLLISION) {
-			Boundary boundary = (Boundary) object2;
-			
-			if (boundary.getBoundaryType() == Constants.BOTTOM || boundary.getBoundaryType() == Constants.TOP)
-				this.setYVelocity(-this.getYVelocity());
-			else 
-				this.setXVelocity(-this.getXVelocity());
-			return;
-		}
-		else if (collisionType == Constants.ENTITYCOLLISION) {
-			if (object2 instanceof Ship) {
-				Ship ship1 = this;
-				Ship ship2 = (Ship) object2;
-				 
-				double deltaVX = ship1.getXVelocity() - ship2.getXVelocity();
-				double deltaVY = ship1.getYVelocity() - ship2.getYVelocity();
-				double deltaX = ship1.getXCoordinate() - ship2.getXCoordinate();
-				double deltaY = ship1.getYCoordinate() - ship2.getYCoordinate();
-				
-				double ship1J = (2*ship1.getMassTotal()*ship2.getMassTotal() * (deltaVX * deltaX + deltaVY * deltaY)) / (ship1.getRadius() * (ship1.getMassTotal() + ship2.getMassTotal()));
-				double ship1JX = (ship1J * deltaX) / ship1.getRadius();
-				double ship1JY = (ship1J * deltaY) / ship1.getRadius();
-				
-				deltaVX = ship2.getXVelocity() - ship1.getXVelocity();
-				deltaVY = ship2.getYVelocity() - ship1.getYVelocity();
-				deltaX = ship2.getXCoordinate() - ship1.getXCoordinate();
-				deltaY = ship2.getYCoordinate() - ship1.getYCoordinate();
-				
-				double ship2J = (2*ship1.getMassTotal()*ship2.getMassTotal() * (deltaVX * deltaX + deltaVY * deltaY)) / (ship2.getRadius() * (ship1.getMassTotal() + ship2.getMassTotal()));
-				double ship2JX = (ship2J * deltaX) / ship2.getRadius();
-				double ship2JY = (ship2J * deltaY) / ship2.getRadius();
-				
-				ship1.setXVelocity(ship1.getXVelocity() + ship1JX / ship1.getMassTotal());
-				ship1.setYVelocity(ship1.getYVelocity() + ship1JY / ship1.getMassTotal());
-				ship2.setXVelocity(ship2.getXVelocity() + ship2JX / ship2.getMassTotal());
-				ship2.setYVelocity(ship2.getYVelocity() + ship2JY / ship2.getMassTotal());
-				
-				return;
-			}
-			if (object2 instanceof Bullet) {
-				Bullet b = (Bullet) object2;
-				b.collideWith(this, Constants.ENTITYCOLLISION);
-				return;
-			}
-			if (object2 instanceof Asteroid) {
-				this.finalize();
-				return;
-			}
-			if (object2 instanceof Planetoid) {
-				this.teleport();
-				return;
-			}
-			
-		}
-		else
-			throw new IllegalArgumentException("Invalid Collision type");
-	}
+//	/**
+//	 * 	Updates a few properties of this ship to simulate a collision with another object.
+//	 * 	@param 	object2
+//	 * 			Object to collide with.
+//	 * 	@param 	collisiontype
+//	 * 			Type of collision to simulate. Collision types are defined in constants.java.
+//	 *  @see	Implementation
+//	 *  @throws	IllegalArgumentException
+//	 *  		collisionType is not specified in the class Constants.	
+//	 */
+//	@Override
+//	public void collideWith(GameObject object2, int collisionType) {
+//		if (collisionType == Constants.BOUNDARYCOLLISION) {
+//			Boundary boundary = (Boundary) object2;
+//			
+//			if (boundary.getBoundaryType() == Constants.BOTTOM || boundary.getBoundaryType() == Constants.TOP)
+//				this.setYVelocity(-this.getYVelocity());
+//			else 
+//				this.setXVelocity(-this.getXVelocity());
+//			return;
+//		}
+//		else if (collisionType == Constants.ENTITYCOLLISION) {
+//			if (object2 instanceof Ship) {
+//				Ship ship1 = this;
+//				Ship ship2 = (Ship) object2;
+//				 
+//				double deltaVX = ship1.getXVelocity() - ship2.getXVelocity();
+//				double deltaVY = ship1.getYVelocity() - ship2.getYVelocity();
+//				double deltaX = ship1.getXCoordinate() - ship2.getXCoordinate();
+//				double deltaY = ship1.getYCoordinate() - ship2.getYCoordinate();
+//				
+//				double ship1J = (2*ship1.getMassTotal()*ship2.getMassTotal() * (deltaVX * deltaX + deltaVY * deltaY)) / (ship1.getRadius() * (ship1.getMassTotal() + ship2.getMassTotal()));
+//				double ship1JX = (ship1J * deltaX) / ship1.getRadius();
+//				double ship1JY = (ship1J * deltaY) / ship1.getRadius();
+//				
+//				deltaVX = ship2.getXVelocity() - ship1.getXVelocity();
+//				deltaVY = ship2.getYVelocity() - ship1.getYVelocity();
+//				deltaX = ship2.getXCoordinate() - ship1.getXCoordinate();
+//				deltaY = ship2.getYCoordinate() - ship1.getYCoordinate();
+//				
+//				double ship2J = (2*ship1.getMassTotal()*ship2.getMassTotal() * (deltaVX * deltaX + deltaVY * deltaY)) / (ship2.getRadius() * (ship1.getMassTotal() + ship2.getMassTotal()));
+//				double ship2JX = (ship2J * deltaX) / ship2.getRadius();
+//				double ship2JY = (ship2J * deltaY) / ship2.getRadius();
+//				
+//				ship1.setXVelocity(ship1.getXVelocity() + ship1JX / ship1.getMassTotal());
+//				ship1.setYVelocity(ship1.getYVelocity() + ship1JY / ship1.getMassTotal());
+//				ship2.setXVelocity(ship2.getXVelocity() + ship2JX / ship2.getMassTotal());
+//				ship2.setYVelocity(ship2.getYVelocity() + ship2JY / ship2.getMassTotal());
+//				
+//				return;
+//			}
+//			if (object2 instanceof Bullet) {
+//				Bullet b = (Bullet) object2;
+//				b.collideWith(this, Constants.ENTITYCOLLISION);
+//				return;
+//			}
+//			if (object2 instanceof Asteroid) {
+//				this.finalize();
+//				return;
+//			}
+//			if (object2 instanceof Planetoid) {
+//				this.teleport();
+//				return;
+//			}
+//			
+//		}
+//		else
+//			throw new IllegalArgumentException("Invalid Collision type");
+//	}
 
 	/**
 	 * Teleports this ship to a random place in its world and destroys all its entities.
@@ -589,5 +586,44 @@ public class Ship extends Entity {
 	@Raw
 	public String toString() {
 		return "[Ship] " + this;
+	}
+
+	@Override
+	public void collideWith(Entity entity) {
+		if (entity instanceof Ship) {
+			System.out.println("Collision ship ship");
+			Ship ship1 = this;
+			Ship ship2 = (Ship) entity;
+			
+			System.out.println(ship1.getMassTotal());
+			System.out.println(ship2.getMassTotal());
+			 
+			double deltaVX = ship1.getXVelocity() - ship2.getXVelocity();
+			double deltaVY = ship1.getYVelocity() - ship2.getYVelocity();
+			double deltaRX = ship1.getXCoordinate() - ship2.getXCoordinate();
+			double deltaRY = ship1.getYCoordinate() - ship2.getYCoordinate();
+			double sigma = Math.sqrt(deltaRX*deltaRX + deltaRY*deltaRY);
+			
+			double J = (2*ship1.getMassTotal()*ship2.getMassTotal()*(deltaVX*deltaRX + deltaVY * deltaRY))/(sigma*(ship1.getMassTotal()+ship2.getMassTotal()));
+			double Jx = J*deltaRX/sigma;
+			double Jy = J*deltaRY/sigma;
+			
+			ship1.setXVelocity(ship1.getXVelocity() + Jx/ship1.getMassTotal());
+			ship1.setYVelocity(ship1.getYVelocity() + Jy/ship1.getMassTotal());
+			
+			ship2.setXVelocity(ship2.getXVelocity() + Jx/ship2.getMassTotal());
+			ship2.setYVelocity(ship2.getYVelocity() + Jy/ship2.getMassTotal());
+			
+			
+			return;
+		}
+		else if (entity instanceof Bullet) {
+			System.out.println("Collision ship bullet");
+			finalize();
+			entity.finalize();
+		}
+		else {
+			entity.collideWith(this);
+		}
 	}
 }
