@@ -394,12 +394,12 @@ public class Facade implements asteroids.part3.facade.IFacade {
 		
 	}
 
-	@Override
-	public double[] getPositionCollisionBoundary(Object object) throws ModelException {
-		Entity entity = (Entity) object;
-		return entity.getCollisionPosition(entity.getFirstCollisionBoundary());
-		
-	}
+	//@Override
+	///public double[] getPositionCollisionBoundary(Object object) throws ModelException {
+	//	Entity entity = (Entity) object;
+	//	return entity.getCollisionPosition(entity.get());
+	//	
+	//}
 
 	@Override
 	public double getTimeCollisionEntity(Object entity1, Object entity2) throws ModelException {
@@ -636,6 +636,13 @@ public class Facade implements asteroids.part3.facade.IFacade {
 	@Override
 	public IProgramFactory<?, ?, ?, ? extends Program> createProgramFactory() throws ModelException {
 		return new ProgramFactory();
+	}
+
+
+	@Override
+	public double[] getPositionCollisionBoundary(Object object) throws ModelException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

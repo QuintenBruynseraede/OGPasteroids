@@ -152,8 +152,10 @@ public class Bullet extends Entity {
 	 * 			| 	this.finalize();
 	 */
 	public void addBounce() {
-		if (this.getBounces() == MAXBOUNCES-1)
+		if (this.getBounces() == MAXBOUNCES-1) {
+			System.out.println("Removed bullet on third bounce.");
 			this.finalize();
+		}
 		this.bounces++;
 	}
 	
@@ -250,7 +252,14 @@ public class Bullet extends Entity {
 	@Override
 	@Raw
 	public void advance(double deltaTime) {
-		move(deltaTime);
+		if (this.isLoaded) {
+			this.setXCoordinate(getParent().getXCoordinate());
+			this.setYCoordinate(getParent().getYCoordinate());
+		}
+		else {
+			move(deltaTime);
+		}
+		
 	}
 
 	
@@ -265,12 +274,14 @@ public class Bullet extends Entity {
 	@Override
 	@Raw
 	public void finalize() {
-		
+		if (finalized) return;
 		if (this.getParent() != null)
 			this.getParent().removeBullet(this);
-		if (this.getWorld() != null)
+		if (this.getWorld() != null) {
 			this.getWorld().removeEntity(this);
+		}
 		this.finalized = true;
+		System.out.println("Finalizing bullet");
 	}
 
 	/**
@@ -281,12 +292,48 @@ public class Bullet extends Entity {
 	@Override
 	@Raw
 	public String toString() {
-		return "[Bullet] " + this;
+		return "[Bullet] " + this.hashCode();
 	}
 
 	@Override
 	public void collideWith(Entity entity) {
-		finalize();
+		if (entity instanceof Bullet) {
+			entity.finalize();
+			this.finalize();
+			System.out.println("Collision with other bullet.");
+		}
+		else if (entity instanceof Ship) {
+			if (entity == getParent()) {
+				((Ship) entity).addBulletToLoaded(this);
+				setLoaded(true);
+				getWorld().removeEntity(this);
+				setWorld(null);
+				System.out.println("Picked up own bullet");
+				
+			}
+			else {
+				System.out.println("Collision with other ship");
+				entity.finalize();
+				finalize();
+			}	
+		}
+		else
+			entity.collideWith(this);
+	}
+	
+	@Override
+	public void collideBoundary() {
+		if (getWorld() == null) return;
+		if (getXCoordinate() < 1.01*getRadius())
+			setXVelocity(-getXVelocity());
+		else if (getXCoordinate() > getWorld().getWidth()-1.01*getRadius())
+			setXVelocity(-getXVelocity());
+		else if (getYCoordinate() < 1.01 * getRadius())
+			setYVelocity(-getYVelocity());
+		else if (getYCoordinate() > getWorld().getHeight()-1.01*getRadius())
+			setYVelocity(-getYVelocity());
+		
+		addBounce();
 	}
 	
 }

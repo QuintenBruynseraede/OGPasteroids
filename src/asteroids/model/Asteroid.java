@@ -137,4 +137,10 @@ public class Asteroid extends MinorPlanet {
 	public String toString() {
 		return "[Asteroid] " + this;
 	}
+
+	@Override
+	public void collideWith(Entity entity) {
+		// TODO Auto-generated method stub
+		
+	}
 }

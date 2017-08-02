@@ -83,6 +83,8 @@ public class Ship extends Entity {
 			
 		}
 		
+		
+		
 	}
 	
 	
@@ -212,7 +214,7 @@ public class Ship extends Entity {
 	/**
 	 * Constant registering the force this ship's thruster exerts.
 	 */
-	public final double THRUSTERFORCE = 1.1e20;
+	public final double THRUSTERFORCE = 1.1e23;
 	
 	/**
 	 * Returns the acceleration this ship is subsceptible to, making use of Newton's second law of motion (F = ma).
@@ -284,16 +286,13 @@ public class Ship extends Entity {
 	 * 			The bullet to remove.
 	 * @post	| bulletsLoaded.contains(bullet) == false
 	 * @post	| bullet.setLoaded(false)
-	 * @post	| bullet.setWorld(null)
-	 * @post	| bullet.setParent(null)
 	 */
 	@Raw
 	public void removeBullet(Bullet bullet) {
 		bulletsLoaded.remove(bullet);
 		bullet.setLoaded(false);
-		bullet.setWorld(null);
-		bullet.setParent(null);
-		
+		//bullet.setWorld(null);
+		//bullet.setParent(null);
 		return;
 	}
 	
@@ -306,6 +305,7 @@ public class Ship extends Entity {
 	 */
 	@Raw
 	public void addBulletToLoaded(Bullet bullet) {
+		//System.out.println("addBulletToLoaded");
 		bulletsLoaded.add(bullet);
 		bullet.setParent(this);
 	}
@@ -355,16 +355,29 @@ public class Ship extends Entity {
 		if (this.getWorld() == null) return;
 		
 		if (this.bulletsLoaded.isEmpty())
-			{ return;}
+			{return;}
 		Bullet bullet = this.bulletsLoaded.iterator().next();
-
 		
+		//System.out.printf("BEFORE: position: (%f, %f), Velocity: (%f, %f)\n", bullet.getXCoordinate(), bullet.getYCoordinate(), bullet.getXVelocity(), bullet.getYVelocity());
+		//System.out.println("BEFORE: world: " + bullet.getWorld());
+		//System.out.println(getWorld().getEntities().size());
+		//System.out.println(getWorld().getEntitiesOfType(Bullet.class).size());
 		if (bulletsLoaded.contains(bullet) == false)
 			{ throw new IllegalArgumentException("Firing bullet that is not loaded."); }
 		
 		
 		this.removeBullet(bullet);
 		bullet.setLoaded(false);
+		bullet.setWorld(getWorld());
+		getWorld().addEntity(bullet);
+		
+		assert getWorld().getEntities().contains(bullet);
+		assert !bullet.isLoaded();
+		assert bullet.getWorld() == getWorld();
+		assert bullet.getXVelocity() != 0;
+		assert bullet.getYVelocity() != 0;
+		
+		//System.out.println("Bullets left: " + bulletsLoaded.size());
 		
 		bullet.setXVelocity(FIRINGSPEED * Math.cos(getOrientation()));
 		bullet.setYVelocity(FIRINGSPEED * Math.sin(getOrientation()));
@@ -373,6 +386,18 @@ public class Ship extends Entity {
 		bullet.setXCoordinate(this.getXCoordinate() + (this.getRadius() + bullet.getRadius()) * Math.cos(this.getOrientation()));
 		bullet.setYCoordinate(this.getYCoordinate() + (this.getRadius() + bullet.getRadius()) * Math.sin(this.getOrientation()));
 		
+		for (Entity e: getWorld().getEntities()) {
+			if (bullet.overlap(e) && e != bullet) {
+				System.out.println("Removing bullet on launch");
+				bullet.finalize();
+			}
+		}
+
+		//System.out.printf("Fired bullet from ship at (%f, %f)\n", getXCoordinate(), getYCoordinate());
+		//System.out.printf("Inital position: (%f, %f), Velocity: (%f, %f)\n", bullet.getXCoordinate(), bullet.getYCoordinate(), bullet.getXVelocity(), bullet.getYVelocity());
+		//System.out.println("World: " + bullet.getWorld());
+		//System.out.println(getWorld().getEntities().size());
+		//System.out.println(getWorld().getEntitiesOfType(Bullet.class).size());
 	}
 	
 
@@ -585,42 +610,41 @@ public class Ship extends Entity {
 	@Override
 	@Raw
 	public String toString() {
-		return "[Ship] " + this;
+		return "[Ship] " + this.hashCode();
 	}
 
 	@Override
 	public void collideWith(Entity entity) {
 		if (entity instanceof Ship) {
-			System.out.println("Collision ship ship");
+			//System.out.println("Collision ship ship");
 			Ship ship1 = this;
 			Ship ship2 = (Ship) entity;
 			
-			System.out.println(ship1.getMassTotal());
-			System.out.println(ship2.getMassTotal());
+			//System.out.println(ship1.getMassTotal());
+			//System.out.println(ship2.getMassTotal());
 			 
-			double deltaVX = ship1.getXVelocity() - ship2.getXVelocity();
-			double deltaVY = ship1.getYVelocity() - ship2.getYVelocity();
-			double deltaRX = ship1.getXCoordinate() - ship2.getXCoordinate();
-			double deltaRY = ship1.getYCoordinate() - ship2.getYCoordinate();
-			double sigma = Math.sqrt(deltaRX*deltaRX + deltaRY*deltaRY);
+			double deltaVX = ship2.getXVelocity() - ship1.getXVelocity();
+			double deltaVY = ship2.getYVelocity() - ship1.getYVelocity();
+			double deltaRX = ship2.getXCoordinate() - ship1.getXCoordinate();
+			double deltaRY = ship2.getYCoordinate() - ship1.getYCoordinate();
+			double sigma = Math.sqrt(Math.pow(ship1.getXCoordinate()-ship2.getXCoordinate(), 2) + Math.pow(ship1.getYCoordinate()-ship2.getYCoordinate(), 2));
 			
-			double J = (2*ship1.getMassTotal()*ship2.getMassTotal()*(deltaVX*deltaRX + deltaVY * deltaRY))/(sigma*(ship1.getMassTotal()+ship2.getMassTotal()));
+			double J = (2*ship1.getMassTotal()*ship2.getMassTotal()*(deltaVX * deltaRX + deltaVY * deltaRY))/(sigma*(ship1.getMassTotal()+ship2.getMassTotal()));
 			double Jx = J*deltaRX/sigma;
 			double Jy = J*deltaRY/sigma;
 			
-			ship1.setXVelocity(ship1.getXVelocity() + Jx/ship1.getMassTotal());
-			ship1.setYVelocity(ship1.getYVelocity() + Jy/ship1.getMassTotal());
+			ship1.setXVelocity(ship1.getXVelocity() + (Jx/ship1.getMassTotal()));
+			ship1.setYVelocity(ship1.getYVelocity() + (Jy/ship1.getMassTotal()));
 			
-			ship2.setXVelocity(ship2.getXVelocity() + Jx/ship2.getMassTotal());
-			ship2.setYVelocity(ship2.getYVelocity() + Jy/ship2.getMassTotal());
+			ship2.setXVelocity(ship2.getXVelocity() - (Jx/ship2.getMassTotal()));
+			ship2.setYVelocity(ship2.getYVelocity() - (Jy/ship2.getMassTotal()));
+			
+			//System.out.println("Ship1 with radius " + ship1.getRadius() + ": " + ship1.getMassTotal());
+			//System.out.println("Ship2 with radius " + ship2.getRadius() + ": " + ship2.getMassTotal());
+			
 			
 			
 			return;
-		}
-		else if (entity instanceof Bullet) {
-			System.out.println("Collision ship bullet");
-			finalize();
-			entity.finalize();
 		}
 		else {
 			entity.collideWith(this);

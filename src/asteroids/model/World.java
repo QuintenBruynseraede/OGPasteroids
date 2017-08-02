@@ -128,7 +128,17 @@ public class World {
 	public void addEntity(Entity e) throws IllegalArgumentException {
 		if (e == null)
 			throw new IllegalArgumentException("Null object");
+		
 		entities.add(e);
+		for (Entity entity: getEntities()) {
+			if (e.overlap(entity) && entity != e) {
+				if (e instanceof Bullet && ((Bullet) e).getParent() == entity) return;
+				e.collideWith(entity);
+				return;
+			}
+		}
+		
+		
 	}
 
 	/**
@@ -143,9 +153,13 @@ public class World {
 	public void removeEntity(Entity entity) throws IllegalArgumentException {
 		if (! this.entities.contains(entity))
 			throw new IllegalArgumentException("Trying to remove entity that is not in this world.");
-		
+		//System.out.println("removeEntity");
 		entity.setWorld(null);
+		
+		//for (Entity e: entities)
+			//System.out.println(entity);
 		entities.remove(entity);
+		
 	}
 	
 	/**
@@ -288,19 +302,22 @@ public class World {
 		double[] positionNextCollision = getPositionNextCollision();
 		Entity[] entitiesNextCollision = getEntitiesNextCollision();
 		
-		while (timeToCollision <= dt) {
-			System.out.println("Advancing");
+		while (timeToCollision <= dt && timeToCollision > 0) {
+			//System.out.println("Advancing " + timeToCollision);
 			advance(timeToCollision);
 			if (entitiesNextCollision[1] == null) {
 				Entity e = entitiesNextCollision[0];
-				if (l != null) l.boundaryCollision(e, e.getXCoordinate() + Math.cos(e.getXVelocity()/e.getYVelocity())*e.getRadius(), e.getYCoordinate() + Math.sin(e.getXVelocity()/e.getYVelocity())*e.getRadius());
+				if (l != null) 
+					l.boundaryCollision(e, e.getXCoordinate() + Math.cos(e.getXVelocity()/e.getYVelocity())*e.getRadius(), e.getYCoordinate() + Math.sin(e.getXVelocity()/e.getYVelocity())*e.getRadius());
 				e.collideBoundary();
 			}
 			else {
 				Entity e1 = entitiesNextCollision[0];
 				Entity e2 = entitiesNextCollision[1];
-				if (l != null) l.objectCollision(e1, e2, e1.getCollisionPosition(e2)[0], e1.getCollisionPosition(e2)[1]);
+				if (l != null) 
+					l.objectCollision(e1, e2, e1.getCollisionPosition(e2)[0], e1.getCollisionPosition(e2)[1]);
 				e1.collideWith(e2);
+				advance(0.0000001);
 			}
 			dt -= timeToCollision;
 			
@@ -309,6 +326,7 @@ public class World {
 			entitiesNextCollision = getEntitiesNextCollision();
 		}
 		advance(dt);
+		
 	}
 	
 	
@@ -370,6 +388,6 @@ public class World {
 	 */
 	@Raw
 	public String toString() {
-		return "[World] " + this;
+		return "[World] " + this.hashCode();
 	}
 }

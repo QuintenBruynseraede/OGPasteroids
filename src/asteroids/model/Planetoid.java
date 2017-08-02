@@ -246,5 +246,11 @@ public class Planetoid extends MinorPlanet {
 	public String toString() {
 		return "[Planetoid] " + this;
 	}
+
+	@Override
+	public void collideWith(Entity entity) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

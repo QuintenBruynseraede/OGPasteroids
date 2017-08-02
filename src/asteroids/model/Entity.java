@@ -1,7 +1,5 @@
 package asteroids.model;
 
-import java.util.Random;
-
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
 import be.kuleuven.cs.som.annotate.Raw;
@@ -329,12 +327,13 @@ public abstract class Entity {
 		//If world is null, don't try to add anything to it\
 		//This allows us to provide 'null' as an argument in case we want to 
 		//undo the association for this entity.
-		if (! (this.getWorld() == null || world == null)) {
+		if (!(this.getWorld() == null) && !(world == null)) {
 			this.getWorld().removeEntity(this);
 			world.addEntity(this);
 		}
 
 		this.world = world;
+		
 	}
 	
 	/**
@@ -529,7 +528,9 @@ public abstract class Entity {
 	public boolean overlap(Entity otherEntity) throws IllegalArgumentException {
 		if (otherEntity == null) 
 			throw new IllegalArgumentException("Invalid argument object (null).");
-		if ( this.getDistanceBetween(otherEntity) < 0.01)
+		if (this == otherEntity) return true;
+		
+		if ( this.getDistanceBetween(otherEntity) < -0.01)
 			return true;
 		else
 			return false;
@@ -657,11 +658,11 @@ public abstract class Entity {
 	@Override
 	@Raw
 	public String toString() {
-		return "[Entity] " + this;
+		return "[Entity] " + this.hashCode();
 	}
 
 	public void collideBoundary() {
-		System.out.println("collideBoundary");
+		//System.out.println("collideBoundary");
 		if (getWorld() == null) return;
 		if (getXCoordinate() < 1.01*getRadius())
 			setXVelocity(-getXVelocity());

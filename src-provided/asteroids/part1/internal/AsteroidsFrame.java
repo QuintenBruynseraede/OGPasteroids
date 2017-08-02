@@ -143,9 +143,9 @@ public class AsteroidsFrame extends JFrame {
 	private Set<Ship> initModel(IFacade facade) {
 		Set<Ship> ships = new HashSet<>();
 		try {
-			ships.add(facade.createShip(200, 400, 10, 0, 50, 0));
-			ships.add(facade.createShip(700, 400, 0, 0, 50, Math.PI));
-			ships.add(facade.createShip(450, 600, 0, 0, 75, 3 * Math.PI / 2));
+			ships.add(facade.createShip(0, 0, 10, 0, 50, 0));
+			//ships.add(facade.createShip(700, 400, 0, 0, 50, Math.PI));
+			//ships.add(facade.createShip(450, 600, 0, 0, 75, 3 * Math.PI / 2));
 		} catch (ModelException e) {
 			handleError(e);
 		}

@@ -68,20 +68,20 @@ public class AsteroidsFrame2<F extends IFacade> extends JFrame {
 	}
 
 	public void startGame() {
-		// Set op a world with 1 ship for the player and a random number
+		// Set up a world with 1 ship for the player and a random number
 		// of enemy ships.
 		World world;
 		Ship player;
 		try {
 			world = facade.createWorld(width, height);
-			player = facade.createShip(width / 2., height / 2., 1, 6, 40, 0, 3e17);
+			player = facade.createShip(width / 2., height / 2., 1, 6, 40, 0, 3e22);
 			facade.addShipToWorld(world, player);
 		} catch (ModelException e) {
 			handleError(e);
 			return;
 		}
 
-		for (int i = 1; i < 1000; i++) {
+		for (int i = 1; i < 20; i++) {
 			try {
 				Bullet bullet = facade.createBullet(width / 2.0, height / 2.0, 0, 0, Math.random() * 10 + 5);
 				facade.loadBulletOnShip(player, bullet);
@@ -90,6 +90,7 @@ public class AsteroidsFrame2<F extends IFacade> extends JFrame {
 			}
 		}
 		int nbEnemyShips = (int) (Math.random() * 10 + 1);
+		nbEnemyShips = 3;
 		Set<Ship> enemies = new HashSet<>();
 		for (int j = 0; j < nbEnemyShips; j++) {
 			try {
@@ -106,7 +107,7 @@ public class AsteroidsFrame2<F extends IFacade> extends JFrame {
 				// so be it
 			}
 		}
-		int nbBullets = (int) (Math.random() * 3);
+		int nbBullets = (int) (Math.random() * 8);
 		for (int j = 0; j < nbBullets; j++) {
 			try {
 				Bullet bullet = facade.createBullet(Math.random() * width, Math.random() * height, 10, 12,

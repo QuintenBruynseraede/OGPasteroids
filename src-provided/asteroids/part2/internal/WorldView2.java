@@ -177,6 +177,17 @@ public class WorldView2<F extends IFacade> extends JPanel implements KeyListener
 			g2d.setFont(g2d.getFont().deriveFont(20f));
 			drawCenteredString(g2d, "Press ESC to continue ...", getHeight() / 3 * 2);
 		}
+		g2d.setColor(Color.WHITE);
+		g2d.setFont(g2d.getFont().deriveFont(13f));
+		try {
+			g2d.drawString("Bullets left: " + facade.getNbBulletsOnShip(player) , 16, 16);
+		} catch (ModelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
 	}
 
 	protected void drawObjects(DrawContext<F> ctx) {
