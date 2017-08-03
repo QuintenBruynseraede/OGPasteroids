@@ -160,7 +160,7 @@ public class Bullet extends Entity {
 	 */
 	public void addBounce() {
 		if (this.getBounces() == MAXBOUNCES-1) {
-			System.out.println("Removed bullet on third bounce.");
+			//System.out.println("Removed bullet on third bounce.");
 			this.finalize();
 		}
 		this.bounces++;
@@ -282,10 +282,10 @@ public class Bullet extends Entity {
 	@Raw
 	public void finalize() {
 		if (finalized) return;
-		if (this.getParent() != null) {
-			this.getParent().removeBullet(this);
-			this.parent = null;
-		}
+		//if (this.getParent() != null) {
+		//	this.getParent().removeBullet(this);
+		//	this.parent = null;
+		//}
 		if (this.getWorld() != null) {
 			this.getWorld().removeEntity(this);
 		}
@@ -303,7 +303,9 @@ public class Bullet extends Entity {
 		return "[Bullet] " + this.hashCode();
 	}
 
+	
 	/**
+	 *  Resolves a collision between this bullet and another entity
 	 * 	@param	entity
 	 * 			The entity that will collide with this bullet.
 	 *	@post	If the given entity is instance of a Ship and this bullet is a child of that ship, the bullet will be reloaded to his parent and the bounces will be set to 0..
@@ -333,11 +335,15 @@ public class Bullet extends Entity {
 		}
 		else if (entity instanceof Ship) {
 			if (entity == getParent()) {
+				System.out.println("Picking up bullet");
 				((Ship) entity).addBulletToLoaded(this);
 				setLoaded(true);
 				getWorld().removeEntity(this);
 				setWorld(null);
 				resetBounces();
+				setXCoordinate(entity.getXCoordinate());
+				setYCoordinate(entity.getYCoordinate());
+				System.out.println("here");
 			}
 			else {
 				entity.finalize();
@@ -352,12 +358,6 @@ public class Bullet extends Entity {
 			entity.collideWith(this);
 	}
 	
-	/**
-	 * @post	If the world of this bullet is null, nothing will happen.
-	 * 			| if(getWorld() == null
-	 * 			|		return
-..........
-	 */
 	@Override
 	public void collideBoundary() {
 		if (getWorld() == null) return;

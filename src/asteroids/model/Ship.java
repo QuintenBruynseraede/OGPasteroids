@@ -287,7 +287,9 @@ public class Ship extends Entity {
 	 * @post	| bullet.setLoaded(false)
 	 */
 	@Raw
-	public void removeBullet(Bullet bullet) {
+	public void removeBullet(Bullet bullet) throws IllegalArgumentException {
+		if (!bulletsLoaded.contains(bullet)) 
+			throw new IllegalArgumentException("Can't remove bullet not on this ship.");
 		bulletsLoaded.remove(bullet);
 		bullet.setLoaded(false);
 		//bullet.setWorld(null);
@@ -303,7 +305,8 @@ public class Ship extends Entity {
 	 * @post	| bullet.getParent() == this
 	 */
 	@Raw
-	public void addBulletToLoaded(Bullet bullet) {
+	public void addBulletToLoaded(Bullet bullet) throws IllegalArgumentException {
+		
 		//System.out.println("addBulletToLoaded");
 		bulletsLoaded.add(bullet);
 		bullet.setParent(this);
@@ -370,11 +373,11 @@ public class Ship extends Entity {
 		bullet.setWorld(getWorld());
 		getWorld().addEntity(bullet);
 		
-		assert getWorld().getEntities().contains(bullet);
-		assert !bullet.isLoaded();
-		assert bullet.getWorld() == getWorld();
-		assert bullet.getXVelocity() != 0;
-		assert bullet.getYVelocity() != 0;
+		//assert getWorld().getEntities().contains(bullet);
+		//assert !bullet.isLoaded();
+		//assert bullet.getWorld() == getWorld();
+		//assert bullet.getXVelocity() != 0;
+		//assert bullet.getYVelocity() != 0;
 		
 		//System.out.println("Bullets left: " + bulletsLoaded.size());
 		
@@ -544,7 +547,10 @@ public class Ship extends Entity {
 		return "[Ship] " + this.hashCode();
 	}
 
+	
+	
 	/**
+	 *  Resolves a collision between this ship and another entity
 	 * 	@param	entity
 	 * 			The entity that will collide with this ship.
 	 *	@post	If the given entity is instance of a Ship, they will bounce off each other.

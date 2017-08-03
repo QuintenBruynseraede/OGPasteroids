@@ -67,7 +67,7 @@ public class BlackHole extends Entity {
 	}
 
 	/**
-	 * Updates the black hole's radius or destroys it when it has shrunk too small.
+	 * Updates the black hole's radius. Destroys it when it has shrunk too small.
 	 * @param 	radius
 	 * 			The new radius for this black hole.
 	 * @post	The new radius of the black hole is equal to the given argument radius.
@@ -145,6 +145,7 @@ public class BlackHole extends Entity {
 
 
 	/**
+	 * 	Resolves a collision between this Black Hole and another entity
 	 * 	@param	entity
 	 * 			The entity that will collide with this black hole.
 	 * 	@post	If the given entity is instance of a Minorplanet, the minorplanet will be finalized.
@@ -190,6 +191,8 @@ public class BlackHole extends Entity {
 			entity.finalize();
 			this.finalize();
 		}
+		else
+			entity.collideWith(this);
 	}
 	
 	/**

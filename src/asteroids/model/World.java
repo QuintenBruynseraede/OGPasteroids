@@ -128,17 +128,20 @@ public class World {
 	public void addEntity(Entity e) throws IllegalArgumentException, IllegalStateException {
 		if (e == null)
 			throw new IllegalArgumentException("Null object");
+		if (getEntities().contains(e)) 
+			throw new IllegalArgumentException("Already in this world");
 		
 		entities.add(e);
 		
 		for (Entity entity: getEntities()) {
-			if (e.overlap(entity) && entity != e) {	
+			if (e.overlap(entity) && entity != e) {
+				System.out.println("Overlap on add");
 				if (e instanceof Bullet) {
 					if (((Bullet) e).getParent() == entity) 
 						return;
 					else
-						e.collideWith(entity);
-					return;
+						throw new IllegalStateException("Cannot add overlapping entities that are not bullets.");
+						//return;
 				}
 				throw new IllegalStateException("Cannot add overlapping entities that are not bullets.");
 			}
@@ -302,11 +305,13 @@ public class World {
 	 * Evolves the world for a duration dt
 	 */
 	public void evolve(double dt, CollisionListener l) throws IllegalArgumentException {
+		
 		if (dt < 0) throw new IllegalArgumentException("Delta time cannot be negative");
 		
 		double timeToCollision = getTimeNextCollision();
 		double[] positionNextCollision = getPositionNextCollision();
 		Entity[] entitiesNextCollision = getEntitiesNextCollision();
+		//System.out.println(timeToCollision);
 		
 		while (timeToCollision <= dt && timeToCollision > 0) {
 			//System.out.println("Advancing " + timeToCollision);
@@ -330,9 +335,10 @@ public class World {
 			timeToCollision = getTimeNextCollision();
 			positionNextCollision = getPositionNextCollision();
 			entitiesNextCollision = getEntitiesNextCollision();
+			//System.out.println(timeToCollision);
 		}
 		advance(dt);
-		
+		//System.out.println(timeToCollision);
 	}
 	
 	

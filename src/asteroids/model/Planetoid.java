@@ -38,7 +38,9 @@ public class Planetoid extends MinorPlanet {
 	@Raw
 	public Planetoid(double x, double y, double xVelocity, double yVelocity, double radius) {
 		super(x, y, xVelocity, yVelocity, radius);
-		setMass((4/3) * Math.PI * Math.pow(this.getRadius(), 3) * Planetoid.MASSDENSITY);
+		//setMass((4/3) * Math.PI * Math.pow(this.getRadius(), 3) * Planetoid.MASSDENSITY);
+		setMass(4 * Math.PI / 3);
+		setMass(getMass() * MASSDENSITY * radius * radius * radius);
 		
 		if (! isValidRadius(radius))  
 			throw new IllegalArgumentException("Non valid radius when initializing bullet");
@@ -124,7 +126,8 @@ public class Planetoid extends MinorPlanet {
 	public void setRadius(double radius) {
 		if (isValidRadius(radius)) {
 			this.radius = radius;
-			setMass((4/3) * Math.PI * Math.pow(this.getRadius(), 3) * Planetoid.MASSDENSITY);
+			setMass(4 * Math.PI / 3);
+			setMass(getMass() * MASSDENSITY * radius * radius * radius);
 		}
 		else
 			this.finalize();
@@ -184,8 +187,10 @@ public class Planetoid extends MinorPlanet {
 		if (d < 0)
 			throw new IllegalArgumentException("Negative distance in addToDistanceTravelled");
 		this.distanceTravelled += d;
-		if (getRadius() - 0.000001 * getDistanceTravelled() < getRadiusLowerBound())
+		if (initialRadius - 0.000001 * getDistanceTravelled() < getRadiusLowerBound())
 			finalize();
+		else
+			setRadius(initialRadius - 0.000001 * getDistanceTravelled());
 	}
 
 	/**
@@ -249,7 +254,9 @@ public class Planetoid extends MinorPlanet {
 		return "[Planetoid] " + this;
 	}
 
+	
 	/**
+	 *  Resolves a collision between this planetoid and another entity
 	 * 	@param	entity
 	 * 			The entity that will collide with this planetoid.
 	 *	@post	If the given entity is instance of a Ship, that ship will be teleported.

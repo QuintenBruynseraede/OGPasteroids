@@ -37,7 +37,8 @@ public class Asteroid extends MinorPlanet {
 	@Raw
 	public Asteroid(double x, double y, double xVelocity, double yVelocity, double radius) {
 		super(x, y, xVelocity, yVelocity, radius);
-		this.setMass((4/3) * Math.PI * Math.pow(this.getRadius(), 3) * Asteroid.MASSDENSITY);
+		setMass(4*Math.PI/3);
+		setMass(getMass() * MASSDENSITY * Math.pow(radius, 3));
 	}
 
 	/**
@@ -138,7 +139,9 @@ public class Asteroid extends MinorPlanet {
 		return "[Asteroid] " + this;
 	}
 
+	
 	/**
+	 *	Resolves a collision between this Asteroid and another entity
 	 * 	@param	entity
 	 * 			The entity that will collide with this Asteroid.
 	 *	@post	If the given entity is instance of an Asteroid, the two asteroids will bounce off each other.
