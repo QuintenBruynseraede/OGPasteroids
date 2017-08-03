@@ -20,23 +20,18 @@ import be.kuleuven.cs.som.annotate.Raw;
 public class BlackHole extends Entity {
 
 	/**
+	 * Initialize a new black hole with given x and y coordinate and a radius.
 	 * 
 	 * @param 	x
 	 * 			The x coordinate for this new black hole.
 	 * @param 	y
 	 * 			The y coordinate for this new black hole.
 	 * @param 	radius
-	 * 			The radius for this new black hole
-	 * @throws	IllegalArgumentException
-	 * 			|!isValidXCoordinate(x)
-	 * @throws	IllegalArgumentException
-	 * 			|!isValidYCoordinate(y)
-	 * @throws	IllegalArgumentException
-	 * 			|!isValidRadius(radius)
+	 * 			The radius for this new black hole.
 	 * @effect	Initializes this black hole as an Entity with a position and radius.
 	 * 			| super(x, y, radius)
 	 */
-	public BlackHole(double x, double y, double radius) throws IllegalArgumentException {
+	public BlackHole(double x, double y, double radius) {
 		super(x, y, 0, 0, radius);
 	}
 
@@ -89,13 +84,15 @@ public class BlackHole extends Entity {
 		if (isValidRadius(radius)) 
 			this.radius = radius;
 		else 
-			this.finalize();
-		
+			throw new IllegalArgumentException("Non valid radius.");	
 	}
 
+	/**
+	 * 
+	 */
 	@Override
 	public void advance(double deltaTime) {
-
+		return;
 	}
 
 
@@ -114,11 +111,14 @@ public class BlackHole extends Entity {
 	/**
 	 * 	Returns whether it is possible to set this black hole to the world specified as a parameter.
 	 * 	@param 	world
+	 * 			The world to check whether, the black hole can be positioned in it or not.
 	 * 	@see 	implementation
+	 * 	@throws	IllegalArgumentException
+	 * 			If the black hole does not overlap with a ship, minorplanet or another blackhole and the black hole can be positioned in the given world.
 	 */
 	@Raw
 	@Override
-	public boolean canHaveAsWorld(World world) {
+	public boolean canHaveAsWorld(World world) throws IllegalArgumentException {
 		for (Entity element : world.getEntitiesOfType(Ship.class))  {
 			if (this.overlap(element))
 				return false;
@@ -134,24 +134,41 @@ public class BlackHole extends Entity {
 				return false;
 		}
 		
-		return (this.getXCoordinate() - this.radius >= 0 
+		if ( this.getXCoordinate() - this.radius >= 0 
 				&& this.getXCoordinate() + this.radius < World.WIDTHUPPERBOUND 
 				&& this.getYCoordinate() - this.radius >= 0 
-				&& this.getYCoordinate() + this.radius < World.HEIGHTUPPERBOUND);
+				&& this.getYCoordinate() + this.radius < World.HEIGHTUPPERBOUND)
+			return true;
+		else 
+			throw new IllegalArgumentException("This black hole cannot be positioned in the given world.");
 	}
-	
+
+
 	/**
-	 * Returns a string representation of a black hole.
-	 * 
-	 * @return	A string representation of a black hole.
+	 * 	@param	entity
+	 * 			The entity that will collide with this black hole.
+	 * 	@post	If the given entity is instance of a minorplanet, the minorplanet will be finalized.
+	 * 			| if(entity instanceof MinorPlanet)
+				| 		entity.finalize();
+	 *	@post	If the given entity is instance of a ship, the ship will be finalized.
+	 * 			| if(entity instanceof Ship)
+	 *			| 		entity.finalize();
+	 *	@post	If the given entity is instance of a Bullet, there is no effect.
+	 *			| if (entity instanceof Bullet)
+	 *			|		return;
+	 * 	@post	If the given entity is instance of a black hole, both holes are destroyed and replaced with a new black hole whose
+				center is at the point of collision and whose radius is equal to the sum of the radii of both
+				colliding black holes.
+				| if (entity instanceof BlackHole)
+				| 		double newX = getCollisionPosition(entity)[0];
+				|		double newY = getCollisionPosition(entity)[1];
+				|		double newRadius = this.getRadius() + entity.getRadius();
+			
+				|		getWorld().addEntity(new BlackHole(newX, newY, newRadius));
+			
+				|		entity.finalize();
+				|		this.finalize();
 	 */
-	@Override
-	@Raw
-	public String toString() {
-		return "[BlackHole] " + this.hashCode();
-	}
-
-
 	@Override
 	public void collideWith(Entity entity) {
 		if (entity instanceof MinorPlanet)
@@ -165,12 +182,24 @@ public class BlackHole extends Entity {
 			double newY = getCollisionPosition(entity)[1];
 			double newRadius = this.getRadius() + entity.getRadius();
 			
+			getWorld().removeEntity(entity);
+			getWorld().removeEntity(this);
+			
 			getWorld().addEntity(new BlackHole(newX, newY, newRadius));
 			
 			entity.finalize();
 			this.finalize();
 		}
-		
 	}
 	
+	/**
+	 * Returns a string representation of a black hole.
+	 * 
+	 * @return	A string representation of a black hole.
+	 */
+	@Override
+	@Raw
+	public String toString() {
+		return "[BlackHole] " + this.hashCode();
+	}
 }
