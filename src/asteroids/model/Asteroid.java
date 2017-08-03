@@ -140,7 +140,57 @@ public class Asteroid extends MinorPlanet {
 
 	@Override
 	public void collideWith(Entity entity) {
-		// TODO Auto-generated method stub
+		if (entity instanceof Asteroid) {
+			Asteroid asteroid1 = this;
+			Asteroid asteroid2 = (Asteroid) entity;
+			
+			 
+			double deltaVX = asteroid2.getXVelocity() - asteroid1.getXVelocity();
+			double deltaVY = asteroid2.getYVelocity() - asteroid1.getYVelocity();
+			double deltaRX = asteroid2.getXCoordinate() - asteroid1.getXCoordinate();
+			double deltaRY = asteroid2.getYCoordinate() - asteroid1.getYCoordinate();
+			double sigma = Math.sqrt(Math.pow(asteroid1.getXCoordinate()-asteroid2.getXCoordinate(), 2) + Math.pow(asteroid1.getYCoordinate()-asteroid2.getYCoordinate(), 2));
+			
+			double J = (2*asteroid1.getMass()*asteroid2.getMass()*(deltaVX * deltaRX + deltaVY * deltaRY))/(sigma*(asteroid1.getMass()+asteroid2.getMass()));
+			double Jx = J*deltaRX/sigma;
+			double Jy = J*deltaRY/sigma;
+			
+			asteroid1.setXVelocity(asteroid1.getXVelocity() + (Jx/asteroid1.getMass()));
+			asteroid1.setYVelocity(asteroid1.getYVelocity() + (Jy/asteroid1.getMass()));
+			
+			asteroid2.setXVelocity(asteroid2.getXVelocity() - (Jx/asteroid2.getMass()));
+			asteroid2.setYVelocity(asteroid2.getYVelocity() - (Jy/asteroid2.getMass()));
+			return;
+		}
+		
+		if (entity instanceof Planetoid) {
+			Asteroid asteroid1 = this;
+			Planetoid planetoid2 = (Planetoid) entity;
+			
+			 
+			double deltaVX = planetoid2.getXVelocity() - asteroid1.getXVelocity();
+			double deltaVY = planetoid2.getYVelocity() - asteroid1.getYVelocity();
+			double deltaRX = planetoid2.getXCoordinate() - asteroid1.getXCoordinate();
+			double deltaRY = planetoid2.getYCoordinate() - asteroid1.getYCoordinate();
+			double sigma = Math.sqrt(Math.pow(asteroid1.getXCoordinate()-planetoid2.getXCoordinate(), 2) + Math.pow(asteroid1.getYCoordinate()-planetoid2.getYCoordinate(), 2));
+			
+			double J = (2*asteroid1.getMass()*planetoid2.getMass()*(deltaVX * deltaRX + deltaVY * deltaRY))/(sigma*(asteroid1.getMass()+planetoid2.getMass()));
+			double Jx = J*deltaRX/sigma;
+			double Jy = J*deltaRY/sigma;
+			
+			asteroid1.setXVelocity(asteroid1.getXVelocity() + (Jx/asteroid1.getMass()));
+			asteroid1.setYVelocity(asteroid1.getYVelocity() + (Jy/asteroid1.getMass()));
+			
+			planetoid2.setXVelocity(planetoid2.getXVelocity() - (Jx/planetoid2.getMass()));
+			planetoid2.setYVelocity(planetoid2.getYVelocity() - (Jy/planetoid2.getMass()));
+			return;
+		}
+		if (entity instanceof Ship) {
+			entity.finalize();
+		}
+		else {
+			entity.collideWith(this);
+		}
 		
 	}
 }

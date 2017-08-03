@@ -125,16 +125,22 @@ public class World {
 	 * 			The entity to be added to this world.
 	 * @post	| new.getEntities().contains(entity)
 	 */
-	public void addEntity(Entity e) throws IllegalArgumentException {
+	public void addEntity(Entity e) throws IllegalArgumentException, IllegalStateException {
 		if (e == null)
 			throw new IllegalArgumentException("Null object");
 		
 		entities.add(e);
+		
 		for (Entity entity: getEntities()) {
-			if (e.overlap(entity) && entity != e) {
-				if (e instanceof Bullet && ((Bullet) e).getParent() == entity) return;
-				e.collideWith(entity);
-				return;
+			if (e.overlap(entity) && entity != e) {	
+				if (e instanceof Bullet) {
+					if (((Bullet) e).getParent() == entity) 
+						return;
+					else
+						e.collideWith(entity);
+					return;
+				}
+				throw new IllegalStateException("Cannot add overlapping entities that are not bullets.");
 			}
 		}
 		

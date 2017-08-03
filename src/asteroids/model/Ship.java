@@ -119,7 +119,7 @@ public class Ship extends Entity {
 	}
 	
 	/**
-	 * This method returns the orientation of this ship.
+	 * Returns the orientation of this ship.
 	 */
 	@Basic
 	public double getOrientation() {
@@ -160,7 +160,6 @@ public class Ship extends Entity {
 	/**
 	 * Returns the mass of this ship including any entities it is carrying.
 	 */
-	@Basic
 	public double getMassTotal(){
 		double totalMass = this.getMassShip();
 		for (Bullet b : bulletsLoaded)
@@ -214,7 +213,7 @@ public class Ship extends Entity {
 	/**
 	 * Constant registering the force this ship's thruster exerts.
 	 */
-	public final double THRUSTERFORCE = 1.1e23;
+	public final double THRUSTERFORCE = 1.1e18;
 	
 	/**
 	 * Returns the acceleration this ship is subsceptible to, making use of Newton's second law of motion (F = ma).
@@ -458,75 +457,7 @@ public class Ship extends Entity {
 			updateVelocity();
 	}
 
-//	/**
-//	 * 	Updates a few properties of this ship to simulate a collision with another object.
-//	 * 	@param 	object2
-//	 * 			Object to collide with.
-//	 * 	@param 	collisiontype
-//	 * 			Type of collision to simulate. Collision types are defined in constants.java.
-//	 *  @see	Implementation
-//	 *  @throws	IllegalArgumentException
-//	 *  		collisionType is not specified in the class Constants.	
-//	 */
-//	@Override
-//	public void collideWith(GameObject object2, int collisionType) {
-//		if (collisionType == Constants.BOUNDARYCOLLISION) {
-//			Boundary boundary = (Boundary) object2;
-//			
-//			if (boundary.getBoundaryType() == Constants.BOTTOM || boundary.getBoundaryType() == Constants.TOP)
-//				this.setYVelocity(-this.getYVelocity());
-//			else 
-//				this.setXVelocity(-this.getXVelocity());
-//			return;
-//		}
-//		else if (collisionType == Constants.ENTITYCOLLISION) {
-//			if (object2 instanceof Ship) {
-//				Ship ship1 = this;
-//				Ship ship2 = (Ship) object2;
-//				 
-//				double deltaVX = ship1.getXVelocity() - ship2.getXVelocity();
-//				double deltaVY = ship1.getYVelocity() - ship2.getYVelocity();
-//				double deltaX = ship1.getXCoordinate() - ship2.getXCoordinate();
-//				double deltaY = ship1.getYCoordinate() - ship2.getYCoordinate();
-//				
-//				double ship1J = (2*ship1.getMassTotal()*ship2.getMassTotal() * (deltaVX * deltaX + deltaVY * deltaY)) / (ship1.getRadius() * (ship1.getMassTotal() + ship2.getMassTotal()));
-//				double ship1JX = (ship1J * deltaX) / ship1.getRadius();
-//				double ship1JY = (ship1J * deltaY) / ship1.getRadius();
-//				
-//				deltaVX = ship2.getXVelocity() - ship1.getXVelocity();
-//				deltaVY = ship2.getYVelocity() - ship1.getYVelocity();
-//				deltaX = ship2.getXCoordinate() - ship1.getXCoordinate();
-//				deltaY = ship2.getYCoordinate() - ship1.getYCoordinate();
-//				
-//				double ship2J = (2*ship1.getMassTotal()*ship2.getMassTotal() * (deltaVX * deltaX + deltaVY * deltaY)) / (ship2.getRadius() * (ship1.getMassTotal() + ship2.getMassTotal()));
-//				double ship2JX = (ship2J * deltaX) / ship2.getRadius();
-//				double ship2JY = (ship2J * deltaY) / ship2.getRadius();
-//				
-//				ship1.setXVelocity(ship1.getXVelocity() + ship1JX / ship1.getMassTotal());
-//				ship1.setYVelocity(ship1.getYVelocity() + ship1JY / ship1.getMassTotal());
-//				ship2.setXVelocity(ship2.getXVelocity() + ship2JX / ship2.getMassTotal());
-//				ship2.setYVelocity(ship2.getYVelocity() + ship2JY / ship2.getMassTotal());
-//				
-//				return;
-//			}
-//			if (object2 instanceof Bullet) {
-//				Bullet b = (Bullet) object2;
-//				b.collideWith(this, Constants.ENTITYCOLLISION);
-//				return;
-//			}
-//			if (object2 instanceof Asteroid) {
-//				this.finalize();
-//				return;
-//			}
-//			if (object2 instanceof Planetoid) {
-//				this.teleport();
-//				return;
-//			}
-//			
-//		}
-//		else
-//			throw new IllegalArgumentException("Invalid Collision type");
-//	}
+
 
 	/**
 	 * Teleports this ship to a random place in its world and destroys all its entities.
@@ -536,7 +467,7 @@ public class Ship extends Entity {
 	 * 			|	if(i.overlap(this))
 	 *			| 		this.finalize();
 	 */
-	private void teleport() {
+	public void teleport() {
 		Random r = new Random();
 
 		this.setXCoordinate(this.getRadius() + r.nextInt() % (this.getWorld().getWidth() - 2 * this.getRadius()));
@@ -635,19 +566,12 @@ public class Ship extends Entity {
 			
 			ship1.setXVelocity(ship1.getXVelocity() + (Jx/ship1.getMassTotal()));
 			ship1.setYVelocity(ship1.getYVelocity() + (Jy/ship1.getMassTotal()));
-			
 			ship2.setXVelocity(ship2.getXVelocity() - (Jx/ship2.getMassTotal()));
 			ship2.setYVelocity(ship2.getYVelocity() - (Jy/ship2.getMassTotal()));
 			
-			//System.out.println("Ship1 with radius " + ship1.getRadius() + ": " + ship1.getMassTotal());
-			//System.out.println("Ship2 with radius " + ship2.getRadius() + ": " + ship2.getMassTotal());
-			
-			
-			
 			return;
 		}
-		else {
+		else 
 			entity.collideWith(this);
-		}
 	}
 }

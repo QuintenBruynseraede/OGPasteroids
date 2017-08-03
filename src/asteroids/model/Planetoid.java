@@ -184,6 +184,8 @@ public class Planetoid extends MinorPlanet {
 		if (d < 0)
 			throw new IllegalArgumentException("Negative distance in addToDistanceTravelled");
 		this.distanceTravelled += d;
+		if (getRadius() - 0.000001 * getDistanceTravelled() < getRadiusLowerBound())
+			finalize();
 	}
 
 	/**
@@ -249,8 +251,11 @@ public class Planetoid extends MinorPlanet {
 
 	@Override
 	public void collideWith(Entity entity) {
-		// TODO Auto-generated method stub
-		
+		if (entity instanceof Ship) {
+			((Ship) entity).teleport();
+		}
+		else
+			entity.collideWith(this);
 	}
 	
 }

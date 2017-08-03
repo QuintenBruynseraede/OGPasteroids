@@ -141,6 +141,13 @@ public class Bullet extends Entity {
 		return this.bounces;
 	}
 	
+	/**
+	 * Resets the number of bounces against a boundary this bullet has made.
+	 * @post 	| new.getBounces() == 0
+	 */
+	public void resetBounces() {
+		this.bounces = 0;
+	}
 	
 	
 	/**
@@ -275,13 +282,14 @@ public class Bullet extends Entity {
 	@Raw
 	public void finalize() {
 		if (finalized) return;
-		if (this.getParent() != null)
+		if (this.getParent() != null) {
 			this.getParent().removeBullet(this);
+			this.parent = null;
+		}
 		if (this.getWorld() != null) {
 			this.getWorld().removeEntity(this);
 		}
 		this.finalized = true;
-		System.out.println("Finalizing bullet");
 	}
 
 	/**
@@ -300,7 +308,6 @@ public class Bullet extends Entity {
 		if (entity instanceof Bullet) {
 			entity.finalize();
 			this.finalize();
-			System.out.println("Collision with other bullet.");
 		}
 		else if (entity instanceof Ship) {
 			if (entity == getParent()) {
@@ -308,14 +315,16 @@ public class Bullet extends Entity {
 				setLoaded(true);
 				getWorld().removeEntity(this);
 				setWorld(null);
-				System.out.println("Picked up own bullet");
-				
+				resetBounces();
 			}
 			else {
-				System.out.println("Collision with other ship");
 				entity.finalize();
 				finalize();
 			}	
+		}
+		else if (entity instanceof MinorPlanet) {
+			entity.finalize();
+			this.finalize();
 		}
 		else
 			entity.collideWith(this);

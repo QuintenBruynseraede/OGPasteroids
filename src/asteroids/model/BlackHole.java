@@ -98,10 +98,6 @@ public class BlackHole extends Entity {
 
 	}
 
-	@Override
-	public void collideWith(GameObject object2, int collisiontype) {
-		
-	}
 
 	/**
 	 * Finalizes the black hole, preparing it to be removed by the garbage collector.
@@ -152,7 +148,29 @@ public class BlackHole extends Entity {
 	@Override
 	@Raw
 	public String toString() {
-		return "[BlackHole] " + this;
+		return "[BlackHole] " + this.hashCode();
+	}
+
+
+	@Override
+	public void collideWith(Entity entity) {
+		if (entity instanceof MinorPlanet)
+			entity.finalize();
+		else if (entity instanceof Ship)
+			entity.finalize();
+		else if (entity instanceof Bullet)
+			return;
+		else if (entity instanceof BlackHole) {
+			double newX = getCollisionPosition(entity)[0];
+			double newY = getCollisionPosition(entity)[1];
+			double newRadius = this.getRadius() + entity.getRadius();
+			
+			getWorld().addEntity(new BlackHole(newX, newY, newRadius));
+			
+			entity.finalize();
+			this.finalize();
+		}
+		
 	}
 	
 }
