@@ -147,16 +147,16 @@ public class BlackHole extends Entity {
 	/**
 	 * 	@param	entity
 	 * 			The entity that will collide with this black hole.
-	 * 	@post	If the given entity is instance of a minorplanet, the minorplanet will be finalized.
+	 * 	@post	If the given entity is instance of a Minorplanet, the minorplanet will be finalized.
 	 * 			| if(entity instanceof MinorPlanet)
 				| 		entity.finalize();
-	 *	@post	If the given entity is instance of a ship, the ship will be finalized.
+	 *	@post	If the given entity is instance of a Ship, the ship will be finalized.
 	 * 			| if(entity instanceof Ship)
 	 *			| 		entity.finalize();
 	 *	@post	If the given entity is instance of a Bullet, there is no effect.
 	 *			| if (entity instanceof Bullet)
 	 *			|		return;
-	 * 	@post	If the given entity is instance of a black hole, both holes are destroyed and replaced with a new black hole whose
+	 * 	@post	If the given entity is instance of a BlackHole, both holes are destroyed and replaced with a new black hole whose
 				center is at the point of collision and whose radius is equal to the sum of the radii of both
 				colliding black holes.
 				| if (entity instanceof BlackHole)

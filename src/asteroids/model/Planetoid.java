@@ -249,6 +249,16 @@ public class Planetoid extends MinorPlanet {
 		return "[Planetoid] " + this;
 	}
 
+	/**
+	 * 	@param	entity
+	 * 			The entity that will collide with this planetoid.
+	 *	@post	If the given entity is instance of a Ship, that ship will be teleported.
+	 * 			| if (entity instanceof Ship)
+	 * 			|	((Ship) entity).teleport()
+	 *	@post	If the given entity is not instance of Ship, that entity will call his own collideWith method.
+	 *			| if (entity !instanceof Ship)
+	 *			|		entity.collideWith(this);
+	 */
 	@Override
 	public void collideWith(Entity entity) {
 		if (entity instanceof Ship) {

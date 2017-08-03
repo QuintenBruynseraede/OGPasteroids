@@ -138,6 +138,22 @@ public class Asteroid extends MinorPlanet {
 		return "[Asteroid] " + this;
 	}
 
+	/**
+	 * 	@param	entity
+	 * 			The entity that will collide with this Asteroid.
+	 *	@post	If the given entity is instance of an Asteroid, the two asteroids will bounce off each other.
+	 *			|	if (entity instanceof Asteroid)
+	 *			|  		see implementation
+	 *	@post	If the given entity is instance of a Planetoid, the asteroid and plantetoid will bounce off each other.
+	 *			|if (entity instanceof Planetoid)
+	 *			|		see implementation
+	 *	@post	If the given entity is instance of Ship, the ship will be finalized.
+	 *			| if (entity instanceof Ship)
+	 *			|		entity.finalize()
+	 *	@post	If the entity is not instance of a MinorPlanet Ship or Bullet, the entity will call his own collideWith method.
+	 *			| if (entity is not instanceof {MinorPlanet, Ship, Bullet})
+	 *			| 		entity.collideWith(this)
+	 */
 	@Override
 	public void collideWith(Entity entity) {
 		if (entity instanceof Asteroid) {

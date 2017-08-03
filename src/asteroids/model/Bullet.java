@@ -303,6 +303,28 @@ public class Bullet extends Entity {
 		return "[Bullet] " + this.hashCode();
 	}
 
+	/**
+	 * 	@param	entity
+	 * 			The entity that will collide with this bullet.
+	 *	@post	If the given entity is instance of a Ship and this bullet is a child of that ship, the bullet will be reloaded to his parent and the bounces will be set to 0..
+	 * 			| if (entity instanceof Ship) && (entity == getParent())
+	 *			|		((Ship) entity).addBulletToLoaded(this)
+	 *			|		setLoaded(true)
+	 *			|		getWorld().removeEntity(this)
+	 *			|		setWorld(null)
+	 *			|		resetBounces()
+	 *	@post	If the given entity is instance of a Ship and this bullet is not a child of that ship, the ship and bullet will be finalized.
+	 *			|if (entity instanceof Ship) && (entity != getParent())
+	 *			|		entity.finalize()
+	 *			|		finalize()
+	 *	@post	If the given entity is instance of MinorPlanet, the minor planet and bullet will be finalized.
+	 *			| if (entity instanceof MinorPlanet)
+	 *			|		entity.finalize()
+	 *			|		finalize()
+	 *	@post	If the entity is not instance of a MinorPlanet, Ship or Bullet, the entity will call his own collideWith method.
+	 *			| if(entity is not instanceof {MinorPlanet, Ship, Bullet})
+	 *			| 		entity.collideWith(this)
+	 */
 	@Override
 	public void collideWith(Entity entity) {
 		if (entity instanceof Bullet) {
@@ -330,6 +352,12 @@ public class Bullet extends Entity {
 			entity.collideWith(this);
 	}
 	
+	/**
+	 * @post	If the world of this bullet is null, nothing will happen.
+	 * 			| if(getWorld() == null
+	 * 			|		return
+..........
+	 */
 	@Override
 	public void collideBoundary() {
 		if (getWorld() == null) return;

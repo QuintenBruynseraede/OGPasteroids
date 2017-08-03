@@ -544,6 +544,16 @@ public class Ship extends Entity {
 		return "[Ship] " + this.hashCode();
 	}
 
+	/**
+	 * 	@param	entity
+	 * 			The entity that will collide with this ship.
+	 *	@post	If the given entity is instance of a Ship, they will bounce off each other.
+	 * 			| if (entity instanceof Ship)
+	 * 			|	@see implementation
+	 *	@post	If the given entity is not instance of Ship, that entity will call his own collideWith method.
+	 *			| if (entity !instanceof Ship)
+	 *			|		entity.collideWith(this);
+	 */
 	@Override
 	public void collideWith(Entity entity) {
 		if (entity instanceof Ship) {
