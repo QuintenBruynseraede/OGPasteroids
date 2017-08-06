@@ -44,7 +44,7 @@ public class IfThenElseStatement extends Statement{
 	}
 
 	@Override
-	public void eval() throws Exception {
+	public void eval() {
 		boolean ex;
 		try {
 			ex = (boolean) condition.eval();
@@ -53,21 +53,11 @@ public class IfThenElseStatement extends Statement{
 		}
 		
 		if (ex) {
-			ifBody.addStatementsToList(this.getProgram().getStatementList());
-			this.getProgram().getStatementList().remove(elseBody);
 			ifBody.eval();
 		}
 		else {
-			elseBody.addStatementsToList(this.getProgram().getStatementList());
-			this.getProgram().getStatementList().remove(ifBody);
 			elseBody.eval();
 		}
-	}
-
-	@Override
-	public void addStatementsToList(List<Statement> statements) {
-		statements.add(ifBody);
-		statements.add(elseBody);
 	}
 	
 	public void setProgram(Program program) {

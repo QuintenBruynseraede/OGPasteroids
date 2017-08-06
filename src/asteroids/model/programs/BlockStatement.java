@@ -22,17 +22,11 @@ public class BlockStatement extends Statement{
 	}
 
 	@Override
-	public void eval() throws Exception {
+	public void eval() {
 		for (Statement s : statements)
 			s.eval();
 	}
 
-	@Override
-	public void addStatementsToList(List<Statement> listStatements) {
-		for (Statement s : getStatements()) {
-			s.addStatementsToList(listStatements);
-		}
-	}
 	
 	public void setProgram(Program program) {
 		this.program = program;

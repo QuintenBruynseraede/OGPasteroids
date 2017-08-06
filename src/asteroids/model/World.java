@@ -145,6 +145,10 @@ public class World {
 				}
 				throw new IllegalStateException("Cannot add overlapping entities that are not bullets.");
 			}
+			if (e.getTimeFirstCollisionBoundary() <= 0) {
+				System.out.println("Removing instance partly out of world");
+				e.finalize();
+			}
 		}
 		
 		
@@ -228,17 +232,24 @@ public class World {
 	 * 			| result == (time where for each Collision c: c.getTime() >= time)
 	 */
 	public double getTimeNextCollision() {
-		double time = Double.POSITIVE_INFINITY;
+		double timeToCollision = Double.POSITIVE_INFINITY;
+		
 		for (Entity e: getEntities()) {
-			time = Math.min(time, e.getTimeFirstCollisionBoundary());
 			for (Entity e2: getEntities()) {
 				if (e != e2) {
-					if (e.overlap(e2)) return 0;
-					time = Math.min(time, e.getTimeToCollision(e2));
+					if (e.overlap(e2)) 
+						return 0;
+					if (e.getTimeToCollision(e2) < timeToCollision)
+						timeToCollision = e.getTimeToCollision(e2);
 				}
 			}
+			
+			double timeToBoundaryCollision = e.getTimeFirstCollisionBoundary();
+			if (timeToBoundaryCollision < timeToCollision)
+				timeToCollision = timeToBoundaryCollision;
+			
 		}
-		return time;
+		return timeToCollision;
 	}
 	
 	/**
@@ -247,28 +258,56 @@ public class World {
 	 * @return	The two objects involved in the next collision.
 	 * 			| [object1, object2] where getNextCollisionData().getObject1() == object1 && getNextCollisionData().getObject2() == object2
 	 */
+	//TODO
 	public Entity[] getEntitiesNextCollision() {
 		Entity[] entities = new Entity[]{null,null};
 		double timeNextCollision = Double.POSITIVE_INFINITY;
 		for (Entity entity1 : getEntities()){
 			if (timeNextCollision > entity1.getTimeFirstCollisionBoundary()){
 				timeNextCollision = entity1.getTimeFirstCollisionBoundary();
-				entities = new Entity[]{entity1,null};
+				entities[0] = entity1;
+				entities[1] = null;
 			}
 			for (Entity entity2 : getEntities()){
-				if (entity1 != entity2) {
-					if (entity1.overlap(entity2)) return new Entity[]{entity1,entity2};
+
+					if (entity1.overlap(entity2) && entity1 != entity2) return new Entity[]{entity1,entity2};
 					
-					if (timeNextCollision > entity1.getTimeToCollision(entity2)){
+					if (timeNextCollision > entity1.getTimeToCollision(entity2) && entity1 != entity2){
 						timeNextCollision = entity1.getTimeToCollision(entity2);
-						entities = new Entity[]{entity1,entity2};
+						entities[0] = entity1;
+						entities[1] = entity2;
 					}
-				}
 				
 			}
 		}
 		return entities;
+		
+//		double timeToCollision = Double.POSITIVE_INFINITY;
+//		Entity[] entities = new Entity[2];
+//		for (Entity e1: getEntities()) {
+//			for (Entity e2: getEntities()) {
+//				if (e1.overlap(e2) && e1 != e2) {
+//					entities[0] = e1;
+//					entities[1] = e2;
+//					return entities;
+//				}
+//				if (e1.getTimeToCollision(e2) < timeToCollision && e1 != e2) {
+//					timeToCollision = e1.getTimeToCollision(e2);
+//					entities[0] = e1;
+//					entities[1] = e2;
+//				}
+//			}
+//			
+//			if (e1.getTimeFirstCollisionBoundary() < timeToCollision) {
+//				entities[0] = e1;
+//				entities[1] = null;
+//			}
+//		}
+//		
+//		return entities;
 	}
+	
+	
 	
 	/**
 	 * Returns the position of the next collision.
@@ -281,7 +320,13 @@ public class World {
 	public double[] getPositionNextCollision() {
 		Entity[] nextCollisionEntities = getEntitiesNextCollision();
 		double nextCollisionTime = getTimeNextCollision();
-		if (nextCollisionEntities[0] == null) return new double[] {Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY}; //No objects involved
+		if (nextCollisionEntities[0] == null) {
+			double positionX = Double.POSITIVE_INFINITY;
+			double positionY = Double.POSITIVE_INFINITY;
+			double[] position = {positionX, positionY};
+			return position;
+		}
+			
 		
 		if (nextCollisionEntities[1] == null) { //Boundary collision
 			Entity e = nextCollisionEntities[0];
@@ -306,7 +351,7 @@ public class World {
 	 */
 	public void evolve(double dt, CollisionListener l) throws IllegalArgumentException {
 		
-		if (dt < 0) throw new IllegalArgumentException("Delta time cannot be negative");
+if (dt < 0) throw new IllegalArgumentException("Delta time cannot be negative");
 		
 		double timeToCollision = getTimeNextCollision();
 		double[] positionNextCollision = getPositionNextCollision();
@@ -328,7 +373,7 @@ public class World {
 				if (l != null) 
 					l.objectCollision(e1, e2, e1.getCollisionPosition(e2)[0], e1.getCollisionPosition(e2)[1]);
 				e1.collideWith(e2);
-				advance(0.0000001);
+				//advance(0.0000001);
 			}
 			dt -= timeToCollision;
 			
@@ -379,9 +424,9 @@ public class World {
 	
 	/**
 	 * A method that prepares this world to be removed by the garbage collector.
-	 * @post	| this.getEntites().getSize() == 0
 	 * @post	| for each Entity e : old.getEntities()
 	 * 			| 	e.getWorld() == null;
+	 * @post	| this.getEntites().getSize() == 0
 	 * @post	| this.finalized = true
 	 */
 	public void finalize() {

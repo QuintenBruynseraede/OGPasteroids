@@ -16,8 +16,4 @@ public class BreakStatement extends Statement {
 		throw new BreakException();
 	}
 
-	@Override
-	public void addStatementsToList(List<Statement> statements) {
-		statements.add(this);
-	}
 }

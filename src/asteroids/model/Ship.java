@@ -3,6 +3,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
@@ -178,8 +179,16 @@ public class Ship extends Entity {
 	/**
 	 *  A HashSet registering the bullets that are currently loaded by this ship.
 	 */
-	public HashSet<Bullet> bulletsLoaded = new HashSet<Bullet>();
+	private HashSet<Bullet> bulletsLoaded = new HashSet<Bullet>();
 
+	/**
+	 * Returns a list of bullets loaded on this ship
+	 * @return | {bullet1, bullet2, ...} where bulletN.getParent() == this
+	 */
+	public Set<Bullet> getBulletsLoaded() {
+		return new HashSet<Bullet>(bulletsLoaded);
+	}
+	
 	/**
 	 *  Variable registering whether this ship's thruster is currently on.
 	 */
@@ -507,17 +516,18 @@ public class Ship extends Entity {
 	
 	/**
 	 * 	Executes the program loaded on this ship
-	 * @return	List containing all objects printed out by the program.
+	 *  @return	List containing all objects printed out by the program.
+	 * 
 	 */
 	@Raw
-	public List<Object> executeProgram(double dt) throws IllegalStateException {
+	public List<Object> executeProgram(double dt) {
 		List<Object> r = this.getProgramLoaded().execute(dt);
 		return r;
 	}
 	
 	/**
 	 * Finalizes the bullet, preparing it to be removed by the garbage collector.
-	 * @post	| for each bullet: bulletLoaded
+	 * @post	| for each bullet: getBulletsLoaded()
 	 * 			| 	bullet.parent == null
 	 * @post	| this.getWorld().removeEntity(this)
 	 * @post	| new.finalized == true

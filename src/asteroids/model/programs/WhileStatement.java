@@ -33,7 +33,7 @@ public class WhileStatement extends Statement {
 	}
 
 	@Override
-	public void eval() throws Exception {
+	public void eval() {
 		this.setLastStatement();
 		boolean ex;
 		try {
@@ -55,10 +55,6 @@ public class WhileStatement extends Statement {
 		}
 	}
 
-	@Override
-	public void addStatementsToList(List<Statement> statements) {
-		statements.add(this);
-	}
 	
 	@Override
 	public void setProgram(Program program) {

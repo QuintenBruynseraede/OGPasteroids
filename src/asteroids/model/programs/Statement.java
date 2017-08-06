@@ -15,7 +15,7 @@ public abstract class Statement {
 		this.setSourceLocation(s);	
 	}
 	
-	public abstract void eval() throws Exception; //TODO not sure about void
+	public abstract void eval(); //TODO not sure about void
 	
 		
 	@Basic
@@ -51,7 +51,5 @@ public abstract class Statement {
 	public void setLastStatement() {
 		this.getProgram().setLastExecutedStatement(this);
 	}
-
-	public abstract void addStatementsToList(List<Statement> statements);
 	
 }

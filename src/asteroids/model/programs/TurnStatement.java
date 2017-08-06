@@ -21,7 +21,7 @@ public class TurnStatement extends ActionStatement {
 	}
 
 	@Override
-	public void eval() throws OutOfTimeException {
+	public void eval() {
 		if (this.getProgram().getTimeLeft() >= 0.2) {
 			this.setLastStatement();
 			double a;
@@ -33,11 +33,8 @@ public class TurnStatement extends ActionStatement {
 			this.getProgram().getShip().turn(a);
 		}
 		else 
-			throw new OutOfTimeException();
+			return;
+			//throw new OutOfTimeException();
 	}
 
-	@Override
-	public void addStatementsToList(List<Statement> statements) {
-		statements.add(this);
-	}
 }

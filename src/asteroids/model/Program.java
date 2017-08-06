@@ -22,11 +22,10 @@ public class Program {
 	private double timeLeft;
 	private List<Function> functions;
 	private List<Object> returns = new ArrayList<Object>();
-	private List<Variable> globalVariables;
+	private List<Variable> globalVariables = new ArrayList<Variable>();
 	private Statement main;
 	private SourceLocation sourceLocation = new SourceLocation(0, 0);
 	private Statement lastExecutedStatement;
-	private List<Statement> statements = new ArrayList<Statement>();
 	private boolean hasBeenExecuted;
 	/**
 	 * 	Expresses the name of the function that is being executed right now. 
@@ -37,7 +36,6 @@ public class Program {
 	public Program(List<Function> functions, Statement main) {
 		setMain(main);
 		setFunctions(functions);
-		main.addStatementsToList(statements);
 		main.setProgram(this);
 	}
 	
@@ -52,25 +50,7 @@ public class Program {
 	
 	public List<Object> execute(double time) {
 		this.timeLeft = time;
-		//main.eval();
-		int start = (hasBeenExecuted? this.statements.indexOf(lastExecutedStatement)+1 : 0);
-		
-		Iterator<Statement> i = statements.iterator();
-		
-		for(; start>1;--start) {
-			i.next();
-		}
-		
-		
-		while(i.hasNext()) {
-			try {
-				i.next().eval();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				//e.printStackTrace();
-			}
-		
-		}
+		main.eval();
 		return returns;
 	}
 	
@@ -107,8 +87,11 @@ public class Program {
 	public Function getFunctionByName(String name) {
 		List<Function> result = getFunctions().stream().filter(f -> f.getName().equals(name)).collect(Collectors.toList());
 
-		if (result.isEmpty()) 
+		if (result.isEmpty()) {
+			System.out.println("No such variable found");
 			return null;
+		}
+		System.out.println("Correct variable found");
 		return result.get(0);
 		
 		
@@ -154,9 +137,6 @@ public class Program {
 		this.timeLeft = time;
 	}
 
-	public List<Statement> getStatementList() {
-		return this.statements;
-	}
 
 	public Statement getLastExecutedStatement() {
 		return lastExecutedStatement;

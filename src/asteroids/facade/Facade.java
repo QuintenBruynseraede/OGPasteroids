@@ -315,8 +315,14 @@ public class Facade implements asteroids.part3.facade.IFacade {
 	public void addShipToWorld(World world, Ship ship) throws ModelException {
 		if (world == null) throw new ModelException("Null reference to world when adding ship to world");
 		if (ship == null) throw new ModelException("Null reference to ship when adding ship to world");
-		ship.setWorld(world);
-		world.addEntity(ship);
+		try {
+			ship.setWorld(world);
+			world.addEntity(ship);
+		} catch (IllegalStateException e) {
+			throw new ModelException("");
+		} catch (IllegalArgumentException e) {
+			throw new ModelException("");
+		}
 	}
 
 	@Override
@@ -336,8 +342,14 @@ public class Facade implements asteroids.part3.facade.IFacade {
 	@Override
 	public void addBulletToWorld(World world, Bullet bullet) throws ModelException {
 		if (world == null || bullet == null) throw new ModelException("Null reference adding bullet");
-		bullet.setWorld(world);
-		world.addEntity(bullet);
+		try {
+			bullet.setWorld(world);
+			world.addEntity(bullet);
+		} catch (IllegalStateException e) {
+			throw new ModelException("");
+		} catch (IllegalArgumentException e) {
+			throw new ModelException("");
+		}
 	}
 
 	@Override
@@ -349,19 +361,24 @@ public class Facade implements asteroids.part3.facade.IFacade {
 	@Override
 	public Set<? extends Bullet> getBulletsOnShip(Ship ship) throws ModelException {
 		if (ship == null) throw new ModelException("Querying list of bullets on null ship");
-		return ship.bulletsLoaded;
+		return ship.getBulletsLoaded();
 	}
 
 	@Override
 	public int getNbBulletsOnShip(Ship ship) throws ModelException {
 		if (ship == null) throw new ModelException("Querying number of bullets on null ship");
-		return ship.bulletsLoaded.size();
+		return ship.getBulletsLoaded().size();
 	}
 
 	@Override
 	public void loadBulletOnShip(Ship ship, Bullet bullet) throws ModelException {
 		if (ship == null || bullet == null) throw new ModelException("Null reference adding bullet to ship");
-		ship.addBulletToLoaded(bullet);
+		
+		try {
+			ship.addBulletToLoaded(bullet);
+		} catch (IllegalArgumentException e) {
+			throw new ModelException("");
+		}
 	}
 
 	@Override
@@ -377,7 +394,11 @@ public class Facade implements asteroids.part3.facade.IFacade {
 	@Override
 	public void removeBulletFromShip(Ship ship, Bullet bullet) throws ModelException {
 		if (ship == null || bullet == null) throw new ModelException("Null reference removing bullet from ship");
-		ship.removeBullet(bullet);
+		try {
+			ship.removeBullet(bullet);
+		} catch (IllegalArgumentException e) {
+			throw new ModelException("");
+		}
 	}
 
 	@Override
@@ -478,6 +499,7 @@ public class Facade implements asteroids.part3.facade.IFacade {
 
 	@Override
 	public void addAsteroidToWorld(World world, Asteroid asteroid) throws ModelException {
+		asteroid.setWorld(world);
 		world.addEntity(asteroid);
 	}
 
@@ -496,6 +518,7 @@ public class Facade implements asteroids.part3.facade.IFacade {
 
 	@Override
 	public void addPlanetoidToWorld(World world, Planetoid planetoid) throws ModelException {
+		planetoid.setWorld(world);
 		world.addEntity(planetoid);
 		
 	}

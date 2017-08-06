@@ -8,6 +8,6 @@ public abstract class ActionStatement extends Statement {
 	}
 
 	@Override
-	public abstract void eval() throws Exception;
+	public abstract void eval();
 	
 }

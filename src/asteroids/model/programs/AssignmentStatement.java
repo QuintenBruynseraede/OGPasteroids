@@ -37,11 +37,6 @@ public class AssignmentStatement extends Statement {
 		//TODO doesn't check whether this variable exists already.
 		this.getProgram().addVariable(variableName, value);
 	}
-
-	@Override
-	public void addStatementsToList(List<Statement> statements) {
-		statements.add(this);
-	}
 	
 	
 }

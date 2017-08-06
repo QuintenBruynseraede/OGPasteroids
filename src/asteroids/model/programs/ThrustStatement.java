@@ -14,7 +14,7 @@ public class ThrustStatement extends ActionStatement {
 	}
 
 	@Override
-	public void eval() throws OutOfTimeException {
+	public void eval() {
 		if (this.getProgram().getTimeLeft() >= 0.2) {
 			this.setLastStatement();
 			if (state)
@@ -23,7 +23,8 @@ public class ThrustStatement extends ActionStatement {
 				this.getProgram().getShip().thrustOff();
 		}
 		else 
-			throw new OutOfTimeException();
+			//throw new OutOfTimeException();
+			return;
 		
 	}
 
@@ -35,9 +36,5 @@ public class ThrustStatement extends ActionStatement {
 		this.state = state;
 	}
 
-	@Override
-	public void addStatementsToList(List<Statement> statements) {
-		statements.add(this);
-	}
 
 }

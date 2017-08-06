@@ -265,11 +265,9 @@ public class Bullet extends Entity {
 		}
 		else {
 			move(deltaTime);
-		}
-		
+		}	
 	}
 
-	
 	
 	/**
 	 * Finalizes the bullet, preparing it to be removed by the garbage collector.
@@ -282,10 +280,6 @@ public class Bullet extends Entity {
 	@Raw
 	public void finalize() {
 		if (finalized) return;
-		//if (this.getParent() != null) {
-		//	this.getParent().removeBullet(this);
-		//	this.parent = null;
-		//}
 		if (this.getWorld() != null) {
 			this.getWorld().removeEntity(this);
 		}
@@ -343,7 +337,6 @@ public class Bullet extends Entity {
 				resetBounces();
 				setXCoordinate(entity.getXCoordinate());
 				setYCoordinate(entity.getYCoordinate());
-				System.out.println("here");
 			}
 			else {
 				entity.finalize();
@@ -358,6 +351,12 @@ public class Bullet extends Entity {
 			entity.collideWith(this);
 	}
 	
+	/**
+	 *  Changes the velocity of this bullet to reflect a collision against a boundary of the world.
+	 *  Adds one to the number of bounces against a boundary this bullet has made. 
+	 *  @post | new.getBounces() = getBounces() + 1
+	 *  @see Implementation
+	 */
 	@Override
 	public void collideBoundary() {
 		if (getWorld() == null) return;

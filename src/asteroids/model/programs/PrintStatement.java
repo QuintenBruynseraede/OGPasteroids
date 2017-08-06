@@ -7,10 +7,11 @@ import asteroids.part3.programs.SourceLocation;
 public class PrintStatement extends Statement {
 	private Expression value;
 	
-	public PrintStatement(Expression value, SourceLocation sourceLocation) {
+	public PrintStatement(Expression v, SourceLocation sourceLocation) {
 		super(sourceLocation);
-		setValue(value);
-		value.setStatement(this);
+		System.out.println("Value set for " + v);
+		this.value = v;
+		v.setStatement(this);
 	}
 
 	public Expression getValue() {
@@ -22,15 +23,10 @@ public class PrintStatement extends Statement {
 	}
 
 	@Override
-	public void eval() throws Exception {
+	public void eval() {
 		this.setLastStatement();
 		System.out.println(value.eval());
 		this.getProgram().addReturnItem(value.eval());
-		
 	}
 
-	@Override
-	public void addStatementsToList(List<Statement> statements) {
-		statements.add(this);
-	}
 }

@@ -10,17 +10,14 @@ public class FireStatement extends ActionStatement {
 	}
 
 	@Override
-	public void eval() throws OutOfTimeException {
+	public void eval() {
 		if (this.getProgram().getTimeLeft() >= 0.2) {
 			this.setLastStatement();
 			this.getProgram().getShip().fire();
 		}
 		else
-			throw new OutOfTimeException();
+			//throw new OutOfTimeException();
+			return;
 	}
 
-	@Override
-	public void addStatementsToList(List<Statement> statements) {
-		statements.add(this);
-	}
 }
