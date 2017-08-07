@@ -11,7 +11,7 @@ public class ReadVariableExpression extends Expression<Object> {
 	}
 
 	public Object eval() {
-		System.out.println(this.getStatement());
+		System.out.println(getStatement());
 		return this.getStatement().getProgram().getVariableValue(varName);
 	}
 

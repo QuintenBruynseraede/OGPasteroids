@@ -30,7 +30,13 @@ public class TurnStatement extends ActionStatement {
 			} catch (Exception e) {
 				throw new ClassCastException("Expression within while statement must evaluate to a boolean value");
 			}
-			this.getProgram().getShip().turn(a);
+			
+			
+			try {
+				this.getProgram().getShip().turn(a);
+			} catch (AssertionError e) {
+				throw new IllegalArgumentException();
+			}
 		}
 		else 
 			return;

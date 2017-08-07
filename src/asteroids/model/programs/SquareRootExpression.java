@@ -12,6 +12,7 @@ public class SquareRootExpression extends Expression<Double> {
 
 	@Override
 	public Double eval() {
+		expression.setStatement(getStatement());
 		return Math.sqrt(expression.eval());
 	}
 

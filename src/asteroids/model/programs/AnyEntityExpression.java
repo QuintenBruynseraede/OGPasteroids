@@ -1,28 +1,28 @@
 package asteroids.model.programs;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import asteroids.model.Entity;
 import asteroids.model.World;
 import asteroids.part3.programs.SourceLocation;
 
 public class AnyEntityExpression extends Expression<Entity> {
-	Entity entity;
 	
 	public AnyEntityExpression(SourceLocation sourceLocation) {
 		super(sourceLocation);
-		
-		Random r = new Random();
-		List<Entity> entities = (ArrayList<Entity>) this.getStatement().getProgram().getShip().getWorld().getEntities();
-		entity = entities.get(r.nextInt(entities.size()));
 	}
 
 	@Override
 	public Entity eval() {
-		return this.entity;
+		Random r = new Random();
+		
+		//System.out.println(getStatement());
+		Set<Entity> entities = new HashSet<Entity>(getStatement().getProgram().getShip().getWorld().getEntities());
+		int i = r.nextInt(entities.size());
+		return (Entity) entities.toArray()[i];
 	}
-	
-
 }

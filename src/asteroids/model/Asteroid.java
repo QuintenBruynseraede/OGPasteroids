@@ -136,7 +136,7 @@ public class Asteroid extends MinorPlanet {
 	@Override
 	@Raw
 	public String toString() {
-		return "[Asteroid] " + this;
+		return "[Asteroid] " + this.hashCode();
 	}
 
 	

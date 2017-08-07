@@ -652,7 +652,14 @@ public class Facade implements asteroids.part3.facade.IFacade {
 
 	@Override
 	public List<Object> executeProgram(Ship ship, double dt) throws ModelException {
-		return ship.executeProgram(dt);
+		try {
+			return ship.executeProgram(dt);
+		} catch (IllegalArgumentException e) {
+			throw new ModelException("");
+		} catch (ClassCastException e) {
+			System.out.println(e.getMessage());
+			throw new ModelException("");
+		}
 	}
 
 

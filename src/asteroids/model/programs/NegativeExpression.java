@@ -12,6 +12,7 @@ public class NegativeExpression extends Expression<Double> {
 
 	@Override
 	public Double eval() {
+		expression.setStatement(getStatement());
 		return -(expression.eval());
 	}
 

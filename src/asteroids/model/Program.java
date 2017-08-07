@@ -88,15 +88,24 @@ public class Program {
 		List<Function> result = getFunctions().stream().filter(f -> f.getName().equals(name)).collect(Collectors.toList());
 
 		if (result.isEmpty()) {
-			System.out.println("No such variable found");
+			//System.out.println("No such function found");
 			return null;
 		}
-		System.out.println("Correct variable found");
-		return result.get(0);
-		
-		
+		//System.out.println("Correct function found");
+		return result.get(0);	
 		//The collected list will always contain just one element, thus taking the first element yields the correct result.
+	}
 	
+	public Variable<?> getVariableByName(String name) {
+		List<Variable<?>> result = getVariables().stream().filter(f -> f.getName().equals(name)).collect(Collectors.toList());
+		
+		if (result.isEmpty()) {
+			//System.out.println("No such variable found: " + name);
+			return null;
+		}
+		//System.out.println("Correct variable found: " + name);
+		return result.get(0);	
+		//The collected list will always contain just one element, thus taking the first element yields the correct result.
 	}
 	
 	public void addReturnItem(Object o) {

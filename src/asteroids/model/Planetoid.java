@@ -251,7 +251,7 @@ public class Planetoid extends MinorPlanet {
 	@Override
 	@Raw
 	public String toString() {
-		return "[Planetoid] " + this;
+		return "[Planetoid] " + this.hashCode();
 	}
 
 	

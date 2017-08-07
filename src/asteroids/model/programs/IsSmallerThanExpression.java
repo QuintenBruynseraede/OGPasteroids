@@ -17,6 +17,8 @@ public class IsSmallerThanExpression extends Expression<Boolean> {
 
 	@Override
 	public Boolean eval() {
+		expression1.setStatement(getStatement());
+		expression2.setStatement(getStatement());
 		return (this.expression1.eval() < this.expression2.eval());
 	}
 }

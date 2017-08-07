@@ -4,15 +4,27 @@ import asteroids.model.Entity;
 import asteroids.part3.programs.SourceLocation;
 
 public class GetVelocityXExpression extends Expression<Double> {
-	Entity entity;
+	private Expression<Entity> expression;
 	
 	public GetVelocityXExpression(Expression<Entity> e, SourceLocation sourceLocation) {
 		super(sourceLocation);
-		this.entity = e.eval();
+		setExpression(e);
 	}
 
 	@Override
 	public Double eval() {
-		return this.entity.getXVelocity();
+		expression.setStatement(getStatement());
+		if (expression.eval() == null) 
+			throw new IllegalArgumentException();
+		else
+			return expression.eval().getXVelocity();
+	}
+
+	public Expression<Entity> getExpression() {
+		return expression;
+	}
+
+	public void setExpression(Expression<Entity> expression) {
+		this.expression = expression;
 	}
 }

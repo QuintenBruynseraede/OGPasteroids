@@ -39,6 +39,8 @@ public class MultiplicationExpression extends Expression<Double> {
 
 	@Override
 	public Double eval() {
+		getLeftFactor().setStatement(getStatement());
+		getRightFactor().setStatement(getStatement());
 		return getLeftFactor().eval() * getRightFactor().eval();
 	}
 }

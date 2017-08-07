@@ -39,6 +39,7 @@ public class WhileStatement extends Statement {
 		try {
 			ex = (boolean) condition.eval();
 		} catch (Exception e) {
+			System.out.println(e.getClass());
 			throw new ClassCastException("Expression within while statement must evaluate to a boolean value");
 		}
 		while(ex) {

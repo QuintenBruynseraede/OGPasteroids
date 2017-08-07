@@ -14,13 +14,13 @@ public class IsEqualToExpression extends Expression<Boolean> {
 
 	@Override
 	public Boolean eval() {
-		try {
-			if (left.eval() == right.eval()) {
-				return true;
-			}
-		} catch (Exception e) {
-			return false;
+		left.setStatement(getStatement());
+		right.setStatement(getStatement());
+		
+		if (left.eval().equals(right.eval())) {
+			return true;
 		}
 		return false;
+		
 	}
 }

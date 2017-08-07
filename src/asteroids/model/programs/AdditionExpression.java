@@ -39,6 +39,8 @@ public class AdditionExpression extends Expression<Double> {
 
 	@Override
 	public Double eval()  {
+		getLeftTerm().setStatement(getStatement());
+		getRightTerm().setStatement(getStatement());
 		return getLeftTerm().eval() + getRightTerm().eval();
 	}
 }

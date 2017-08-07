@@ -3,15 +3,26 @@ package asteroids.model.programs;
 import asteroids.part3.programs.SourceLocation;
 
 public class IsNotExpression extends Expression<Boolean> {
-	private boolean val;
+	private Expression<Boolean> expression;
 	
 	public IsNotExpression(Expression<Boolean> e, SourceLocation sourceLocation) {
 		super(sourceLocation);
-		this.val = e.eval();
+		setExpression(e);
+		
 	}
 	
 	public Boolean eval() {
-		return !(val);
+		expression.setStatement(getStatement());
+		return !(expression.eval());
 	}
+
+	public Expression<Boolean> getExpression() {
+		return expression;
+	}
+
+	private void setExpression(Expression<Boolean> expression) {
+		this.expression = expression;
+	}
+	
 
 }

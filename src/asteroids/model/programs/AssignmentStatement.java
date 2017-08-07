@@ -2,6 +2,9 @@ package asteroids.model.programs;
 
 import java.util.List;
 
+import javax.swing.text.AsyncBoxView;
+
+import asteroids.model.Entity;
 import asteroids.part3.programs.SourceLocation;
 
 public class AssignmentStatement extends Statement {
@@ -30,12 +33,26 @@ public class AssignmentStatement extends Statement {
 	public void setVariableName(String variableName) {
 		this.variableName = variableName;
 	}
+	
 
 	@Override
 	public void eval() {
 		this.setLastStatement();
-		//TODO doesn't check whether this variable exists already.
-		this.getProgram().addVariable(variableName, value);
+		
+		if (!(getProgram().getFunctionByName(variableName) == null))
+			throw new IllegalArgumentException(); //Function with identical name
+	
+		if (getProgram().getVariableByName(variableName) == null)
+			this.getProgram().addVariable(variableName, value); //New variable
+		else {
+			if (value.eval() instanceof Double)
+				this.getProgram().getVariableByName(variableName).setExpression(new ConstantExpression((double) value.eval(), getSourceLocation()));
+			else if (value.eval() instanceof Boolean)
+				this.getProgram().getVariableByName(variableName).setExpression(new BooleanExpression((boolean) value.eval(), getSourceLocation()));
+			else if (value.eval() instanceof Entity)
+				this.getProgram().getVariableByName(variableName).setExpression(new EntityExpression((Entity) value.eval(), getSourceLocation()));
+		}
+		
 	}
 	
 	
