@@ -271,6 +271,28 @@ public class Planetoid extends MinorPlanet {
 		if (entity instanceof Ship) {
 			((Ship) entity).teleport();
 		}
+		else if (entity instanceof Planetoid) {
+			Planetoid planetoid1 = this;
+			Planetoid planetoid2 = (Planetoid) entity;
+			
+			 
+			double deltaVX = planetoid2.getXVelocity() - planetoid1.getXVelocity();
+			double deltaVY = planetoid2.getYVelocity() - planetoid1.getYVelocity();
+			double deltaRX = planetoid2.getXCoordinate() - planetoid1.getXCoordinate();
+			double deltaRY = planetoid2.getYCoordinate() - planetoid1.getYCoordinate();
+			double sigma = Math.sqrt(Math.pow(planetoid1.getXCoordinate()-planetoid2.getXCoordinate(), 2) + Math.pow(planetoid1.getYCoordinate()-planetoid2.getYCoordinate(), 2));
+			
+			double J = (2*planetoid1.getMass()*planetoid2.getMass()*(deltaVX * deltaRX + deltaVY * deltaRY))/(sigma*(planetoid1.getMass()+planetoid2.getMass()));
+			double Jx = J*deltaRX/sigma;
+			double Jy = J*deltaRY/sigma;
+			
+			planetoid1.setXVelocity(planetoid1.getXVelocity() + (Jx/planetoid1.getMass()));
+			planetoid1.setYVelocity(planetoid1.getYVelocity() + (Jy/planetoid1.getMass()));
+			
+			planetoid2.setXVelocity(planetoid2.getXVelocity() - (Jx/planetoid2.getMass()));
+			planetoid2.setYVelocity(planetoid2.getYVelocity() - (Jy/planetoid2.getMass()));
+			return;
+		}
 		else
 			entity.collideWith(this);
 	}
