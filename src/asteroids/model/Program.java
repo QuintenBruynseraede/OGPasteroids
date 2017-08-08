@@ -27,6 +27,7 @@ public class Program {
 	private SourceLocation sourceLocation = new SourceLocation(0, 0);
 	private Statement lastExecutedStatement;
 	private boolean hasBeenExecuted;
+	private boolean currentlyInWhile = false;
 	/**
 	 * 	Expresses the name of the function that is being executed right now. 
 	 * 	Holds a value of null is this program is currently not executing any function. 
@@ -153,6 +154,14 @@ public class Program {
 
 	public void setLastExecutedStatement(Statement lastExecutedStatement) {
 		this.lastExecutedStatement = lastExecutedStatement;
+	}
+
+	public boolean isCurrentlyInWhile() {
+		return currentlyInWhile;
+	}
+
+	public void setCurrentlyInWhile(boolean currentlyInWhile) {
+		this.currentlyInWhile = currentlyInWhile;
 	}
 	
 	

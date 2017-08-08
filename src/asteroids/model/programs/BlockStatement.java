@@ -32,7 +32,7 @@ public class BlockStatement extends Statement{
 		this.program = program;
 		
 		for (Statement s : getStatements()) {
-			s.setProgram(this.getProgram());
+			s.setProgram(getProgram());
 		}
 	}
 }

@@ -37,11 +37,13 @@ public class WhileStatement extends Statement {
 		this.setLastStatement();
 		boolean ex;
 		try {
+			getProgram().setCurrentlyInWhile(true);
 			ex = (boolean) condition.eval();
 		} catch (Exception e) {
 			System.out.println(e.getClass());
 			throw new ClassCastException("Expression within while statement must evaluate to a boolean value");
 		}
+		
 		while(ex) {
 			try {
 				body.eval();
@@ -54,6 +56,7 @@ public class WhileStatement extends Statement {
 				throw new ClassCastException("Expression within while statement must evaluate to a boolean value");
 			}
 		}
+		getProgram().setCurrentlyInWhile(false);
 	}
 
 	

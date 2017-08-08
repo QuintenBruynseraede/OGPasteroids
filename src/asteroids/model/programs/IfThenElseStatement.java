@@ -55,14 +55,15 @@ public class IfThenElseStatement extends Statement{
 		if (ex) {
 			ifBody.eval();
 		}
-		else {
+		else if (getElseBody() != null){
 			elseBody.eval();
 		}
 	}
 	
 	public void setProgram(Program program) {
 		this.program = program;
-		this.getIfBody().setProgram(program);
-		this.getElseBody().setProgram(program);
+		getIfBody().setProgram(program);
+		if (getElseBody() != null)
+			getElseBody().setProgram(program);
 	}
 }

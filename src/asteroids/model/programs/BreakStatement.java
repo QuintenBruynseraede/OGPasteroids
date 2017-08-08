@@ -13,6 +13,8 @@ public class BreakStatement extends Statement {
 	@Override
 	public void eval() {
 		this.setLastStatement();
+		if (! getProgram().isCurrentlyInWhile())
+			throw new IllegalStateException();
 		throw new BreakException();
 	}
 
