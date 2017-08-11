@@ -10,10 +10,8 @@ import org.junit.Test;
 
 import asteroids.facade.Facade;
 import asteroids.model.Bullet;
-import asteroids.model.Collision;
 import asteroids.model.Constants;
 import asteroids.model.Entity;
-import asteroids.model.GameObject;
 import asteroids.model.Ship;
 import asteroids.model.World;
 import asteroids.part2.facade.IFacade;
@@ -48,8 +46,8 @@ public class Part2Tests {
 		World world = facade.createWorld(5000, 5000);
 		Ship ship = facade.createShip(100, 120, 10, 5, 500, 0, 1.0E20);
 		facade.loadBulletOnShip(ship, bullet);
-		assertTrue(ship.bulletsLoaded.contains(bullet));
-		assertTrue(ship.bulletsLoaded.size() == 1);
+		assertTrue(ship.getBulletsLoaded().contains(bullet));
+		assertTrue(ship.getBulletsLoaded().size() == 1);
 	}
 	
 	@Test
@@ -69,12 +67,12 @@ public class Part2Tests {
 		World world = facade.createWorld(5000, 5000);
 		Ship ship = facade.createShip(100, 120, 10, 5, 500, 0, 1.0E20);
 		facade.loadBulletsOnShip(ship, b);
-		assertTrue(ship.bulletsLoaded.contains(bullet));
-		assertTrue(ship.bulletsLoaded.contains(bullet2));
-		assertTrue(ship.bulletsLoaded.contains(bullet3));
-		assertTrue(ship.bulletsLoaded.contains(bullet4));
-		assertTrue(ship.bulletsLoaded.contains(bullet5));
-		assertTrue(ship.bulletsLoaded.size() == 5);
+		assertTrue(ship.getBulletsLoaded().contains(bullet));
+		assertTrue(ship.getBulletsLoaded().contains(bullet2));
+		assertTrue(ship.getBulletsLoaded().contains(bullet3));
+		assertTrue(ship.getBulletsLoaded().contains(bullet4));
+		assertTrue(ship.getBulletsLoaded().contains(bullet5));
+		assertTrue(ship.getBulletsLoaded().size() == 5);
 	}
 	
 	@Test
@@ -86,9 +84,8 @@ public class Part2Tests {
 		facade.loadBulletOnShip(ship, bullet);
 		assertTrue(bullet.getParent() == ship);
 		assertTrue(bullet.isLoaded());
-		assertTrue(ship.bulletsLoaded.contains(bullet));
+		assertTrue(ship.getBulletsLoaded().contains(bullet));
 	}
-	
 	@Test
 	public void testLoadSameBullet() throws ModelException {
 		Bullet bullet = facade.createBullet(0, 0, 10, 20, 20);
@@ -96,12 +93,12 @@ public class Part2Tests {
 		Ship ship = facade.createShip(100, 120, 10, 5, 500, 0, 1.0E20);
 		
 		facade.loadBulletOnShip(ship, bullet);
-		assertTrue(ship.bulletsLoaded.contains(bullet));
-		assertTrue(ship.bulletsLoaded.size() == 1);
+		assertTrue(ship.getBulletsLoaded().contains(bullet));
+		assertTrue(ship.getBulletsLoaded().size() == 1);
 		
 		facade.loadBulletOnShip(ship, bullet);
-		assertTrue(ship.bulletsLoaded.contains(bullet));
-		assertTrue(ship.bulletsLoaded.size() == 1);
+		assertTrue(ship.getBulletsLoaded().contains(bullet));
+		assertTrue(ship.getBulletsLoaded().size() == 1);
 		
 	}
 	
@@ -121,8 +118,8 @@ public class Part2Tests {
 		facade.loadBulletOnShip(ship, bullet);
 		
 		facade.removeBulletFromShip(ship, bullet2);
-		assertTrue(ship.bulletsLoaded.size() == 1);
-		assertTrue(ship.bulletsLoaded.contains(bullet));
+		assertTrue(ship.getBulletsLoaded().size() == 1);
+		assertTrue(ship.getBulletsLoaded().contains(bullet));
 	}
 	
 
@@ -146,60 +143,32 @@ public class Part2Tests {
 		facade.loadBulletOnShip(ship, bullet2);
 		facade.loadBulletOnShip(ship, bullet3);
 		
-		world.advance(0.1);
+		for (Bullet b: ship.getBulletsLoaded())
+			System.out.println(b); //[]
+		
+		world.advance(0.000001);
 		assertEquals(ship.getXCoordinate(), bullet1.getXCoordinate(), EPSILON);
 		
-		assertTrue(ship.bulletsLoaded.size() == 3);
+		assertTrue(ship.getBulletsLoaded().size() == 3);
 		ship.fire();
-		assertTrue(ship.bulletsLoaded.size() == 2);
+		assertTrue(ship.getBulletsLoaded().size() == 2);
 		ship.fire();
-		assertTrue(ship.bulletsLoaded.size() == 1);
+		assertTrue(ship.getBulletsLoaded().size() == 1);
 		ship.fire();
 
 		assertTrue(!(bullet1.isLoaded()));
 		assertTrue(!(bullet2.isLoaded()));
 		assertTrue(!(bullet3.isLoaded()));
-
+		
+		//System.out.println(bullet1.getParent());
+		//System.out.println(ship.bulletsLoaded.contains(bullet1));
 		assertTrue(bullet1.getParent() == ship);
 		assertTrue(bullet2.getParent() == ship);
 		assertTrue(bullet3.getParent() == ship);
+		for (Bullet b: ship.getBulletsLoaded())
+			System.out.println(b); //[]
 	}
 	
-	@Test	
-	public void testGetObjectsNextCollision() throws ModelException {
-		World world = facade.createWorld(5000, 5000);
-		Ship ship = facade.createShip(100, 120, -10, 0, 20, 0, 1.0E20);
-		
-		facade.addShipToWorld(world, ship);
-		Collision coll = world.getNextCollisionData();
-		GameObject object1 = world.getObjectsNextCollision()[0];
-		GameObject object2 = world.getObjectsNextCollision()[1];
-		assertEquals(coll.getX(), 0.0, EPSILON);
-		assertEquals(coll.getY(), 120.0, EPSILON);
-		assertEquals(coll.getTime(), 10.0, EPSILON);
-		assertEquals(coll.getType(), 1, EPSILON);
-	}	
-
-	@Test
-	public void testTimeFirstCollisionBoundary() throws ModelException {
-		World world = facade.createWorld(5000, 5000);
-		Ship ship = facade.createShip(100, 100, -10, 0, 20, 0, 1.0E20);
-		
-		facade.addShipToWorld(world, ship);
-		assertEquals(ship.getTimeFirstCollisionBoundary(), 10.0, EPSILON);
-		
-	}
-	// FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-	@Test
-	public void testFirstCollisionBoundary() throws ModelException {
-		World world = facade.createWorld(5000, 5000);
-		Ship ship = facade.createShip(100, 100, -10, 0, 20, 0, 1.0E20);
-		
-		facade.addShipToWorld(world, ship);
-		
-		assertEquals(Constants.LEFT, ship.getFirstCollisionBoundary().getBoundaryType(), EPSILON);
-		
-	}
 	
 	@Test
 	public void testParentOfBullet() throws ModelException {
@@ -242,20 +211,25 @@ public class Part2Tests {
 		facade.loadBulletOnShip(ship, bullet);
 		facade.addBulletToWorld(world, bullet);
 		
+		//System.out.println(bullet.getParent());
+		//System.out.println(bullet.getWorld());
 		bullet.finalize();
 		
 		boolean foundShip = false;
-		for (Bullet i : ship.bulletsLoaded) {
+		for (Bullet i : ship.getBulletsLoaded()) {
 			if (bullet == i)
 				foundShip = true;
 		}
 		assertTrue(foundShip == false);
 		
+		
 		boolean foundWorld = false;
 		for (Entity i : world.getEntitiesOfType(Bullet.class)) {
-			if (bullet == i)
+			if (bullet == i) 
 				foundWorld = true;
 		}
+		//System.out.println(bullet.getWorld());
+		//System.out.println(world.getEntities().contains(bullet));
 		assertTrue(foundWorld == false);
 	}
 	
@@ -337,58 +311,7 @@ public class Part2Tests {
 		assertTrue(!world.getEntities().contains(ship4));
 	}
 	
-	@Test
-	public void testTimeNextCollision() throws ModelException {
-		World world = facade.createWorld(5000, 5000);
-		
-		Ship ship1 = facade.createShip(100, 100, 10, 0, 10, 0, 1.0E20);
-		Ship ship2 = facade.createShip(200, 100, -10, 0, 10, 0, 1.0E20);
-		facade.addShipToWorld(world, ship1);
-		facade.addShipToWorld(world, ship2);
-		
-		
-		assertEquals(140, world.getPositionNextCollision()[0], EPSILON);
-		assertEquals(100, world.getPositionNextCollision()[1], EPSILON);
-	}
-	
-	@Test
-	public void testTimeNextCollisionNoCollision() throws ModelException {
-		World world = facade.createWorld(5000, 5000);
-		
-		Ship ship1 = facade.createShip(100, 500, -10, 0, 20, 0, 1.0E20);
-		Ship ship2 = facade.createShip(200, 500, -10, 0, 20, 0, 1.0E20);
-		facade.addShipToWorld(world, ship1);
-		facade.addShipToWorld(world, ship2);
-		
-		
-		
-		assertEquals(10.0, world.getTimeNextCollision(), EPSILON);
-	}
 
-	@Test
-	public void testObjectsNextCollision() throws ModelException {
-		World world = facade.createWorld(5000, 5000);
-		Ship ship1 = facade.createShip(100, 500, -10, 0, 20, 0, 1.0E20);
-		facade.addShipToWorld(world, ship1);
-		GameObject[] objects = world.getObjectsNextCollision();
-		assertTrue(objects[0] == ship1 || objects[0] == world.getBoundaries()[0]);
-		assertTrue(objects[1] == ship1 || objects[1] == world.getBoundaries()[0]);
-	}
-	
-	@Test
-	public void testPositionNextCollision() throws ModelException {
-		World world = facade.createWorld(5000, 5000);
-		
-		Ship ship1 = facade.createShip(100, 100, 10, 0, 20, 0, 1.0E20);
-		Ship ship2 = facade.createShip(200, 100, -10, 0, 20, 0, 1.0E20);
-		facade.addShipToWorld(world, ship1);
-		facade.addShipToWorld(world, ship2);
-		
-		
-		assertTrue(world.getPositionNextCollision()[0] == 130 || world.getPositionNextCollision()[0] == 170);
-		assertTrue(world.getPositionNextCollision()[1] == 100);
-	}
-	
 	@Test
 	public void testFinalizeWorld() throws ModelException {
 		World world = facade.createWorld(5000, 5000);
@@ -415,7 +338,42 @@ public class Part2Tests {
 		assertTrue(world.getEntitiesOfType(Ship.class).size() == 0);
 		assertTrue(world.isFinalized() == true);
 		assertTrue(ship1 != null);
+	}
+	
+	@Test
+	public void testGetTimeFirstCollisionBoundary() throws ModelException {
+		World world = facade.createWorld(100, 100);
 		
+		Ship ship1 = facade.createShip(50, 50, -10, 0, 10, 0, 1.0E20);
+		Ship ship2 = facade.createShip(50, 50, 10, 0, 10, 0, 1.0E20);
+		Ship ship3 = facade.createShip(50, 50, 0, -10, 10, 0, 1.0E20);
+		Ship ship4 = facade.createShip(50, 50, 0, 10, 10, 0, 1.0E20);
 		
+		facade.addShipToWorld(world, ship1);
+		facade.addShipToWorld(world, ship2);
+		facade.addShipToWorld(world, ship3);
+		facade.addShipToWorld(world, ship4);
+		
+		assertEquals(4, ship1.getTimeFirstCollisionBoundary(), 0.1);
+		assertEquals(4, ship2.getTimeFirstCollisionBoundary(), 0.1);
+		assertEquals(4, ship3.getTimeFirstCollisionBoundary(), 0.1);
+		assertEquals(4, ship4.getTimeFirstCollisionBoundary(), 0.1);	
+	}
+	
+	@Test
+	public void testGetTimeToCollision() throws ModelException {
+		World world = facade.createWorld(1000, 1000);
+		
+		Ship ship1 = facade.createShip(100, 50, 10, 0, 10, 0, 1.0E20);
+		Ship ship2 = facade.createShip(200, 50, -10, 0, 10, 0, 1.0E20);
+		Ship ship3 = facade.createShip(10, 10, 0, 0, 10, 0, 1E20);
+
+		
+		facade.addShipToWorld(world, ship1);
+		facade.addShipToWorld(world, ship2);
+		facade.addShipToWorld(world, ship3);
+		
+		assertEquals(4, ship1.getTimeToCollision(ship2), 0.1);
+		assertEquals(Double.POSITIVE_INFINITY, ship1.getTimeToCollision(ship3), 0.1);
 	}
 }

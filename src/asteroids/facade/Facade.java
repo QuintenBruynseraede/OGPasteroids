@@ -373,7 +373,7 @@ public class Facade implements asteroids.part3.facade.IFacade {
 	@Override
 	public void loadBulletOnShip(Ship ship, Bullet bullet) throws ModelException {
 		if (ship == null || bullet == null) throw new ModelException("Null reference adding bullet to ship");
-		
+		if (bullet.getWorld() != null) throw new ModelException("");
 		try {
 			ship.addBulletToLoaded(bullet);
 		} catch (IllegalArgumentException e) {
@@ -658,6 +658,8 @@ public class Facade implements asteroids.part3.facade.IFacade {
 			throw new ModelException("");
 		} catch (ClassCastException e) {
 			System.out.println(e.getMessage());
+			throw new ModelException("");
+		} catch (IllegalStateException e) {
 			throw new ModelException("");
 		}
 	}

@@ -33,7 +33,7 @@ public class Part3TestFull {
   private static final double BIG_EPSILON = 1.0E14;
   private static final double VERY_BIG_EPSILON = 1.0E34;
 
-  static int nbStudentsInTeam;
+  static int nbStudentsInTeam = 2;
   IFacade facade;
   IProgramFactory<?, ?, ?, Program> programFactory;
   World filledWorld;
@@ -1345,7 +1345,18 @@ public class Part3TestFull {
     assertNull(facade.getBulletWorld(bullet1));
     score += 7;
   }
-
+  /*
+   * 
+   * PPPPP    RRRRR    OOOOOOO  GGGGGGG  RRRRR         AA        MM      MM     
+   * P   PP   R   RR   O     O  G     G  R   RR       AAAA       MMM    MMM                   
+   * P    PP  R    RR  O     O  G     G  R    RR     AA  AA      M MM  MM M 
+   * P    PP  R    RR  O     O  G        R    RR    AA    AA     M  MMMM  M
+   * P   PP   R   RR   O     O  G        R   RR    AA      AA    M   MM   M
+   * PPP      RRRR     O     O  G   GGG  RRRR     AAAAAAAAAAAA   M        M
+   * P        R  RR    O     O  G     G  R  RR    AA         AA  M        M
+   * P        R   RR   O     O  G     G  R   RR   AA         AA  M        M
+   * P        R    RR  OOOOOOO  GGGGGGG  R    RR  AA         AA  M        M
+   */
   // Assignment Statement
 
   @Test
@@ -1359,7 +1370,8 @@ public class Part3TestFull {
     assertArrayEquals(expecteds, results.toArray());
     score += 4;
   }
-
+  
+  
   @Test
   public void testAssignmentStatement_LocalVariableSameNameGlobalVariable() throws ModelException {
     max_score += 12;

@@ -10,8 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import asteroids.model.Bullet;
-import asteroids.model.Collision;
-import asteroids.model.GameObject;
 import asteroids.model.Ship;
 import asteroids.model.World;
 import asteroids.facade.Facade;

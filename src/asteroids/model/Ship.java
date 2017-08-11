@@ -400,7 +400,8 @@ public class Ship extends Entity {
 		for (Entity e: getWorld().getEntities()) {
 			if (bullet.overlap(e) && e != bullet) {
 				System.out.println("Removing bullet on launch");
-				bullet.finalize();
+				bullet.collideWith(e);
+				//bullet.finalize();
 			}
 		}
 
