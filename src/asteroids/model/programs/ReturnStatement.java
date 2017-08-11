@@ -15,7 +15,7 @@ public class ReturnStatement extends Statement{
 
 	@Override
 	public void eval() {
-		//
+		getProgram().getCurrentFunction().setReturnValue(value.eval());
 	}
 	
 	public Expression<?> evaluate() {

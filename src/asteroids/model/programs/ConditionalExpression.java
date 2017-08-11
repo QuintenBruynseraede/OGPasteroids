@@ -17,9 +17,9 @@ public class ConditionalExpression extends Expression<Object> {
 	@Override
 	public Object eval() {
 		if (getBooleanExpression().eval())
-			return getThenExpression();
+			return getThenExpression().eval();
 		else
-			return getElseExpression();
+			return getElseExpression().eval();
 	}
 	
 	private boolean canHaveAsBooleanExpression(Expression<Boolean> e) {

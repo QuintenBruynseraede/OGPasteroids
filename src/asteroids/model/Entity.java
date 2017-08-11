@@ -648,18 +648,6 @@ public abstract class Entity {
 	public boolean isFinalized() {
 		return this.finalized;
 	}
-	
-
-	/**
-	 * Returns a string representation of an entity.
-	 * 
-	 * @return	A string representation of an entity.
-	 */
-	@Override
-	@Raw
-	public String toString() {
-		return "[Entity] " + this.hashCode();
-	}
 
 	public void collideBoundary() {
 		//System.out.println("collideBoundary");

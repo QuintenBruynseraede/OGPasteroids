@@ -22,12 +22,13 @@ public class Program {
 	private double timeLeft;
 	private List<Function> functions;
 	private List<Object> returns = new ArrayList<Object>();
-	private List<Variable> globalVariables = new ArrayList<Variable>();
+	private List<Variable<?>> globalVariables = new ArrayList<Variable<?>>();
 	private Statement main;
 	private SourceLocation sourceLocation = new SourceLocation(0, 0);
 	private Statement lastExecutedStatement;
-	private boolean hasBeenExecuted;
 	private boolean currentlyInWhile = false;
+
+	
 	/**
 	 * 	Expresses the name of the function that is being executed right now. 
 	 * 	Holds a value of null is this program is currently not executing any function. 
@@ -37,6 +38,12 @@ public class Program {
 	public Program(List<Function> functions, Statement main) {
 		setMain(main);
 		setFunctions(functions);
+		
+		for (Function f: getFunctions()) {
+			f.setProgram(this);
+		}
+
+		
 		main.setProgram(this);
 	}
 	
@@ -81,18 +88,20 @@ public class Program {
 	}
 	
 	@Basic
-	private void setFunctions(List<Function> functions2) {
-		this.functions = functions2;
+	private void setFunctions(List<Function> functions) {
+		this.functions = functions;
+
+		for (Function f: functions) {
+			f.setProgram(this);
+		}
 	}
 	
 	public Function getFunctionByName(String name) {
 		List<Function> result = getFunctions().stream().filter(f -> f.getName().equals(name)).collect(Collectors.toList());
 
 		if (result.isEmpty()) {
-			//System.out.println("No such function found");
 			return null;
 		}
-		//System.out.println("Correct function found");
 		return result.get(0);	
 		//The collected list will always contain just one element, thus taking the first element yields the correct result.
 	}
@@ -135,7 +144,7 @@ public class Program {
 		//TODO: functional programming
 	}
 	
-	public List<Variable> getVariables() {
+	public List<Variable<?>> getVariables() {
 		return this.globalVariables;
 	}
 	

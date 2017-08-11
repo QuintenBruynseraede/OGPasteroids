@@ -41,7 +41,10 @@ public class AssignmentStatement extends Statement {
 		
 		if (!(getProgram().getFunctionByName(variableName) == null))
 			throw new IllegalArgumentException(); //Function with identical name
-	
+		
+		if (getProgram().getCurrentFunction() != null)
+			getProgram().getCurrentFunction().addVariable(variableName, value);
+		
 		if (getProgram().getVariableByName(variableName) == null)
 			this.getProgram().addVariable(variableName, value); //New variable
 		else {

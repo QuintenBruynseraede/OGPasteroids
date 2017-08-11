@@ -486,8 +486,10 @@ public class Ship extends Entity {
 		this.setYCoordinate(this.getRadius() + r.nextInt() % (this.getWorld().getHeight() - 2 * this.getRadius()));
 		
 		for (Entity i : this.getWorld().getEntities()) {
-			if(i.overlap(this))
+			if(i.overlap(this) && i != this) {
+				System.out.println("Finalizing ship because of overlap on teleport.");
 				this.finalize();
+			}
 		}		
 	}
 	
@@ -541,7 +543,7 @@ public class Ship extends Entity {
 				b.setParent(null);
 			}
 		}
-
+		System.out.println(getWorld());
 		this.getWorld().removeEntity(this);
 		this.finalized = true;
 	}

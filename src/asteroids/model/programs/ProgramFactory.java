@@ -5,21 +5,23 @@ import java.util.List;
 import asteroids.model.*;
 import asteroids.part3.programs.IProgramFactory;
 import asteroids.part3.programs.SourceLocation;
+import asteroids.util.ModelException;
 
 public class ProgramFactory implements IProgramFactory<Expression, Statement, Function, Program>{
 
 	@Override
 	public Program createProgram(List<Function> functions, Statement main) {
-		return new Program(functions, main);
+		return new Program(functions, main);	
 	}
 
 	@Override
 	public Function createFunctionDefinition(String functionName, Statement body, SourceLocation sourceLocation) {
-		try {
-			return new Function(body, functionName, sourceLocation);
-		} catch (Exception e) {
-			return null;
-		}
+			try {
+				return new Function(body, functionName, sourceLocation);
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+				return null;
+			}
 	}
 
 	@Override
