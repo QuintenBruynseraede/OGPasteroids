@@ -20,6 +20,12 @@ public class Function {
 	private Object returnValue;
 	
 	public Function(Statement body, String name, SourceLocation sourceLocation) throws Exception {
+		setBody(body);
+		setName(name);
+		this.sourceLocation = sourceLocation;
+	}
+	
+	public Object execute(List<Expression> arguments) {
 		if (body instanceof BlockStatement) {
 			List<Statement> statements = ((BlockStatement) body).getStatements();
 			Iterator <Statement> i = statements.iterator();
@@ -39,19 +45,18 @@ public class Function {
 			//Single statement: return	
 		}
 		else if (body instanceof IfThenElseStatement) {
-			//Single statement: ifthenelse, return is probably within if or else branch
+			IfThenElseStatement s = (IfThenElseStatement) body;
+			if (s.getElseBody() instanceof PrintStatement)
+				throw new IllegalArgumentException("Print statement in else body within function");
+			//TODO Print statement in nested if/elses still go through. Needs a function in IfElseStatement
+			if (s.getIfBody() instanceof PrintStatement)
+				throw new IllegalArgumentException("Print statement in if body within function.");
 		}
 		else {
 			System.out.println(body);
 			throw new IllegalArgumentException("Single statement but not of correct type");
 		}
 		
-		setBody(body);
-		setName(name);
-		this.sourceLocation = sourceLocation;
-	}
-	
-	public Object execute(List<Expression> arguments) {
 		this.arguments = arguments;	
 		getProgram().setCurrentFunction(this);
 		getBody().setProgram(getProgram());

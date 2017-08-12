@@ -48,6 +48,7 @@ public class WhileStatement extends Statement {
 			try {
 				body.eval();
 			} catch (BreakException e1) {
+				System.out.println("Breaking");
 				break;
 			}
 			try {

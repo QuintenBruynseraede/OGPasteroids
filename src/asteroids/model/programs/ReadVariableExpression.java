@@ -13,26 +13,28 @@ public class ReadVariableExpression extends Expression<Object> {
 
 	public Object eval() {
 		Program p = getStatement().getProgram();
-		if (p.getCurrentFunction() == null) {
+		if (p.getCurrentFunction() == null) { //GLOBAL VARIABLE
+			//System.out.println("Looking for variable in global variables");
 			if (p.getVariableValue(varName) != null) {
-				System.out.println("Found " + varName + " here.");
 				return p.getVariableValue(varName);
-			}
-				
-			else throw new IllegalArgumentException();
-		}
-		else {
-			if (p.getVariableValue(varName) != null) {
-				System.out.println("Found " + varName + " here2.");
-				return p.getVariableValue(varName);
-			}
-			else if (p.getCurrentFunction().getVariableValue(varName) != null) {
-				System.out.println("Found " + varName + " here3.");
-				return p.getCurrentFunction().getVariableValue(varName);
 			}	
-			else
-				throw new IllegalArgumentException();
+			else throw new IllegalArgumentException("");
 		}
+		else { //LOCAL VARIABLE
+			try {
+				return p.getCurrentFunction().getVariableValue(varName);
+			}
+			catch (IllegalArgumentException e) {
+				try {
+					return p.getVariableValue(varName);
+				} 
+				catch (IllegalArgumentException f) {
+						throw new IllegalArgumentException("Variable not found locally or globally");
+				}
+					
+			}
+		}
+		
 				
 	}
 

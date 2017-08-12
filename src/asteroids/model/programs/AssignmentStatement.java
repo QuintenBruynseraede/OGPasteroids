@@ -39,15 +39,22 @@ public class AssignmentStatement extends Statement {
 	public void eval() {
 		this.setLastStatement();
 		
-		if (!(getProgram().getFunctionByName(variableName) == null))
-			throw new IllegalArgumentException(); //Function with identical name
-		
-		if (getProgram().getCurrentFunction() != null)
+		if (getProgram().getCurrentFunction() != null) { //Add as local variable	
+			//System.out.println("Adding local variable " + variableName);
 			getProgram().getCurrentFunction().addVariable(variableName, value);
+			return;
+		}
 		
-		if (getProgram().getVariableByName(variableName) == null)
+		if (!(getProgram().getFunctionByName(variableName) == null)) {
+			throw new IllegalArgumentException("Variable already exists as function"); //Function with identical name
+		}
+		
+		if (getProgram().getVariableByName(variableName) == null) {
+			//System.out.println("Adding global variable " + variableName);
 			this.getProgram().addVariable(variableName, value); //New variable
+		}
 		else {
+			//System.out.println("Modifying value of existing global variable " + variableName + " to " + (double) value.eval());
 			if (value.eval() instanceof Double)
 				this.getProgram().getVariableByName(variableName).setExpression(new ConstantExpression((double) value.eval(), getSourceLocation()));
 			else if (value.eval() instanceof Boolean)

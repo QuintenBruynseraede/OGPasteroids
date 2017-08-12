@@ -15,6 +15,8 @@ public class ReturnStatement extends Statement{
 
 	@Override
 	public void eval() {
+		if (getProgram().getCurrentFunction() == null)
+			throw new IllegalStateException("Cannot return when not in function");
 		getProgram().getCurrentFunction().setReturnValue(value.eval());
 	}
 	

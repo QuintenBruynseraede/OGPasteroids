@@ -139,7 +139,7 @@ public class Program {
 			if (v.getName().equals(varName))
 				return v.eval();
 		}
-		throw new IllegalArgumentException("Non-existent variable.");
+		throw new IllegalArgumentException("Non-existent global variable " + varName);
 		
 		//TODO: functional programming
 	}
