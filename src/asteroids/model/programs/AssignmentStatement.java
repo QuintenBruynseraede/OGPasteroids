@@ -1,9 +1,5 @@
 package asteroids.model.programs;
 
-import java.util.List;
-
-import javax.swing.text.AsyncBoxView;
-
 import asteroids.model.Entity;
 import asteroids.part3.programs.SourceLocation;
 
@@ -37,7 +33,8 @@ public class AssignmentStatement extends Statement {
 
 	@Override
 	public void eval() {
-		this.setLastStatement();
+		if (getProgram().getLastExecutedStatement() != null)
+			return;
 		
 		if (getProgram().getCurrentFunction() != null) { //Add as local variable	
 			//System.out.println("Adding local variable " + variableName);

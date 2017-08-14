@@ -6,8 +6,6 @@ import be.kuleuven.cs.som.annotate.Raw;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import org.antlr.v4.runtime.ConsoleErrorListener;
-
 import asteroids.part2.CollisionListener;
 
 

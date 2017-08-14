@@ -1,7 +1,5 @@
 package asteroids.model.programs;
 
-import java.util.List;
-
 import asteroids.part3.programs.SourceLocation;
 
 public class SkipStatement extends ActionStatement {
@@ -11,15 +9,19 @@ public class SkipStatement extends ActionStatement {
 	}
 
 	@Override
-	public void eval() {
-		if (this.getProgram().getTimeLeft() >= 0.2) {
-			this.setLastStatement();
-			//Nothing
+	public void eval() throws OutOfTimeException {
+		if (getProgram().getLastExecutedStatement() != null) {
+			if (getProgram().getLastExecutedStatement() == this) {
+				getProgram().setLastExecutedStatement(null);
+				System.out.println("Resuming execution after " + this);
+				return;
+			}
+			else
+				return;
 		}
-		else 
-			//throw new OutOfTimeException();
-			return;
-		
+		//Do nothing
+		System.out.println("SKIP " + this);
+		advanceTime();	
 	}
 
 

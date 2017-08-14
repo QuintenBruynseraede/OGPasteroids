@@ -1,7 +1,5 @@
 package asteroids.model.programs;
 
-import java.util.List;
-
 import asteroids.part3.programs.SourceLocation;
 
 public class PrintStatement extends Statement {
@@ -24,7 +22,9 @@ public class PrintStatement extends Statement {
 
 	@Override
 	public void eval() {
-		this.setLastStatement();
+		if (getProgram().getLastExecutedStatement() != null)
+			return;
+		
 		System.out.println(value.eval());
 		this.getProgram().addReturnItem(value.eval());
 	}

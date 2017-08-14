@@ -1,7 +1,5 @@
 package asteroids.model.programs;
 
-import java.util.List;
-
 import asteroids.part3.programs.SourceLocation;
 
 public class ReturnStatement extends Statement{
@@ -15,13 +13,15 @@ public class ReturnStatement extends Statement{
 
 	@Override
 	public void eval() {
+		if (getProgram().getLastExecutedStatement() != null)
+			return;
+		
 		if (getProgram().getCurrentFunction() == null)
 			throw new IllegalStateException("Cannot return when not in function");
 		getProgram().getCurrentFunction().setReturnValue(value.eval());
 	}
 	
 	public Expression<?> evaluate() {
-		this.setLastStatement();
 		return (Expression<?>) value.eval();
 	}
 

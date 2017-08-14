@@ -1,46 +1,48 @@
 package asteroids.model.programs;
 
-import java.util.List;
-
 import asteroids.part3.programs.SourceLocation;
 
 public class TurnStatement extends ActionStatement {
-	private Expression angle;
+	private Expression<Double> angle;
 	
-	public TurnStatement(Expression angle, SourceLocation location) {
+	public TurnStatement(Expression<Double> angle, SourceLocation location) {
 		super(location);
 		setAngle(angle);
 	}
 
-	public Expression getAngle() {
+	public Expression<Double> getAngle() {
 		return angle;
 	}
 
-	public void setAngle(Expression angle) {
+	public void setAngle(Expression<Double> angle) {
 		this.angle = angle;
 	}
 
 	@Override
-	public void eval() {
-		if (this.getProgram().getTimeLeft() >= 0.2) {
-			this.setLastStatement();
-			double a;
-			try {
-				a = (Double) angle.eval();
-			} catch (Exception e) {
-				throw new ClassCastException("Expression within while statement must evaluate to a boolean value");
+	public void eval() throws OutOfTimeException {
+		if (getProgram().getLastExecutedStatement() != null) {
+			if (getProgram().getLastExecutedStatement() == this) {
+				getProgram().setLastExecutedStatement(null);
+				System.out.println("Resuming execution after " + this);
+				return;
 			}
-			
-			
-			try {
-				this.getProgram().getShip().turn(a);
-			} catch (AssertionError e) {
-				throw new IllegalArgumentException();
-			}
+			else
+				return;
 		}
-		else 
-			return;
-			//throw new OutOfTimeException();
+		
+		double a;
+		try {				
+			a = (Double) angle.eval();
+		} catch (Exception e) {
+			throw new ClassCastException("");
+		}
+			
+			
+		try {
+			this.getProgram().getShip().turn(a);
+		} catch (AssertionError e) {
+			throw new IllegalArgumentException();
+		}
+		advanceTime();
 	}
-
 }

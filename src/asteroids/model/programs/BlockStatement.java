@@ -22,7 +22,7 @@ public class BlockStatement extends Statement{
 	}
 
 	@Override
-	public void eval() {
+	public void eval() throws OutOfTimeException {
 		for (Statement s : statements)
 			s.eval();
 	}

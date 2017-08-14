@@ -1,7 +1,5 @@
 package asteroids.model.programs;
 
-import java.util.List;
-
 import asteroids.model.Program;
 import asteroids.part3.programs.SourceLocation;
 
@@ -33,8 +31,7 @@ public class WhileStatement extends Statement {
 	}
 
 	@Override
-	public void eval() {
-		this.setLastStatement();
+	public void eval() throws OutOfTimeException {
 		boolean ex;
 		try {
 			getProgram().setCurrentlyInWhile(true);

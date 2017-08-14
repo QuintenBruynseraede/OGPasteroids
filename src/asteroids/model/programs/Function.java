@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.lang.Character;
 
-import asteroids.model.Entity;
 import asteroids.model.Program;
 import asteroids.part3.programs.SourceLocation;
 import be.kuleuven.cs.som.annotate.Basic;
@@ -25,7 +24,7 @@ public class Function {
 		this.sourceLocation = sourceLocation;
 	}
 	
-	public Object execute(List<Expression> arguments) {
+	public Object execute(List<Expression> arguments) throws OutOfTimeException {
 		if (body instanceof BlockStatement) {
 			List<Statement> statements = ((BlockStatement) body).getStatements();
 			Iterator <Statement> i = statements.iterator();

@@ -1,7 +1,5 @@
 package asteroids.model.programs;
 
-import java.util.List;
-
 import asteroids.model.Program;
 import asteroids.part3.programs.SourceLocation;
 
@@ -44,7 +42,7 @@ public class IfThenElseStatement extends Statement{
 	}
 
 	@Override
-	public void eval() {
+	public void eval() throws OutOfTimeException {
 		boolean ex;
 		try {
 			ex = (boolean) condition.eval();

@@ -8,6 +8,18 @@ public abstract class ActionStatement extends Statement {
 	}
 
 	@Override
-	public abstract void eval();
+	public abstract void eval() throws OutOfTimeException;
 	
+	public void advanceTime() throws OutOfTimeException {
+		getProgram().subtractTime();
+		if (getProgram().getTimeLeft() < 0.2 && getProgram().getCurrentFunction() == null) {
+			setLastStatement();
+			throw new OutOfTimeException();
+		}
+			
+	}
+	
+	public void setLastStatement() {
+		this.getProgram().setLastExecutedStatement(this);
+	}
 }

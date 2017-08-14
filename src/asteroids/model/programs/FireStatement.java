@@ -1,7 +1,5 @@
 package asteroids.model.programs;
 
-import java.util.List;
-
 import asteroids.part3.programs.SourceLocation;
 
 public class FireStatement extends ActionStatement {
@@ -10,14 +8,19 @@ public class FireStatement extends ActionStatement {
 	}
 
 	@Override
-	public void eval() {
-		if (this.getProgram().getTimeLeft() >= 0.2) {
-			this.setLastStatement();
-			this.getProgram().getShip().fire();
+	public void eval() throws OutOfTimeException {
+		if (getProgram().getLastExecutedStatement() != null) {
+			if (getProgram().getLastExecutedStatement() == this) {
+				getProgram().setLastExecutedStatement(null);
+				System.out.println("Resuming execution after " + this);
+				return;
+			}
+			else
+				return;
 		}
-		else
-			//throw new OutOfTimeException();
-			return;
-	}
 
+		
+		getProgram().getShip().fire();
+		advanceTime();
+	}
 }

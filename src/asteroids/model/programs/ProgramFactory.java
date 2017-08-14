@@ -5,7 +5,6 @@ import java.util.List;
 import asteroids.model.*;
 import asteroids.part3.programs.IProgramFactory;
 import asteroids.part3.programs.SourceLocation;
-import asteroids.util.ModelException;
 
 public class ProgramFactory implements IProgramFactory<Expression, Statement, Function, Program>{
 

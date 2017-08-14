@@ -1,12 +1,13 @@
 package asteroids.model;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import asteroids.model.programs.ActionStatement;
 import asteroids.model.programs.Expression;
 import asteroids.model.programs.Function;
+import asteroids.model.programs.OutOfTimeException;
 import asteroids.model.programs.Statement;
 import asteroids.model.programs.Variable;
 import asteroids.part3.programs.SourceLocation;
@@ -19,13 +20,13 @@ import be.kuleuven.cs.som.annotate.Basic;
  */
 public class Program {
 	private Ship ship;
-	private double timeLeft;
+	private double timeLeft = 0;
 	private List<Function> functions;
 	private List<Object> returns = new ArrayList<Object>();
 	private List<Variable<?>> globalVariables = new ArrayList<Variable<?>>();
 	private Statement main;
 	private SourceLocation sourceLocation = new SourceLocation(0, 0);
-	private Statement lastExecutedStatement;
+	private ActionStatement lastExecutedStatement = null;
 	private boolean currentlyInWhile = false;
 
 	
@@ -57,8 +58,17 @@ public class Program {
 	}
 	
 	public List<Object> execute(double time) {
-		this.timeLeft = time;
-		main.eval();
+		timeLeft += time;
+		
+		if (timeLeft < 0.2)
+			return null;
+		
+		try { main.eval(); }
+		catch (OutOfTimeException e) {
+			System.out.println("Stopped execution because " + getTimeLeft());
+			return null;
+		}
+		
 		return returns;
 	}
 	
@@ -152,8 +162,12 @@ public class Program {
 		return this.timeLeft;
 	}
 	
-	public void setTimeLeft(double time) {
+	private void setTimeLeft(double time) {
 		this.timeLeft = time;
+	}
+	
+	public void subtractTime() {
+		setTimeLeft(getTimeLeft() - 0.2);
 	}
 
 
@@ -161,7 +175,7 @@ public class Program {
 		return lastExecutedStatement;
 	}
 
-	public void setLastExecutedStatement(Statement lastExecutedStatement) {
+	public void setLastExecutedStatement(ActionStatement lastExecutedStatement) {
 		this.lastExecutedStatement = lastExecutedStatement;
 	}
 

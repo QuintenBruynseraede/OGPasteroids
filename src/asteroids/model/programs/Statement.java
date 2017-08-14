@@ -1,7 +1,5 @@
 package asteroids.model.programs;
 
-import java.util.List;
-
 import asteroids.model.Program;
 import asteroids.part3.programs.SourceLocation;
 import be.kuleuven.cs.som.annotate.Basic;
@@ -15,7 +13,7 @@ public abstract class Statement {
 		this.setSourceLocation(s);	
 	}
 	
-	public abstract void eval(); //TODO not sure about void
+	public abstract void eval() throws OutOfTimeException; //TODO not sure about void
 	
 		
 	@Basic
@@ -48,8 +46,6 @@ public abstract class Statement {
 		return this.timeToExecute;
 	}
 	
-	public void setLastStatement() {
-		this.getProgram().setLastExecutedStatement(this);
-	}
+
 	
 }

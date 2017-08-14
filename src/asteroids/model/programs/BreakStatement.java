@@ -1,7 +1,5 @@
 package asteroids.model.programs;
 
-import java.util.List;
-
 import asteroids.part3.programs.SourceLocation;
 
 public class BreakStatement extends Statement {
@@ -12,7 +10,9 @@ public class BreakStatement extends Statement {
 
 	@Override
 	public void eval() {
-		this.setLastStatement();
+		if (getProgram().getLastExecutedStatement() != null)
+			return;
+		
 		if (! getProgram().isCurrentlyInWhile())
 			throw new IllegalStateException();
 		throw new BreakException();
