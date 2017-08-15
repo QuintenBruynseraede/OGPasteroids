@@ -47,8 +47,17 @@ public class AssignmentStatement extends Statement {
 		}
 		
 		if (getProgram().getVariableByName(variableName) == null) {
-			//System.out.println("Adding global variable " + variableName);
-			this.getProgram().addVariable(variableName, value); //New variable
+			System.out.println("Adding global variable " + variableName + " " + value);
+			if (value instanceof FunctionExpression) {
+				if (value.eval() instanceof Double)
+					this.getProgram().addVariable(variableName, new ConstantExpression((double) value.eval(), getSourceLocation()));
+				else if (value.eval() instanceof Boolean)
+					this.getProgram().addVariable(variableName, new BooleanExpression((boolean) value.eval(), getSourceLocation()));
+				else if (value.eval() instanceof Entity)
+					this.getProgram().addVariable(variableName, new EntityExpression((Entity) value.eval(), getSourceLocation()));
+			}
+			else	
+				this.getProgram().addVariable(variableName, value); //New variable
 		}
 		else {
 			//System.out.println("Modifying value of existing global variable " + variableName + " to " + (double) value.eval());

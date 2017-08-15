@@ -343,7 +343,12 @@ public class Bullet extends Entity {
 				finalize();
 			}	
 		}
-		else if (entity instanceof MinorPlanet) {
+		else if (entity instanceof Asteroid) {
+			entity.finalize();
+			this.finalize();
+		}
+		else if (entity instanceof Planetoid) {
+			System.out.println("Finalizing planetoid");
 			entity.finalize();
 			this.finalize();
 		}

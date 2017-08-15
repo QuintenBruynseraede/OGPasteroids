@@ -44,8 +44,10 @@ public class Planetoid extends MinorPlanet {
 		
 		if (! isValidRadius(radius))  
 			throw new IllegalArgumentException("Non valid radius when initializing bullet");
+		
 		setRadius(radius);
 		this.initialRadius = radius;
+
 	}
 
 	/**
@@ -127,10 +129,13 @@ public class Planetoid extends MinorPlanet {
 		if (isValidRadius(radius)) {
 			this.radius = radius;
 			setMass(4 * Math.PI / 3);
+			//System.out.println("New radius " + this.radius);
 			setMass(getMass() * MASSDENSITY * radius * radius * radius);
 		}
-		else
+		else {
+			//System.out.println("Too small, finalizing");
 			this.finalize();
+		}
 	}
 
 	/**
@@ -225,17 +230,22 @@ public class Planetoid extends MinorPlanet {
 	 */
 	public void finalize() {
 		if (this.getWorld() != null && this.getRadius() >= 30) {
+			System.out.println("Creating two new planetoids");
 			double child1XVelocity = Math.random()*(9/4)*(this.getXVelocity()*this.getXVelocity()+this.getYVelocity()*this.getYVelocity());
 			double child1YVelocity = Math.sqrt((9/4)*(this.getXVelocity()*this.getXVelocity()+this.getYVelocity()*this.getYVelocity()) - child1XVelocity*child1XVelocity);
 			
-			
 			Asteroid a1 = new Asteroid(this.getXCoordinate() + this.getRadius()/2, this.getYCoordinate(), child1XVelocity, child1YVelocity, this.getRadius()/2);
 			Asteroid a2 = new Asteroid(this.getXCoordinate() - this.getRadius()/2, this.getYCoordinate(), -child1XVelocity, -child1YVelocity, this.getRadius()/2);
-			this.getWorld().addEntity(a1);
-			this.getWorld().addEntity(a2);
+			World w = getWorld();
+			w.removeEntity(this);
+			w.addEntity(a1);
+			w.addEntity(a2);
 			
 			a1.setWorld(this.getWorld());
 			a2.setWorld(this.getWorld());
+		}
+		else if (getWorld() != null){
+			getWorld().removeEntity(this);
 		}
 		this.finalized = true;
 	}

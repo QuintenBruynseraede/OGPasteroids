@@ -117,7 +117,7 @@ public class ProgramFactory implements IProgramFactory<Expression, Statement, Fu
 
 	@Override
 	public Expression createBulletExpression(SourceLocation location) {
-		return new ClosestEntityExpression(Bullet.class, location);
+		return new BulletExpression(location);
 	}
 
 	@Override

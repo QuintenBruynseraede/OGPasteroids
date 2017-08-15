@@ -21,7 +21,7 @@ public class Function {
 	public Function(Statement body, String name, SourceLocation sourceLocation) throws Exception {
 		setBody(body);
 		setName(name);
-		this.sourceLocation = sourceLocation;
+		this.setSourceLocation(sourceLocation);
 	}
 	
 	public Object execute(List<Expression> arguments) throws OutOfTimeException {
@@ -109,8 +109,11 @@ public class Function {
 	}
 	
 	public boolean isValidParameterName(String name) {
-		assert(name.charAt(0) == '$');
-		assert(Character.isDigit(name.charAt(1)));
+		if (name.charAt(0) != '$') 
+			return false;
+		if (!Character.isDigit(name.charAt(1))) 
+			return false;
+		
 		return true;
 	}
 	
@@ -136,5 +139,13 @@ public class Function {
 
 	public void setReturnValue(Object returnValue) {
 		this.returnValue = returnValue;
+	}
+
+	public SourceLocation getSourceLocation() {
+		return sourceLocation;
+	}
+
+	public void setSourceLocation(SourceLocation sourceLocation) {
+		this.sourceLocation = sourceLocation;
 	}
 }

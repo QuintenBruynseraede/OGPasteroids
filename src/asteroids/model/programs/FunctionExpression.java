@@ -1,5 +1,6 @@
 package asteroids.model.programs;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import asteroids.part3.programs.SourceLocation;
@@ -22,8 +23,8 @@ public class FunctionExpression extends Expression {
 		
 		if (getStatement().getProgram().getFunctionByName(name) == null) 
 			throw new IllegalArgumentException();
-		
 		try {
+			System.out.println("Executing function");
 			return this.getStatement().getProgram().getFunctionByName(name).execute(arguments);
 		} catch (OutOfTimeException e1) {
 			return null; //Will never happen, as the time left for a program won't be changed when executing a function.
