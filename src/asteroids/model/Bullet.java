@@ -16,7 +16,7 @@ import be.kuleuven.cs.som.annotate.Raw;
  * @invar	The initial correlation between a bullet's radius and its weight is kept during its entire lifetime.
  * 			| getMass() = 4 * Math.PI * Math.pow(this.getRadius(), 3) * Bullet.MASSDENSITY / 3.0
  * @invar	A bullet has never withstood more bounces than its allowed number of bounces - 1
- * 			| this.getBounces() <= MAXBOUNCES - 1
+ * 			| this.getBounces() <= Bullet.MAXBOUNCES - 1
  */
 
 public class Bullet extends Entity {
@@ -79,7 +79,7 @@ public class Bullet extends Entity {
 	}
 	
 	/**
-	 * variable registering the mass density of a bullet in kilogrammes 
+	 * Variable registering the mass density of a bullet in kilogrammes.
 	 */
 	private static final double MASSDENSITY = 7.8E12;
 	
@@ -101,7 +101,7 @@ public class Bullet extends Entity {
 	/**
 	 * Sets the ship this bullet is loaded on or fired by. 
 	 * @param 	ship
-	 * @post	| new.getParent() = this.getParent()
+	 * @post	| new.getParent() = ship
 	 */
 	@Raw
 	public void setParent(Ship ship) {
@@ -142,7 +142,8 @@ public class Bullet extends Entity {
 	}
 	
 	/**
-	 * Resets the number of bounces against a boundary this bullet has made.
+	 * Resets the number of bounces against a boundary this bullet has made. 
+	 * Necessary when a ship intercepts a bullet it fired.
 	 * @post 	| new.getBounces() == 0
 	 */
 	public void resetBounces() {
@@ -153,17 +154,18 @@ public class Bullet extends Entity {
 	/**
 	 * Adds one to the amount of bounces if necessary. Finalizes the object if it has reached its maximum amount of bounces.
 	 * @post	If the bullet can bounce once more, add one to the counter.
-	 * 			| new.getBounces() = this.getBounces() + 1
+	 * 			| if (getBounces() < MAXBOUNCES - 1)
+	 * 			| 	new.getBounces() = getBounces() + 1
 	 * @post	If the bullet cannot withstand another bounce, finalize it
-	 * 			| if (this.getBounces() == MAXBOUNCES-1)
-	 * 			| 	this.finalize();
+	 * 			| if (getBounces() == MAXBOUNCES-1)
+	 * 			| 	finalize();
 	 */
 	public void addBounce() {
 		if (this.getBounces() == MAXBOUNCES-1) {
-			//System.out.println("Removed bullet on third bounce.");
 			this.finalize();
 		}
-		this.bounces++;
+		else
+			this.bounces++;
 	}
 	
 	/**
@@ -183,7 +185,7 @@ public class Bullet extends Entity {
 	private boolean isLoaded = false;
 	
 	/**
-	 * Returns whether a bullet has been loaded on a ship.
+	 * Returns whether this bullet has been loaded on a ship.
 	 */
 	@Basic
 	@Raw
@@ -213,9 +215,9 @@ public class Bullet extends Entity {
 	/**
 	 * Returns whether a given radius is a valid radius for a bullet.
 	 * @param 	radius
-	 * 			The given radius to check.
+	 * 			The given radius to check if valid.
 	 * @return	True if and only if the velocity is greater than the minimum value specified for a bullet's radius.
-	 * 			| result == radius > this.getRadiusLowerBound()
+	 * 			| result == radius > getRadiusLowerBound()
 	 */
 	@Raw
 	public boolean isValidRadius(double radius) {
@@ -226,8 +228,8 @@ public class Bullet extends Entity {
 	 * Updates the radius of this bullet.
 	 * @param 	radius
 	 * 			The new radius for this bullet.
-	 * @post	The new radius of the bullet is equal to the given argument radius.
-	 * 			| new.radius = radius
+	 * @post	| if (isValidRadius(radius))
+	 * 			|	new.getRadius() = radius
 	 * @throws	IllegalArgumentException
 	 * 			| !isValidRadius(radius)
 	 */
@@ -254,7 +256,11 @@ public class Bullet extends Entity {
 	 * Advances the bullet during a given time duration deltaTime
 	 * @param	deltaTime
 	 * 			The time during which to advance this bullet.
-	 * @effect	| move(deltaTime)
+	 * @post	| if (isLoaded())
+	 * 			|	new.getXCoordinate() == getParent().getXCoordinate()
+	 * 			|	new.getYCoordinate() == getParent().getYCoordinate()
+	 * @effect	| if (! isLoaded())
+	 *  		| 	move(deltaTime)
 	 */
 	@Override
 	@Raw
@@ -271,19 +277,17 @@ public class Bullet extends Entity {
 	
 	/**
 	 * Finalizes the bullet, preparing it to be removed by the garbage collector.
-	 * @post	If this bullet has a parent, make it remove it from its list of bullets
-	 * @post	If this bullet has been added to a world, make the world remove it from its list of bullets
-	 * @post	| new.isFinalized() == true
 	 * @see 	implementation
 	 */
 	@Override
 	@Raw
 	public void finalize() {
 		if (finalized) return;
-		if (this.getWorld() != null) {
-			this.getWorld().removeEntity(this);
+
+		if (getWorld() != null) {
+			getWorld().removeEntity(this);
 		}
-		this.finalized = true;
+		finalized = true;
 	}
 
 	/**
@@ -318,7 +322,7 @@ public class Bullet extends Entity {
 	 *			|		entity.finalize()
 	 *			|		finalize()
 	 *	@post	If the entity is not instance of a MinorPlanet, Ship or Bullet, the entity will call his own collideWith method.
-	 *			| if(entity is not instanceof {MinorPlanet, Ship, Bullet})
+	 *			| if(!entity instanceof {MinorPlanet, Ship, Bullet})
 	 *			| 		entity.collideWith(this)
 	 */
 	@Override
@@ -329,7 +333,6 @@ public class Bullet extends Entity {
 		}
 		else if (entity instanceof Ship) {
 			if (entity == getParent()) {
-				System.out.println("Picking up bullet");
 				((Ship) entity).addBulletToLoaded(this);
 				setLoaded(true);
 				getWorld().removeEntity(this);
@@ -348,7 +351,6 @@ public class Bullet extends Entity {
 			this.finalize();
 		}
 		else if (entity instanceof Planetoid) {
-			System.out.println("Finalizing planetoid");
 			entity.finalize();
 			this.finalize();
 		}
@@ -359,6 +361,8 @@ public class Bullet extends Entity {
 	/**
 	 *  Changes the velocity of this bullet to reflect a collision against a boundary of the world.
 	 *  Adds one to the number of bounces against a boundary this bullet has made. 
+	 *  @post |	if (getWorld() == null)
+	 * 		  |		//Do nothing
 	 *  @post | new.getBounces() = getBounces() + 1
 	 *  @see Implementation
 	 */

@@ -11,17 +11,17 @@ import be.kuleuven.cs.som.annotate.Raw;
 * @author Tom De Backer and Quinten Bruynseraede
 * 
 * @invar	The radius of this entity will always be a valid radius.
-* 			| isValidRadius(this.getRadius())
-* @invar	The X Velocity of this entity will always be a valid velocity
-* 			| isValidVelocity(this.getXVelocity())
-* @invar	The Y Velocity of this entity will always be a valid velocity
-* 			| isValidVelocity(this.getYVelocity())
-* @invar	The world this entity is associated with will always be a proper world
-* 			| canHaveAsWorld(this.getWorld())
-* @invar	The X position of this entity will always be a valid position in the current world
-* 			| isValidXCoordinate(this.getXCoordinate())
-* @invar	The Y position of this entity will always be a valid position in the current world
-* 			| isValidYCoordinate(this.getYCoordinate())
+* 			| isValidRadius(getRadius())
+* @invar	The X Velocity of this entity will always be a valid velocity.
+* 			| isValidVelocity(getXVelocity())
+* @invar	The Y Velocity of this entity will always be a valid velocity.
+* 			| isValidVelocity(getYVelocity())
+* @invar	The world this entity is associated with will always be a proper world.
+* 			| canHaveAsWorld(getWorld())
+* @invar	The X position of this entity will always be a valid position in the current world.
+* 			| isValidXCoordinate(getXCoordinate())
+* @invar	The Y position of this entity will always be a valid position in the current world.
+* 			| isValidYCoordinate(getYCoordinate())
 */
 public abstract class Entity {
 	
@@ -95,6 +95,7 @@ public abstract class Entity {
 	 * @param 	X
 	 * 			The new X coordinate for this entity.
 	 * @post	The X coordinate of this entity is equal to the given X coordinate.
+	 * 			| new.getXCoordinate() = x
 	 * @throws	IllegalArgumentException
 	 * 			The given x coordinate is not a valid coordinate for a entity.
 	 * 			| Double.isNaN(x) || Double.isInfinite(x)
@@ -112,6 +113,7 @@ public abstract class Entity {
 	 * @param 	yCoordinate
 	 * 			The new Y coordinate for this entity.
 	 * @post	The Y coordinate of this entity is equal to the given X coordinate.
+	 * 			| new.getYCoordinate() = y
 	 * @throws	IllegalArgumentException
 	 * 			The given y coordinate is not a valid coordinate for a entity.
 	 * 			| Double.isNaN(y) || Double.isInfinite(y)
@@ -132,9 +134,9 @@ public abstract class Entity {
 	 */
 	@Raw
 	private boolean isValidXCoordinate(double x) {
-		if (this.getWorld() == null)
+		if (getWorld() == null)
 			return true;
-		return (x < this.getWorld().getWidth() && x >= 0);
+		return (x < getWorld().getWidth() && x >= 0);
 	}
 	
 	/**
@@ -145,9 +147,9 @@ public abstract class Entity {
 	 */
 	@Raw
 	private boolean isValidYCoordinate(double y) {
-		if (this.getWorld() == null)
+		if (getWorld() == null)
 			return true;
-		return (y < this.getWorld().getHeight() && y >= 0);
+		return (y < getWorld().getHeight() && y >= 0);
 	}
 	
 	/**
@@ -250,8 +252,8 @@ public abstract class Entity {
 	 * 
 	 * @param 	velocity
 	 * 			The given velocity to check.
-	 * @return	True if and only if the velocity is greater than velocityLowerBound and lower than velocityLowerBound.
-	 * 			| result == (velocity > this.velocityLowerBound && velocity < this.velocityUpperBound)
+	 * @return	| result == (!Double.isFinite(velocity)) &&
+	 *			| (velocity > this.velocityLowerBound && velocity < this.velocityUpperBound)
 	 */
 	@Raw
 	private boolean isValidVelocity(double velocity) {
@@ -287,8 +289,8 @@ public abstract class Entity {
 	 * 			The velocity in the X direction.
 	 * @param 	yVelocity
 	 * 			The velocity in the Y direction
-	 * @return  The total velocity of the entity 
-	 * 			sqrt(xVelocity * xVelocity + yVelocity * yVelocity)
+	 * @return  The total velocity of the entity .
+	 * 			| sqrt(xVelocity * xVelocity + yVelocity * yVelocity)
 	 */
 	public double getTotalVelocity(double xVelocity, double yVelocity) {
 		return Math.sqrt(xVelocity * xVelocity + yVelocity * yVelocity);
@@ -296,7 +298,7 @@ public abstract class Entity {
 	
 	
 	/**
-	 * Variable registering the world this ship is bound to.
+	 * Variable registering the world this entity is bound to.
 	 */
 	private World world = null;
 	
@@ -306,11 +308,11 @@ public abstract class Entity {
 	 * 		The world this entity is to be associated with.
 	 * 	@throws IllegalStateException
 	 * 		| !canHaveAsWorld(world)
-	 * 	@post
-	 * 		The new world for this entity is set.
-	 * 		| new.getWorld() == world
-	 * 		This entity is removed from a previous world
-	 * 		| old.getWorld().removeEntity(this)
+	 * 	@post Associations with this enitity's previous world are undone if possible.
+	 * 		| if (!(getWorld() == null) && ! (world == null)
+	 * 		| 	new.getWorld() == world
+	 * 		| if (!(getWorld() == null) && ! (world == null)
+	 * 		| 	old.getWorld().removeEntity(this)
 	 * 		This entity is added to the new world
 	 * 		| new.getWorld().getEntitiesOfType(this.getClass()).contains(this) == true
 	 *  
@@ -321,7 +323,6 @@ public abstract class Entity {
 	public void setWorld(World world) throws IllegalStateException {
 		if (!canHaveAsWorld(world))
 			throw new IllegalStateException("Invalid position in the world trying to assign this entity to.");
-		
 		
 		//If current world is null, don't try to remove 'this' from it
 		//If world is null, don't try to add anything to it\
@@ -365,7 +366,7 @@ public abstract class Entity {
 	 * 			| new.x = this.x + time * this.xVelocity
 	 * 			| new.y = this.y + time * this.yVelocity
 	 * @throws 	IllegalArgumentException
-	 * 			The given time is not positive.
+	 * 			The given time is not positive (accounting for rounding errors)
 	 * 			| time < 0
 	 */
 	public void move(double time) throws IllegalArgumentException {
@@ -380,17 +381,16 @@ public abstract class Entity {
 	}
 	
 	
-	
 	/**
 	 * Variable registering the radius of this planetoid.
 	 */
 	protected double radius;
 	
 	/**
+	 * Abstract function that returns whether a given radius is valid for an entity.
 	 * @param 	radius
 	 * 			The given radius to check.
-	 * @return	True if and only if the velocity is greater than the minimum value specified for a entity's radius.
-	 * 			| result == (radius > this.radiusLowerBound)
+	 * @note	See implementation in subclasses for details.
 	 */
 	public abstract boolean isValidRadius(double radius);
 	
@@ -407,8 +407,7 @@ public abstract class Entity {
 	/**
 	 * @param 	radius
 	 * 			The new radius for this entity.
-	 * @post	The new radius of the entity is equal to the given argument radius.
-	 * 			| new.radius = radius
+	 * @note	See impolementation in subclasses for details.
 	 */
 	@Basic
 	public abstract void setRadius(double radius);
@@ -429,6 +428,7 @@ public abstract class Entity {
 	 * 			| result ==  {deltaT | (entity1.move(deltaT) => entity1.overlap(entity2)) && (entity1.move(deltaT) => entity2.overlap(entity1))}
 	 * @throws 	IllegalArgumentException
 	 * 			The entity to check a collision against is a null object.
+	 * 			| (other == null)
 	 * @note	Knowing that an entity always moves in a straight line, a ship's position can
 	 * 			easily be calculated as a function of the current position and the ship's velocity 
 	 * 			| newPos = currPos + time * velocity (I)
@@ -481,11 +481,14 @@ public abstract class Entity {
 	/**
 	 * 	Returns the time to the first collision with one of the four boundaries of this entity's world
 	 * 
-	 * 	@return | min(a, b, c, d) where
-	 * 		    | a = time to boundary1
-	 * 		    | b = time to boundary2
-	 * 		    | c = time to boundary3
-	 * 	  	    | d = time to boundary4
+	 * 	@return | result == min(a, b, c, d) where
+	 * 		    | a = time to Top Left Boundary
+	 * 		    | b = time to Top Right Boundary
+	 * 		    | c = time to Bottom Left Boundary
+	 * 	  	    | d = time to Bottom Right Boundary
+	 *  @return | if (getWorld() == null)
+	 * 			|	result == Double.POSTIIVE_INFINITY
+	 * 			
 	 */
 	public double getTimeFirstCollisionBoundary() {
 		if (getWorld() == null) return Double.POSITIVE_INFINITY;
@@ -498,8 +501,6 @@ public abstract class Entity {
 			xTime = - ( getXCoordinate() - getRadius()) / getXVelocity();
 		if (this.getXVelocity() == 0)
 			xTime = Double.POSITIVE_INFINITY;
-			
-
 		
 		if (this.getYVelocity() > 0)
 			yTime = (getWorld().getHeight() - getYCoordinate()  -getRadius()) / getYVelocity();
@@ -508,10 +509,7 @@ public abstract class Entity {
 		if (this.getYVelocity() == 0)
 			yTime = Double.POSITIVE_INFINITY;
 		
-		return Math.min(xTime, yTime);
-		
-		
-		
+		return Math.min(xTime, yTime);	
 	}
 	
 		
@@ -521,8 +519,11 @@ public abstract class Entity {
 	 * 			An entity to check against whether the object invoking the method and the argument Entity overlap.
 	 * @return	True if and only if the distance between entity1 and entity2 is smaller than 0.
 	 * 			| result == thisgetDistanceBetween(otherEntity) < 0
+	 * @return	| if (this == otherEntity)
+	 * 			| 	result == true
 	 * @throws 	IllegalArgumentException
 	 * 			The entity to check an overlap against is a null object.
+	 * 			| (otherEntity == null)
 	 * @note	This method uses the notion of apparent overlap, to account for rounding errors.
 	 */
 	public boolean overlap(Entity otherEntity) throws IllegalArgumentException {
@@ -547,6 +548,7 @@ public abstract class Entity {
 	 * 			| 	result == 0; 
 	 * @throws	IllegalArgumentException 
 	 * 			The entity to check a collision against is a null object.
+	 * 			| otherEntity == null
 	 * @note	As a result of the provided formula, the distance between two overlapping entities shall be negative.
 	 */
 	public double getDistanceBetween(Entity otherEntity) throws IllegalArgumentException {
@@ -615,18 +617,10 @@ public abstract class Entity {
 	 * 	Updates the entity based on a few parameters.
 	 * 	@param 	deltaTime
 	 * 			number of time units to advance this entity.
-	 * 	@note	See implementation in subclass for specification.
+	 * 	@note	See implementations in subclasses for specification.
 	 */
 	public abstract void advance(double deltaTime);
 
-	/**
-	 * 	Updates a few properties of this entity to simulate a collision with another object.
-	 * 	@param 	object2
-	 * 			Object to collide with.
-	 * 	@param 	collisiontype
-	 * 			Type of collision to simulate. Collision types are defined in constants.java.
-	 *  @note	See implementation in subclass for specification.
-	 */
 	
 	/**
 	 * 	Prepares the instance to be removed by the Garbage Collector.
@@ -649,6 +643,12 @@ public abstract class Entity {
 		return this.finalized;
 	}
 
+		/**
+	 *  Changes the velocity of this entity to reflect a collision against a boundary of the world.
+	 *  @post |	if (getWorld() == null)
+	 * 		  |		//Do nothing
+	 *  @see Implementation
+	 */
 	public void collideBoundary() {
 		//System.out.println("collideBoundary");
 		if (getWorld() == null) return;

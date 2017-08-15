@@ -10,7 +10,7 @@ import be.kuleuven.cs.som.annotate.Raw;
  * @version	1.0
  * @author	Tom De Backer and Quinten Bruynseraede
  * 
- *  @invar	The radius of this black hole will always be a valid radius for a planetoid.
+ *  @invar	The radius of this black hole will always be a valid radius for a black hole.
  *  		| isValidRadius(getRadius())
  *  @invar	The velocity of this black hole will always be zero.
  *  		| getXVelocity == 0 && getYVelocity == 0
@@ -67,14 +67,11 @@ public class BlackHole extends Entity {
 	}
 
 	/**
-	 * Updates the black hole's radius. Destroys it when it has shrunk too small.
+	 * Sets the radius for this black hole.
 	 * @param 	radius
 	 * 			The new radius for this black hole.
-	 * @post	The new radius of the black hole is equal to the given argument radius.
-	 * 			| new.radius = radius
-	 * @effect	If the new radius is no valid radius for a black hole, finalize the object.
-	 * 			| if (! isValidRadius(radius))
-	 * 			|	this.finalize()
+	 * @post	| if (isValidRadius(radius))
+	 * 			| 	new.radius = radius
 	 * @throws	IllegalArgumentException
 	 * 			| !isValidRadius(radius)
 	 */
@@ -88,7 +85,8 @@ public class BlackHole extends Entity {
 	}
 
 	/**
-	 * 
+	 * Updates the position of the black hole according to its velocity.
+	 * As black holes cannot have a velocity, the state of the game doesn't change
 	 */
 	@Override
 	public void advance(double deltaTime) {
@@ -183,10 +181,11 @@ public class BlackHole extends Entity {
 			double newY = getCollisionPosition(entity)[1];
 			double newRadius = this.getRadius() + entity.getRadius();
 			
-			getWorld().removeEntity(entity);
-			getWorld().removeEntity(this);
+			World w = getWorld();
+			w.removeEntity(entity);
+			w.removeEntity(this);
 			
-			getWorld().addEntity(new BlackHole(newX, newY, newRadius));
+			w.addEntity(new BlackHole(newX, newY, newRadius));
 			
 			entity.finalize();
 			this.finalize();

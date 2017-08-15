@@ -16,18 +16,18 @@ import asteroids.part2.CollisionListener;
  *  
  * @author Tom De Backer and Quinten Bruynseraede
  * @invar 	The height of this world is always less than or equal to the maximum value for the height of a world
- * 			| this.height <= HEIGTHUPPERBOUND
+ * 			| getHeight() <= HEIGTHUPPERBOUND
  * @invar	The height of this world is always larger than or equal 0.
- * 			| this.height >= 0
+ * 			| getHeight() >= 0
  * @invar	The width of this world is always smaller than or equal to the maximum value for the width of a world
- * 			| this.width <= WIDTHUPPERBOUND
+ * 			| getWidth() <= WIDTHUPPERBOUND
  * @invar	The width of this world is always larger than or equal 0.
- * 			| this.width >= 0
+ * 			| getWidth() >= 0
  * @invar 	Each Entity kept in the list of entities belonging to this world is associated with this world.
- * 			| for each Entity e in this.getEntities()
+ * 			| for each Entity e in getEntities()
  *  		|	 e.getWorld() == this
  * @invar	Every entity in this world lies fully within the bounds of this world.
- * 			| for each Entity e in this.getEntities()
+ * 			| for each Entity e in getEntities()
  *  		|	 isEntityWithinBounds(e)
  */
 
@@ -40,10 +40,11 @@ public class World {
 	 * 			The width for this new world.
 	 * @param 	height	
 	 * 			The height for this new world.
-	 * @effect	Initializes this world as a GameObject of type WORLD
-	 * 			| super(Constants.WORLD)
-	 * @see		Implementation
-	 * @post	This world now has 4 boundaries.
+	 * @post	| if (Double.isNan(width))
+	 * 			|	new.getWidth() = 0
+	 * @post	| if (Double.isNan(height))
+	 * 			|	new.getHeight() = 0
+	 * @post	The size of this world is set in a total way. @see implementation
 	 */
 	@Raw
 	public World (double width, double height) {
@@ -106,7 +107,8 @@ public class World {
 	}
 	
 	/**
-	 *  
+	 * Returns whether a given entity is fully placed within the boundaries of this world
+	 * @see	Implementation
 	 */
 	private boolean isEntityWithinBounds(Entity e) {
 		return e.getXCoordinate() >= e.getRadius() && e.getYCoordinate() >= e.getRadius() && e.getXCoordinate() <= this.getWidth() - e.getRadius() && e.getYCoordinate() <= this.getHeight() - e.getRadius(); 
@@ -121,7 +123,17 @@ public class World {
 	 * 
 	 * @param 	entity
 	 * 			The entity to be added to this world.
-	 * @post	| new.getEntities().contains(entity)
+	 * @throws 	IllegalArgumentException
+	 * 			| (e == null)
+	 * @throws 	IllegalArgumentException
+	 * 			| (getEntities().contains(e))
+	 * @throws 	IllegalStateException()
+	 * 			The new instance overlaps with an existing instance in this world
+	 * 			| e.overlap(otherEntity) where otherEntity.getWorld() == e.getWorld() && e != otherEntity && e.getParent() != otherEntity
+	 * @post	| new.getEntities().size = getEntities().size + 1
+	 * @post	| if (e.getTimeFirstCollisionBoundary() <= 0)
+	 * 			|	e.isFinalized() == true
+	 * 
 	 */
 	public void addEntity(Entity e) throws IllegalArgumentException, IllegalStateException {
 		if (e == null)
@@ -139,7 +151,6 @@ public class World {
 						return;
 					else
 						throw new IllegalStateException("Cannot add overlapping entities that are not bullets.");
-						//return;
 				}
 				throw new IllegalStateException("Cannot add overlapping entities that are not bullets.");
 			}
@@ -148,8 +159,6 @@ public class World {
 				e.finalize();
 			}
 		}
-		
-		
 	}
 
 	/**
@@ -159,16 +168,13 @@ public class World {
 	 * @throws	IllegalArgumentException
 	 * 			The list containing all entity in this world does not contain the entity provided as an argument.
 	 * @post	| ! entities.contains(entity)
+	 * @post	| new.entity.getWorld() == null
 	 */
 	@Raw
 	public void removeEntity(Entity entity) throws IllegalArgumentException {
 		if (! this.entities.contains(entity))
 			throw new IllegalArgumentException("Trying to remove entity that is not in this world.");
-		//System.out.println("removeEntity");
 		entity.setWorld(null);
-		
-		//for (Entity e: entities)
-			//System.out.println(entity);
 		entities.remove(entity);
 		
 	}
@@ -212,7 +218,7 @@ public class World {
 	 * Returns a list of all entities in this world.
 	 * 
 	 * @return 	A list of all entities in this world.
-	 * 			| { entity1, entity2, ..., entityN | entityI.getWorld() = this}
+	 * 			| { entity1, entity2, ..., entityN where entityI.getWorld() = this}
 	 * @note	A copy is made to prevent any changes in this world to be reflected in the list we return.
 	 */
 	public Set<Entity> getEntities() {
@@ -254,9 +260,8 @@ public class World {
 	 * Returns the two objects of the next collision.
 	 * 
 	 * @return	The two objects involved in the next collision.
-	 * 			| [object1, object2] where getNextCollisionData().getObject1() == object1 && getNextCollisionData().getObject2() == object2
+	 * 			| result == [object1, object2] where for each Collision c: getTimeNextCollision() < c.getTime()
 	 */
-	//TODO
 	public Entity[] getEntitiesNextCollision() {
 		Entity[] entities = new Entity[]{null,null};
 		double timeNextCollision = Double.POSITIVE_INFINITY;
@@ -280,29 +285,6 @@ public class World {
 		}
 		return entities;
 		
-//		double timeToCollision = Double.POSITIVE_INFINITY;
-//		Entity[] entities = new Entity[2];
-//		for (Entity e1: getEntities()) {
-//			for (Entity e2: getEntities()) {
-//				if (e1.overlap(e2) && e1 != e2) {
-//					entities[0] = e1;
-//					entities[1] = e2;
-//					return entities;
-//				}
-//				if (e1.getTimeToCollision(e2) < timeToCollision && e1 != e2) {
-//					timeToCollision = e1.getTimeToCollision(e2);
-//					entities[0] = e1;
-//					entities[1] = e2;
-//				}
-//			}
-//			
-//			if (e1.getTimeFirstCollisionBoundary() < timeToCollision) {
-//				entities[0] = e1;
-//				entities[1] = null;
-//			}
-//		}
-//		
-//		return entities;
 	}
 	
 	
@@ -349,15 +331,13 @@ public class World {
 	 */
 	public void evolve(double dt, CollisionListener l) throws IllegalArgumentException {
 		
-if (dt < 0) throw new IllegalArgumentException("Delta time cannot be negative");
+		if (dt < 0) throw new IllegalArgumentException("Delta time cannot be negative");
 		
 		double timeToCollision = getTimeNextCollision();
 		double[] positionNextCollision = getPositionNextCollision();
 		Entity[] entitiesNextCollision = getEntitiesNextCollision();
-		//System.out.println(timeToCollision);
 		
 		while (timeToCollision <= dt && timeToCollision > 0) {
-			//System.out.println("Advancing " + timeToCollision);
 			advance(timeToCollision);
 			if (entitiesNextCollision[1] == null) {
 				Entity e = entitiesNextCollision[0];
@@ -378,10 +358,8 @@ if (dt < 0) throw new IllegalArgumentException("Delta time cannot be negative");
 			timeToCollision = getTimeNextCollision();
 			positionNextCollision = getPositionNextCollision();
 			entitiesNextCollision = getEntitiesNextCollision();
-			//System.out.println(timeToCollision);
 		}
 		advance(dt);
-		//System.out.println(timeToCollision);
 	}
 	
 	
@@ -393,7 +371,7 @@ if (dt < 0) throw new IllegalArgumentException("Delta time cannot be negative");
 	 * Ships' velocities may be updated depending on its state(thruster on/off).
 	 * @param 	deltaTime
 	 * 			The time duration over which to update the entities' properties.
-	 * @post	| for each Entity e : this.getEntities()
+	 * @effect	| for each Entity e : this.getEntities()
 	 * 			|	e.advance()
 	 * @note	Specific behaviour in advance() is specified in detail at the level of each subclass.
 	 * 

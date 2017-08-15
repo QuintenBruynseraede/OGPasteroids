@@ -18,7 +18,7 @@ import be.kuleuven.cs.som.annotate.Raw;
 public class Asteroid extends MinorPlanet {
 
 	/**
-	 * 	Creates a new asteroid with a position, velocity, radius and mass.
+	 * 	Creates a new asteroid with a position, velocity, and a radius.
 	 * 	@param 	x
 	 * 			The x position for this Asteroid.
 	 * 	@param 	y
@@ -29,7 +29,6 @@ public class Asteroid extends MinorPlanet {
 	 * 			The y velocity for this Asteroid.
 	 * 	@param 	radius
 	 * 			The radius for this Asteroid.
-	 *  @post	new.getMass() = (4/3) * Math.PI * Math.pow(this.getRadius(), 3) * Asteroid.MASSDENSITY
 	 *  @effect	Initializes this Asteroid as a MinorPlanet with a position, velocity and radius.
 	 *  		| super (x, y, xVelocity, yVelocity, radius)
 	 *  @effect	| setMass((4/3) * Math.PI * Math.pow(this.getRadius(), 3) * Asteroid.MASSDENSITY)
@@ -103,9 +102,8 @@ public class Asteroid extends MinorPlanet {
 	}
 
 	/**
-	 * 	Returns the lower bound of this Asteroid
-	 * 	@returns	
-	 * 		| Asteroid.RADIUSLOWERBOUND
+	 * 	Returns the lower bound of this Asteroid.
+	 * 	@returns	| Asteroid.RADIUSLOWERBOUND
 	 */
 	@Immutable
 	public double getRadiusLowerBound() {
@@ -113,7 +111,7 @@ public class Asteroid extends MinorPlanet {
 	}
 	
 	/**
-	 * 	The smallest radius an instance of the Asteroid class can have
+	 * 	The smallest radius an instance of the Asteroid class can have.
 	 */
 	private static double RADIUSLOWERBOUND = 5;
 
@@ -121,6 +119,7 @@ public class Asteroid extends MinorPlanet {
 	 * 	Moves the Asteroid during a given time
 	 * 	@param 	deltaTime
 	 * 			The time during which the Asteroid is moved.
+	 *  @effect		| move(deltaTime);
 	 */
 	@Override
 	@Raw
