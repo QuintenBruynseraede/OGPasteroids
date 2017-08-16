@@ -344,7 +344,7 @@ public class Ship extends Entity {
 	}
 
 	/**
-	 * Constant registering the firingspeed of this ship.
+	 * Constant registering the firing speed of this ship.
 	 */
 	public final int FIRINGSPEED = 250;
 	
@@ -360,6 +360,9 @@ public class Ship extends Entity {
 	 * @post	| new.getWorld().getEntities().size() = getWorld().getEntities().size + 1
 	 * @post	| b.getXVelocity() = FIRINGSPEED * Math.cos(getOrientation())
 	 * @post	| b.getYVelocity() = FIRINGSPEED * Math.sin(getOrientation())
+	 * @post	If firing this bullet means the bullet now lies outside the boundaries of this world, remove it.
+	 * 			| if (bullet.getXCoordinate() < 0.01 * bullet.getRadius() || bullet.getXCoordinate() > getWorld().getWidth() || bullet.getYCoordinate() < 0.01*bullet.getRadius() || bullet.getYCoordinate() > getWorld().getHeight())
+				|	bullet.finalize();
 	 * @effect	| b.setXCoordinate(getXCoordinate() + (getRadius() + b.getRadius()) * Math.cos(getOrientation()));
 	 * @effect	| b.setYCoordinate(getYCoordinate() + (getRadius() + b.getRadius()) * Math.cos(getOrientation()));
 	 * @effect	If the bullet overlaps with another entity in the world upon creation, simulate a collision immediately
@@ -389,6 +392,9 @@ public class Ship extends Entity {
 		
 		bullet.setXCoordinate(this.getXCoordinate() + (this.getRadius() + bullet.getRadius()) * Math.cos(this.getOrientation()));
 		bullet.setYCoordinate(this.getYCoordinate() + (this.getRadius() + bullet.getRadius()) * Math.sin(this.getOrientation()));
+		
+		if (bullet.getXCoordinate() < 0.01 * bullet.getRadius() || bullet.getXCoordinate() > getWorld().getWidth() || bullet.getYCoordinate() < 0.01*bullet.getRadius() || bullet.getYCoordinate() > getWorld().getHeight())
+			bullet.finalize();
 		
 		for (Entity e: getWorld().getEntities()) {
 			if (bullet.overlap(e) && e != bullet) {

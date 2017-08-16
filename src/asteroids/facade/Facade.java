@@ -672,8 +672,8 @@ public class Facade implements asteroids.part3.facade.IFacade {
 
 	@Override
 	public double[] getPositionCollisionBoundary(Object object) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		Entity e = (Entity) object;
+		return e.getCollisionPositionFirstBoundary();
 	}
 
 

@@ -323,11 +323,9 @@ public abstract class Entity {
 	public void setWorld(World world) throws IllegalStateException {
 		if (!canHaveAsWorld(world))
 			throw new IllegalStateException("Invalid position in the world trying to assign this entity to.");
-		if (world != null && (getXCoordinate() > world.getWidth() || getYCoordinate() > world.getHeight()))
-			throw new IllegalStateException("Invalid position in the world trying to assign this entity to.");
-		
+	
 		//If current world is null, don't try to remove 'this' from it
-		//If world is null, don't try to add anything to it\
+		//If world is null, don't try to add anything to it
 		//This allows us to provide 'null' as an argument in case we want to 
 		//undo the association for this entity.
 		if (!(this.getWorld() == null) && !(world == null)) {
@@ -350,6 +348,9 @@ public abstract class Entity {
 //				&& this.getXCoordinate() < world.getWidth()
 //				&& this.getXCoordinate() >= 0 
 //				&& this.getYCoordinate() < world.getHeight());
+		//return true;
+		if (world != null && (getXCoordinate() > world.getWidth() || getYCoordinate() > world.getHeight()))
+			return false;
 		return true;
 	}
 	
@@ -585,13 +586,28 @@ public abstract class Entity {
 		
 
 		if ( this.overlap(otherEntity) ) {
-			double[] collision = {this.getXCoordinate(), this.getYCoordinate()};
-			return collision; 
+			return null;
 		}
 		
 		if ( this.getTimeToCollision(otherEntity) == Double.POSITIVE_INFINITY)
 			return null;
-		
+//		double dt = getTimeToCollision(otherEntity);
+//		
+//		double[] positionThisShip = new double[] {getXCoordinate(), getYCoordinate()};
+//		double[] velocityThisShip = new double[] {getXVelocity(), getYVelocity()};
+//		double[] positionShip2 = new double[] {otherEntity.getXCoordinate(), otherEntity.getYCoordinate()};
+//		double[] velocityShip2 = new double[] {otherEntity.getXVelocity(), otherEntity.getYVelocity()};
+//		
+//		double xPositionCollisionThisShip = positionThisShip[0] + velocityThisShip[0] * dt;
+//		double yPositionCollisionThisShip = positionThisShip[1] + velocityThisShip[1] * dt;
+//		
+//		double xPositionCollisionShip2 = positionShip2[0] + velocityShip2[0] * dt;
+//		double yPositionCollisionShip2 = positionShip2[1] + velocityShip2[1] * dt;
+//		
+//		double slope = Math.atan2(yPositionCollisionShip2 - yPositionCollisionThisShip, xPositionCollisionShip2 - xPositionCollisionThisShip);
+//			
+//		return new double[] {xPositionCollisionThisShip + Math.cos(slope) * this.getRadius(), yPositionCollisionThisShip + Math.sin(slope) * this.getRadius()};
+
 		double collisionXSelf = this.getXCoordinate() + this.getTimeToCollision(otherEntity) * this.getXVelocity();
 		double collisionYSelf = this.getYCoordinate() + this.getTimeToCollision(otherEntity) * this.getYVelocity();
 
@@ -667,4 +683,33 @@ public abstract class Entity {
 
 	public abstract void collideWith(Entity entity);
 	
+	/**
+	 * Returns the position where the entity collides with a boundary.
+	 * @return | {x, y} where abs(getWorld().getWidth() - x) = getRadius()
+	 * 		   |        or abs(x) = getRadius()
+	 * 		   |		or abs(getWorld().getHeight() - y) = getRadius()
+	 * 		   |		or abs(y) = getRadius()
+	 * @return | if (getWorld() == null || getTotalVelocity() == 0)
+	 * 		   | 	return null;
+	 */
+	public double[] getCollisionPositionFirstBoundary() {
+		if (getWorld() == null)
+			return null;
+		
+		double dt = getTimeFirstCollisionBoundary();
+		
+		double xCenter = getXCoordinate() + dt * getXVelocity();
+		double yCenter = getYCoordinate() + dt * getYVelocity();
+		
+		if (xCenter < 1.01*getRadius()) //LEFT
+			return new double[] {xCenter - getRadius(), yCenter};
+		else if (xCenter > getWorld().getWidth()-1.01*getRadius()) //RIGHT
+			return new double[] {xCenter + getRadius(), yCenter};
+		else if (yCenter < 1.01 * getRadius()) //TOP
+			return new double[] {xCenter, yCenter - getRadius()};
+		else if (yCenter > getWorld().getHeight()-1.01*getRadius()) //BOTTOM
+			return new double[] {xCenter, yCenter + getRadius()};
+		else
+			return null;
+	}
 }
