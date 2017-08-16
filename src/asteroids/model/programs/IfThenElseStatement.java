@@ -58,6 +58,10 @@ public class IfThenElseStatement extends Statement{
 		}
 	}
 	
+	public void checkForIllegalStatements() {
+		getIfBody().checkForIllegalStatements();
+		getElseBody().checkForIllegalStatements();
+	}
 	public void setProgram(Program program) {
 		this.program = program;
 		getIfBody().setProgram(program);

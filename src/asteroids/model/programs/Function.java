@@ -25,41 +25,16 @@ public class Function {
 	}
 	
 	public Object execute(List<Expression> arguments) throws OutOfTimeException {
-		if (body instanceof BlockStatement) {
-			List<Statement> statements = ((BlockStatement) body).getStatements();
-			Iterator <Statement> i = statements.iterator();
-			
-			if (!(statements.get(statements.size() - 1) instanceof ReturnStatement))
-				throw new IllegalArgumentException("Last statement no Return");
-			
-		
-			while (i.hasNext()) {
-				Statement s = i.next();
-				if (s instanceof ActionStatement) {
-					throw new IllegalArgumentException("Action statement in function");
-				}
-			}
-		}
-		else if (body instanceof ReturnStatement) {
-			//Single statement: return	
-		}
-		else if (body instanceof IfThenElseStatement) {
-			IfThenElseStatement s = (IfThenElseStatement) body;
-			if (s.getElseBody() instanceof PrintStatement)
-				throw new IllegalArgumentException("Print statement in else body within function");
-			//TODO Print statement in nested if/elses still go through. Needs a function in IfElseStatement
-			if (s.getIfBody() instanceof PrintStatement)
-				throw new IllegalArgumentException("Print statement in if body within function.");
-		}
-		else {
-			System.out.println(body);
-			throw new IllegalArgumentException("Single statement but not of correct type");
-		}
+		body.checkForIllegalStatements(); //
+		//No print or action statements in function.
 		
 		this.arguments = arguments;	
+		
 		getProgram().setCurrentFunction(this);
 		getBody().setProgram(getProgram());
+		
 		getBody().eval();
+		
 		getProgram().setCurrentFunction(null);
 		return getReturnValue();
 		

@@ -18,4 +18,9 @@ public class BreakStatement extends Statement {
 		throw new BreakException();
 	}
 
+	@Override
+	public void checkForIllegalStatements() {
+		return;
+	}
+
 }

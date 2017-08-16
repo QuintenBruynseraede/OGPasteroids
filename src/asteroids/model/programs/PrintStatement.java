@@ -29,4 +29,9 @@ public class PrintStatement extends Statement {
 		this.getProgram().addReturnItem(value.eval());
 	}
 
+	@Override
+	public void checkForIllegalStatements() {
+		throw new IllegalArgumentException("Illegal statement [Print] in function body.");
+	}
+
 }

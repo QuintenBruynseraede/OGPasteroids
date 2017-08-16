@@ -41,5 +41,10 @@ public class ThrustStatement extends ActionStatement {
 		this.state = state;
 	}
 
+	@Override
+	public void checkForIllegalStatements() {
+		throw new IllegalArgumentException("Illegal statement [Thrust] in function body.");
+	}
+
 
 }

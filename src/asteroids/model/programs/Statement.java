@@ -46,6 +46,6 @@ public abstract class Statement {
 		return this.timeToExecute;
 	}
 	
-
+	public abstract void checkForIllegalStatements();
 	
 }

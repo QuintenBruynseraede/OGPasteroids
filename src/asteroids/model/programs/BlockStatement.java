@@ -35,4 +35,10 @@ public class BlockStatement extends Statement{
 			s.setProgram(getProgram());
 		}
 	}
+
+	@Override
+	public void checkForIllegalStatements() {
+		for (Statement s: getStatements())
+			s.checkForIllegalStatements();
+	}
 }

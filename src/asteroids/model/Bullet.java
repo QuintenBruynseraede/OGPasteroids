@@ -205,7 +205,27 @@ public class Bullet extends Entity {
 	public void setLoaded(boolean loaded) {
 		this.isLoaded = loaded;
 	}
-
+	
+	/**
+	 * Variable holding the ship that fired this bullet. Doesn't change after assignment.
+	 */
+	private Ship firedBy = null;
+	
+	/**
+	 * Sets the ship this bullet was fired off of. Can only be invoked once.
+	 */
+	public void setFiredBy(Ship s) {
+		if (getFiredBy() != null) return;
+		firedBy = s;
+	}
+	
+	/**
+	 * Returns the ship thsi bullet was fired off of.
+	 */
+	@Basic
+	public Ship getFiredBy() {
+		return firedBy;
+	}
 	
 	/**
 	 * 	The smallest radius an instance of the bullet class can have.
@@ -287,6 +307,11 @@ public class Bullet extends Entity {
 		if (getWorld() != null) {
 			getWorld().removeEntity(this);
 		}
+		if (getParent() != null) {
+			getParent().removeBullet(this);
+			setParent(null);
+		}
+			
 		finalized = true;
 	}
 

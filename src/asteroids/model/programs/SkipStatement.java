@@ -24,5 +24,10 @@ public class SkipStatement extends ActionStatement {
 		advanceTime();	
 	}
 
+	@Override
+	public void checkForIllegalStatements() {
+		throw new IllegalArgumentException("Illegal statement [Skip] in function body.");
+	}
+
 
 }

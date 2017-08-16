@@ -175,6 +175,7 @@ public class World {
 		if (! this.entities.contains(entity))
 			throw new IllegalArgumentException("Trying to remove entity that is not in this world.");
 		entity.setWorld(null);
+		
 		entities.remove(entity);
 		
 	}

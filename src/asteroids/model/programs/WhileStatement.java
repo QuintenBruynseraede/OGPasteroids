@@ -63,4 +63,9 @@ public class WhileStatement extends Statement {
 		this.program = program;
 		this.body.setProgram(program);
 	}
+
+	@Override
+	public void checkForIllegalStatements() {
+		getBody().checkForIllegalStatements();
+	}
 }

@@ -34,5 +34,10 @@ public class AssertStatement extends Statement {
 			throw new AssertionError("[Assert] Predicate not true");
 	}
 
+	@Override
+	public void checkForIllegalStatements() {
+		return;
+	}
+
 }
 

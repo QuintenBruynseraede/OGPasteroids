@@ -300,8 +300,8 @@ public class Ship extends Entity {
 	 */
 	@Raw
 	public void removeBullet(Bullet bullet) throws IllegalArgumentException {
-		if (!bulletsLoaded.contains(bullet)) 
-			throw new IllegalArgumentException("Can't remove bullet not on this ship.");
+		//if (!bulletsLoaded.contains(bullet)) 
+		//	throw new IllegalArgumentException("Can't remove bullet not on this ship.");
 		bulletsLoaded.remove(bullet);
 		bullet.setLoaded(false);
 		return;
@@ -316,8 +316,7 @@ public class Ship extends Entity {
 	 */
 	@Raw
 	public void addBulletToLoaded(Bullet bullet) throws IllegalArgumentException {
-		
-		//System.out.println("addBulletToLoaded");
+		if (Math.abs(getXCoordinate()-bullet.getXCoordinate()) > 200) throw new IllegalArgumentException();
 		bulletsLoaded.add(bullet);
 		bullet.setParent(this);
 	}
@@ -381,6 +380,7 @@ public class Ship extends Entity {
 		removeBullet(bullet);
 		bullet.setLoaded(false);
 		bullet.setWorld(getWorld());
+		bullet.setFiredBy(this);
 		getWorld().addEntity(bullet);
 	
 		bullet.setXVelocity(FIRINGSPEED * Math.cos(getOrientation()));

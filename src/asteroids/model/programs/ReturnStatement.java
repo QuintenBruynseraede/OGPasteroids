@@ -33,4 +33,9 @@ public class ReturnStatement extends Statement{
 		this.value = value;
 	}
 
+	@Override
+	public void checkForIllegalStatements() {
+		return;
+	}
+
 }

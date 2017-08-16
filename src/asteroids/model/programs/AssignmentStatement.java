@@ -70,6 +70,11 @@ public class AssignmentStatement extends Statement {
 		}
 		
 	}
+
+	@Override
+	public void checkForIllegalStatements() {
+		return;
+	}
 	
 	
 }

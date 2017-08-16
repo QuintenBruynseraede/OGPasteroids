@@ -45,4 +45,9 @@ public class TurnStatement extends ActionStatement {
 		}
 		advanceTime();
 	}
+
+	@Override
+	public void checkForIllegalStatements() {
+		throw new IllegalArgumentException("Illegal statement [Turn] in function body.");
+	}
 }

@@ -323,6 +323,8 @@ public abstract class Entity {
 	public void setWorld(World world) throws IllegalStateException {
 		if (!canHaveAsWorld(world))
 			throw new IllegalStateException("Invalid position in the world trying to assign this entity to.");
+		if (world != null && (getXCoordinate() > world.getWidth() || getYCoordinate() > world.getHeight()))
+			throw new IllegalStateException("Invalid position in the world trying to assign this entity to.");
 		
 		//If current world is null, don't try to remove 'this' from it
 		//If world is null, don't try to add anything to it\
@@ -344,10 +346,11 @@ public abstract class Entity {
 	 */
 	@Raw
 	public boolean canHaveAsWorld(World world) {
-		return (this.getXCoordinate() >= 0 
-				&& this.getXCoordinate() < World.WIDTHUPPERBOUND 
-				&& this.getXCoordinate() >= 0 
-				&& this.getYCoordinate() < World.HEIGHTUPPERBOUND);
+//		return (this.getXCoordinate() >= 0 
+//				&& this.getXCoordinate() < world.getWidth()
+//				&& this.getXCoordinate() >= 0 
+//				&& this.getYCoordinate() < world.getHeight());
+		return true;
 	}
 	
 	/**

@@ -2,7 +2,6 @@ package asteroids.facade;
 
 import asteroids.model.Ship;
 import asteroids.model.World;
-import asteroids.model.*;
 import asteroids.model.programs.*;
 
 import java.util.Collection;
@@ -15,7 +14,6 @@ import asteroids.model.Entity;
 import asteroids.model.Planetoid;
 import asteroids.model.Program;
 import asteroids.part2.CollisionListener;
-import asteroids.part2.facade.IFacade;
 import asteroids.part3.programs.IProgramFactory;
 import asteroids.util.ModelException;
 
@@ -266,7 +264,7 @@ public class Facade implements asteroids.part3.facade.IFacade {
 	@Override
 	public Ship getBulletSource(Bullet bullet) throws ModelException {
 		if (bullet == null) throw new ModelException("Trying to terminate null bullet.");
-		return bullet.getParent();
+		return (bullet.isFinalized() ? bullet.getFiredBy(): bullet.getParent());
 	}
 
 	@Override
@@ -655,12 +653,13 @@ public class Facade implements asteroids.part3.facade.IFacade {
 		try {
 			return ship.executeProgram(dt);
 		} catch (IllegalArgumentException e) {
-			throw new ModelException("");
+			throw new ModelException(e.getMessage());
 		} catch (ClassCastException e) {
-			System.out.println(e.getMessage());
-			throw new ModelException("");
+			throw new ModelException(e.getMessage());
 		} catch (IllegalStateException e) {
-			throw new ModelException("");
+			throw new ModelException(e.getMessage());
+		} catch (AssertionError e) {
+			throw new ModelException(e.getMessage());
 		}
 	}
 

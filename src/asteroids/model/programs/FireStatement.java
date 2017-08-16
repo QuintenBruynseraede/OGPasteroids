@@ -23,4 +23,9 @@ public class FireStatement extends ActionStatement {
 		getProgram().getShip().fire();
 		advanceTime();
 	}
+
+	@Override
+	public void checkForIllegalStatements() {
+		throw new IllegalArgumentException("Illegal statement [Fire] in function body.");
+	}
 }
