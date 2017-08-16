@@ -180,8 +180,7 @@ public class Asteroid extends MinorPlanet {
 			asteroid2.setYVelocity(asteroid2.getYVelocity() - (Jy/asteroid2.getMass()));
 			return;
 		}
-		
-		if (entity instanceof Planetoid) {
+		else if (entity instanceof Planetoid) {
 			Asteroid asteroid1 = this;
 			Planetoid planetoid2 = (Planetoid) entity;
 			
@@ -203,8 +202,14 @@ public class Asteroid extends MinorPlanet {
 			planetoid2.setYVelocity(planetoid2.getYVelocity() - (Jy/planetoid2.getMass()));
 			return;
 		}
-		if (entity instanceof Ship) {
+		else if (entity instanceof Ship) {
 			entity.finalize();
+			return;
+		}
+		else if (entity instanceof Bullet) {
+			entity.finalize();
+			finalize();
+			return;
 		}
 		else {
 			entity.collideWith(this);

@@ -317,6 +317,11 @@ public class Planetoid extends MinorPlanet {
 			planetoid2.setYVelocity(planetoid2.getYVelocity() - (Jy/planetoid2.getMass()));
 			return;
 		}
+		else if (entity instanceof Bullet) {
+			entity.finalize();
+			finalize();
+			return;
+		}
 		else
 			entity.collideWith(this);
 	}

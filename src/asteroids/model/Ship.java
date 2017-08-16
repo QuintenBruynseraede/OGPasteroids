@@ -82,11 +82,7 @@ public class Ship extends Entity {
 				this.massShip = (4.0*Math.PI*Math.pow(radius, 3)*1.42E12/3.0);
 			else
 				this.massShip = mass;
-			
 		}
-		
-		
-		
 	}
 	
 	/**
@@ -294,14 +290,14 @@ public class Ship extends Entity {
 	 * @param 	bullet
 	 * 			The bullet to remove.
 	 * @throws	IllegalArgumentException
-	 * 			| !getBulletsLoaded().contains(bullet) 
+	 * 			| !(bullet.getParent() == this)
 	 * @post	| new.getBulletsLoaded().contains(bullet) == false
 	 * @post	| bullet.isLoaded(false)
 	 */
 	@Raw
 	public void removeBullet(Bullet bullet) throws IllegalArgumentException {
-		//if (!bulletsLoaded.contains(bullet)) 
-		//	throw new IllegalArgumentException("Can't remove bullet not on this ship.");
+		if (bullet.getParent() != this)
+			throw new IllegalArgumentException("");
 		bulletsLoaded.remove(bullet);
 		bullet.setLoaded(false);
 		return;
@@ -377,7 +373,7 @@ public class Ship extends Entity {
 		Bullet bullet = this.bulletsLoaded.iterator().next();
 
 		if (bulletsLoaded.contains(bullet) == false)
-			{ throw new IllegalArgumentException("Firing bullet that is not loaded."); }
+			{ System.out.println("Probleem"); throw new IllegalArgumentException("Firing bullet that is not loaded."); }
 		
 		
 		removeBullet(bullet);
@@ -565,12 +561,9 @@ public class Ship extends Entity {
 	@Override
 	public void collideWith(Entity entity) {
 		if (entity instanceof Ship) {
-			//System.out.println("Collision ship ship");
 			Ship ship1 = this;
 			Ship ship2 = (Ship) entity;
 			
-			//System.out.println(ship1.getMassTotal());
-			//System.out.println(ship2.getMassTotal());
 			 
 			double deltaVX = ship2.getXVelocity() - ship1.getXVelocity();
 			double deltaVY = ship2.getYVelocity() - ship1.getYVelocity();
