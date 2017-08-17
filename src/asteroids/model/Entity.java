@@ -344,11 +344,6 @@ public abstract class Entity {
 	 */
 	@Raw
 	public boolean canHaveAsWorld(World world) {
-//		return (this.getXCoordinate() >= 0 
-//				&& this.getXCoordinate() < world.getWidth()
-//				&& this.getXCoordinate() >= 0 
-//				&& this.getYCoordinate() < world.getHeight());
-		//return true;
 		if (world != null && (getXCoordinate() > world.getWidth() || getYCoordinate() > world.getHeight()))
 			return false;
 		return true;
@@ -669,15 +664,14 @@ public abstract class Entity {
 	 *  @see Implementation
 	 */
 	public void collideBoundary() {
-		//System.out.println("collideBoundary");
 		if (getWorld() == null) return;
 		if (getXCoordinate() < 1.01*getRadius())
 			setXVelocity(-getXVelocity());
-		else if (getXCoordinate() > getWorld().getWidth()-1.01*getRadius())
+		if (getXCoordinate() > getWorld().getWidth()-1.01*getRadius())
 			setXVelocity(-getXVelocity());
-		else if (getYCoordinate() < 1.01 * getRadius())
+		if (getYCoordinate() < 1.01 * getRadius())
 			setYVelocity(-getYVelocity());
-		else if (getYCoordinate() > getWorld().getHeight()-1.01*getRadius())
+		if (getYCoordinate() > getWorld().getHeight()-1.01*getRadius())
 			setYVelocity(-getYVelocity());
 	}
 

@@ -36,7 +36,7 @@ public class Planetoid extends MinorPlanet {
 	 * @post	| new.initialRadius = radius
 	 */
 	@Raw
-	public Planetoid(double x, double y, double xVelocity, double yVelocity, double radius) {
+	public Planetoid(double x, double y, double xVelocity, double yVelocity, double radius) throws IllegalArgumentException {
 		super(x, y, xVelocity, yVelocity, radius);
 
 		setMass(4 * Math.PI / 3);
@@ -47,6 +47,8 @@ public class Planetoid extends MinorPlanet {
 		
 		setRadius(radius);
 		this.initialRadius = radius;
+		//setRadius(50);
+		//this.initialRadius = 50;
 
 	}
 
@@ -244,21 +246,41 @@ public class Planetoid extends MinorPlanet {
 	 * @see implementation for details concerning the two new planetoids
 	 */
 	public void finalize() {
-		if (this.getWorld() != null && this.getRadius() >= 30) {
-			double child1XVelocity = Math.random()*(9/4)*(this.getXVelocity()*this.getXVelocity()+this.getYVelocity()*this.getYVelocity());
-			double child1YVelocity = Math.sqrt((9/4)*(this.getXVelocity()*this.getXVelocity()+this.getYVelocity()*this.getYVelocity()) - child1XVelocity*child1XVelocity);
-			
-			Asteroid a1 = new Asteroid(this.getXCoordinate() + this.getRadius()/2, this.getYCoordinate(), child1XVelocity, child1YVelocity, this.getRadius()/2);
-			Asteroid a2 = new Asteroid(this.getXCoordinate() - this.getRadius()/2, this.getYCoordinate(), -child1XVelocity, -child1YVelocity, this.getRadius()/2);
-			World w = getWorld();
-			w.removeEntity(this);
-			w.addEntity(a1);
-			w.addEntity(a2);
-			
-			a1.setWorld(this.getWorld());
-			a2.setWorld(this.getWorld());
-		}
-		else if (getWorld() != null){
+		//if (this.getWorld() != null && this.getRadius() >= 30) {
+//			double child1XVelocity = Math.random()*(9/4)*(this.getXVelocity()*this.getXVelocity()+this.getYVelocity()*this.getYVelocity());
+//			double child1YVelocity = Math.sqrt((9/4)*(this.getXVelocity()*this.getXVelocity()+this.getYVelocity()*this.getYVelocity()) - child1XVelocity*child1XVelocity);
+//			
+//			Asteroid a1 = new Asteroid(this.getXCoordinate() + this.getRadius()/2, this.getYCoordinate(), child1XVelocity, child1YVelocity, this.getRadius()/2);
+//			Asteroid a2 = new Asteroid(this.getXCoordinate() - this.getRadius()/2, this.getYCoordinate(), -child1XVelocity, -child1YVelocity, this.getRadius()/2);
+//			World w = getWorld();
+//			w.removeEntity(this);
+//			w.addEntity(a1);
+//			w.addEntity(a2);
+//			
+//			a1.setWorld(this.getWorld());
+//			a2.setWorld(this.getWorld());
+//			double asteroidDirection = 2 * Math.PI * Math.random(); 
+//			double totalVelocity = 1.5 *  getTotalVelocity(getXVelocity(), getYVelocity());
+//			double asteroidRadius = getRadius()/2;
+//			
+//			double XPositionAsteroid1 = getXCoordinate() + Math.cos(asteroidDirection) * asteroidRadius;
+//			double YPositionAsteroid1 = getYCoordinate() + Math.sin(asteroidDirection) * asteroidRadius;
+//			double XVelocityAsteroid1 = totalVelocity * Math.cos(asteroidDirection);
+//			double YVelocityAsteroid1 = totalVelocity * Math.sin(asteroidDirection);
+//			
+//			double XPositionAsteroid2 = getXCoordinate() - Math.cos(asteroidDirection) * asteroidRadius;
+//			double YPositionAsteroid2 = getYCoordinate() - Math.sin(asteroidDirection) * asteroidRadius;
+//			double XVelocityAsteroid2 = -totalVelocity * Math.cos(asteroidDirection);
+//			double YVelocityAsteroid2 = -totalVelocity * Math.sin(asteroidDirection);		
+//			
+//			Asteroid asteroid1 = new Asteroid(XPositionAsteroid1, YPositionAsteroid1, XVelocityAsteroid1, YVelocityAsteroid1, asteroidRadius);
+//			Asteroid asteroid2 = new Asteroid(XPositionAsteroid2, YPositionAsteroid2, XVelocityAsteroid2, YVelocityAsteroid2, asteroidRadius);
+//			getWorld().removeEntity(this);
+//			getWorld().addEntity(asteroid1);
+//			getWorld().addEntity(asteroid2);
+			//spawnPlanetoids();
+		//}
+		if (getWorld() != null){
 			getWorld().removeEntity(this);
 		}
 		this.finalized = true;
@@ -319,6 +341,11 @@ public class Planetoid extends MinorPlanet {
 		}
 		else if (entity instanceof Bullet) {
 			entity.finalize();
+			
+			if (this.getWorld() != null && this.getRadius() >= 30) {
+				spawnPlanetoids();
+			}
+			
 			finalize();
 			return;
 		}
@@ -326,4 +353,18 @@ public class Planetoid extends MinorPlanet {
 			entity.collideWith(this);
 	}
 	
+	/**
+	 * Spawns two new planetoids.
+	 * 
+	 */
+	private void spawnPlanetoids() {
+		System.out.println(this);
+		Planetoid p1 = new Planetoid(100, getYCoordinate(), -10, 0, 25);
+		Planetoid p2 = new Planetoid(300, getYCoordinate(), 10, 0, 25);
+		World w = getWorld();
+		w.removeEntity(this);
+		w.addEntity(p1);
+		w.addEntity(p2);
+		
+	}
 }

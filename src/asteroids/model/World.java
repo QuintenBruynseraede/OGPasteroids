@@ -150,9 +150,9 @@ public class World {
 					if (((Bullet) e).getParent() == entity) 
 						return;
 					else
-						throw new IllegalStateException("Cannot add overlapping entities that are not bullets.");
+						throw new IllegalStateException("1Cannot add overlapping entities that are not bullets. " + e + " " + entity);
 				}
-				throw new IllegalStateException("Cannot add overlapping entities that are not bullets.");
+				throw new IllegalStateException("2Cannot add overlapping entities that are not bullets." + e + " " + entity);
 			}
 			if (e.getTimeFirstCollisionBoundary() <= 0) {
 				System.out.println("Removing instance partly out of world");
