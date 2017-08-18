@@ -385,14 +385,16 @@ public class Ship extends Entity {
 		bullet.setXVelocity(FIRINGSPEED * Math.cos(getOrientation()));
 		bullet.setYVelocity(FIRINGSPEED * Math.sin(getOrientation()));
 		
-		
 		bullet.setXCoordinate(this.getXCoordinate() + (this.getRadius() + bullet.getRadius()) * Math.cos(this.getOrientation()));
 		bullet.setYCoordinate(this.getYCoordinate() + (this.getRadius() + bullet.getRadius()) * Math.sin(this.getOrientation()));
 		
-		if (bullet.getXCoordinate() < 0.01 * bullet.getRadius() || bullet.getXCoordinate() > getWorld().getWidth() || bullet.getYCoordinate() < 0.01*bullet.getRadius() || bullet.getYCoordinate() > getWorld().getHeight())
+		if (bullet.getXCoordinate() < 0.01 * bullet.getRadius() || //Remove if outside bounds
+				bullet.getXCoordinate() > getWorld().getWidth() || 
+					bullet.getYCoordinate() < 0.01*bullet.getRadius() || 
+						bullet.getYCoordinate() > getWorld().getHeight())
 			bullet.finalize();
 		
-		for (Entity e: getWorld().getEntities()) {
+		for (Entity e: getWorld().getEntities()) { //Immediately collide
 			if (bullet.overlap(e) && e != bullet) {
 				bullet.collideWith(e);
 			}
@@ -452,6 +454,7 @@ public class Ship extends Entity {
 	 */
 	@Override
 	public void advance(double deltaTime) {
+		executeProgram(deltaTime);
 		move(deltaTime);
 		if (isThrusterEnabled()) 
 			updateVelocity();
@@ -507,11 +510,13 @@ public class Ship extends Entity {
 	/**
 	 * 	Executes the program loaded on this ship
 	 *  @return	List containing all objects printed out by the program.
-	 * 
+	 *  @return Null if the execution has been halted
 	 */
 	@Raw
 	public List<Object> executeProgram(double dt) {
-		List<Object> r = this.getProgramLoaded().execute(dt);
+		if (getProgramLoaded() == null) 
+			return null;
+		List<Object> r = getProgramLoaded().execute(dt);
 		return r;
 	}
 	

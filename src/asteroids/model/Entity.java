@@ -586,22 +586,6 @@ public abstract class Entity {
 		
 		if ( this.getTimeToCollision(otherEntity) == Double.POSITIVE_INFINITY)
 			return null;
-//		double dt = getTimeToCollision(otherEntity);
-//		
-//		double[] positionThisShip = new double[] {getXCoordinate(), getYCoordinate()};
-//		double[] velocityThisShip = new double[] {getXVelocity(), getYVelocity()};
-//		double[] positionShip2 = new double[] {otherEntity.getXCoordinate(), otherEntity.getYCoordinate()};
-//		double[] velocityShip2 = new double[] {otherEntity.getXVelocity(), otherEntity.getYVelocity()};
-//		
-//		double xPositionCollisionThisShip = positionThisShip[0] + velocityThisShip[0] * dt;
-//		double yPositionCollisionThisShip = positionThisShip[1] + velocityThisShip[1] * dt;
-//		
-//		double xPositionCollisionShip2 = positionShip2[0] + velocityShip2[0] * dt;
-//		double yPositionCollisionShip2 = positionShip2[1] + velocityShip2[1] * dt;
-//		
-//		double slope = Math.atan2(yPositionCollisionShip2 - yPositionCollisionThisShip, xPositionCollisionShip2 - xPositionCollisionThisShip);
-//			
-//		return new double[] {xPositionCollisionThisShip + Math.cos(slope) * this.getRadius(), yPositionCollisionThisShip + Math.sin(slope) * this.getRadius()};
 
 		double collisionXSelf = this.getXCoordinate() + this.getTimeToCollision(otherEntity) * this.getXVelocity();
 		double collisionYSelf = this.getYCoordinate() + this.getTimeToCollision(otherEntity) * this.getYVelocity();
@@ -691,6 +675,9 @@ public abstract class Entity {
 			return null;
 		
 		double dt = getTimeFirstCollisionBoundary();
+		
+		if (dt == Double.POSITIVE_INFINITY)
+			return null;
 		
 		double xCenter = getXCoordinate() + dt * getXVelocity();
 		double yCenter = getYCoordinate() + dt * getYVelocity();

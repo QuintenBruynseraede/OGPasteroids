@@ -107,11 +107,15 @@ public class World {
 	}
 	
 	/**
-	 * Returns whether a given entity is fully placed within the boundaries of this world
+	 * Returns whether a given entity is fully placed within the boundaries of this world,
+	 * taking rounding errors into account.
 	 * @see	Implementation
 	 */
 	private boolean isEntityWithinBounds(Entity e) {
-		return e.getXCoordinate() >= e.getRadius() && e.getYCoordinate() >= e.getRadius() && e.getXCoordinate() <= this.getWidth() - e.getRadius() && e.getYCoordinate() <= this.getHeight() - e.getRadius(); 
+		return e.getXCoordinate() >= 0.99*e.getRadius() && 
+				e.getYCoordinate() >= 0.99*e.getRadius() &&
+				 e.getXCoordinate() <= getWidth() - 0.99*e.getRadius() && 
+				  e.getYCoordinate() <= getHeight() - -.99*e.getRadius(); 
 	}
 	
 	/**
@@ -143,9 +147,11 @@ public class World {
 		
 		entities.add(e);
 		
-		for (Entity entity: getEntities()) {
+		if (!isEntityWithinBounds(e)) //INVAR: Fully within bounds of world
+			e.finalize();
+		
+		for (Entity entity: getEntities()) { //INVAR: No overlap with other entities
 			if (e.overlap(entity) && entity != e) {
-				System.out.println("Overlap on add");
 				if (e instanceof Bullet) {
 					if (((Bullet) e).getParent() == entity) 
 						return;
@@ -153,10 +159,6 @@ public class World {
 						throw new IllegalStateException("1Cannot add overlapping entities that are not bullets. " + e + " " + entity);
 				}
 				throw new IllegalStateException("2Cannot add overlapping entities that are not bullets." + e + " " + entity);
-			}
-			if (e.getTimeFirstCollisionBoundary() <= 0) {
-				System.out.println("Removing instance partly out of world");
-				e.finalize();
 			}
 		}
 	}
@@ -335,7 +337,6 @@ public class World {
 		if (dt < 0) throw new IllegalArgumentException("Delta time cannot be negative");
 		
 		double timeToCollision = getTimeNextCollision();
-		double[] positionNextCollision = getPositionNextCollision();
 		Entity[] entitiesNextCollision = getEntitiesNextCollision();
 		
 		while (timeToCollision <= dt && timeToCollision > 0) {
@@ -352,19 +353,14 @@ public class World {
 				if (l != null) 
 					l.objectCollision(e1, e2, e1.getCollisionPosition(e2)[0], e1.getCollisionPosition(e2)[1]);
 				e1.collideWith(e2);
-				//advance(0.0000001);
 			}
 			dt -= timeToCollision;
 			
 			timeToCollision = getTimeNextCollision();
-			positionNextCollision = getPositionNextCollision();
 			entitiesNextCollision = getEntitiesNextCollision();
 		}
 		advance(dt);
 	}
-	
-	
-	
 	
 	
 	/**
@@ -372,13 +368,13 @@ public class World {
 	 * Ships' velocities may be updated depending on its state(thruster on/off).
 	 * @param 	deltaTime
 	 * 			The time duration over which to update the entities' properties.
-	 * @effect	| for each Entity e : this.getEntities()
+	 * @effect	| for each Entity e : getEntities()
 	 * 			|	e.advance()
 	 * @note	Specific behaviour in advance() is specified in detail at the level of each subclass.
 	 * 
 	 */
 	public void advance(double deltaTime) {
-		for (Entity e : entities) {
+		for (Entity e : getEntities()) {
 			e.advance(deltaTime);
 		}
 	}
@@ -402,16 +398,16 @@ public class World {
 	/**
 	 * A method that prepares this world to be removed by the garbage collector.
 	 * @post	| for each Entity e : old.getEntities()
-	 * 			| 	e.getWorld() == null;
-	 * @post	| this.getEntites().getSize() == 0
-	 * @post	| this.finalized = true
+	 * 			| 	(new e).getWorld() == null;
+	 * @post	| (new this).getEntites().getSize() == 0
+	 * @post	| (new this).isFinalized() == true
 	 */
 	public void finalize() {
-		for (Entity e : this.getEntities()) {
+		for (Entity e : getEntities()) {
 			e.setWorld(null);
 		}
 		entities.clear();
-		this.finalized = true;
+		finalized = true;
 	}
 	
 

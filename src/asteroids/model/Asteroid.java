@@ -115,17 +115,7 @@ public class Asteroid extends MinorPlanet {
 	 */
 	private static double RADIUSLOWERBOUND = 5;
 
-	/**
-	 * 	Moves the Asteroid during a given time
-	 * 	@param 	deltaTime
-	 * 			The time during which the Asteroid is moved.
-	 *  @effect		| move(deltaTime);
-	 */
-	@Override
-	@Raw
-	public void advance(double deltaTime) {
-		move(deltaTime);
-	}	
+	
 	
 	/**
 	 * Returns a string representation of an asteroid.

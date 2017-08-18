@@ -220,7 +220,7 @@ public class Bullet extends Entity {
 	}
 	
 	/**
-	 * Returns the ship thsi bullet was fired off of.
+	 * Returns the ship this bullet was fired off of.
 	 */
 	@Basic
 	public Ship getFiredBy() {

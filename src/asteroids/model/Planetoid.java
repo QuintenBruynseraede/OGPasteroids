@@ -222,7 +222,6 @@ public class Planetoid extends MinorPlanet {
 		
 		move(deltaTime);
 		addToDistanceTravelled(Math.sqrt(Math.pow(deltaTime * this.getXVelocity(), 2) + Math.pow(deltaTime * this.getYVelocity(), 2)));
-		this.setRadius(this.getInitialRadius() - 1E-6*this.getDistanceTravelled());
 	}
 	
 
@@ -358,13 +357,40 @@ public class Planetoid extends MinorPlanet {
 	 * 
 	 */
 	private void spawnPlanetoids() {
-		System.out.println(this);
-		Planetoid p1 = new Planetoid(100, getYCoordinate(), -10, 0, 25);
-		Planetoid p2 = new Planetoid(300, getYCoordinate(), 10, 0, 25);
+		double asteroidDirection = 2 * Math.PI * Math.random(); 
+
+		double totalVelocity = 1.5 *  getTotalVelocity(getXVelocity(), getYVelocity());
+		double asteroidRadius = getRadius()/2;		
+		double XPositionAsteroid1 = getXCoordinate() + Math.cos(asteroidDirection) * asteroidRadius;
+		double YPositionAsteroid1 = getYCoordinate() + Math.sin(asteroidDirection) * asteroidRadius;
+		double XVelocityAsteroid1 = totalVelocity * Math.cos(asteroidDirection);
+		double YVelocityAsteroid1 = totalVelocity * Math.sin(asteroidDirection);
+		
+		double XPositionAsteroid2 = getXCoordinate() - Math.cos(asteroidDirection) * asteroidRadius;
+		double YPositionAsteroid2 = getYCoordinate() - Math.sin(asteroidDirection) * asteroidRadius;
+		double XVelocityAsteroid2 = -totalVelocity * Math.cos(asteroidDirection);
+		double YVelocityAsteroid2 = -totalVelocity * Math.sin(asteroidDirection);		
+
+		Asteroid a1 = new Asteroid(XPositionAsteroid1, YPositionAsteroid1, XVelocityAsteroid1, YVelocityAsteroid1, asteroidRadius);
+		Asteroid a2 = new Asteroid(XPositionAsteroid2, YPositionAsteroid2, XVelocityAsteroid2, YVelocityAsteroid2, asteroidRadius);
+		
 		World w = getWorld();
 		w.removeEntity(this);
-		w.addEntity(p1);
-		w.addEntity(p2);
+		try {
+			w.addEntity(a1);
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IllegalStateException e) {
+			a1.finalize();
+		}
+		
+		try {
+			w.addEntity(a2);
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IllegalStateException e) {
+			a2.finalize();
+		}
 		
 	}
 }

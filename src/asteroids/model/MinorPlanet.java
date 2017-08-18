@@ -47,8 +47,20 @@ public abstract class MinorPlanet extends Entity {
 	 */
 	@Override
 	public void finalize(){
-		this.getWorld().removeEntity(this);
+		if (getWorld() != null)
+			getWorld().removeEntity(this);
 		this.finalized = true;
+	}
+	
+	/**
+	 * 	Advances the MinorPlanet during a given time
+	 * 	@param 	deltaTime
+	 * 			The time during which the Asteroid is moved.
+	 *  @effect		| move(deltaTime);
+	 */
+	@Raw
+	public void advance(double deltaTime) {
+		move(deltaTime);
 	}
 
 	/**
