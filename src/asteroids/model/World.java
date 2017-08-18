@@ -123,6 +123,19 @@ public class World {
 	 */	
 	private Set<Entity> entities = new HashSet<Entity>();
 	
+	
+	/**
+	 * Map that maps all entities on their respective positions
+	 */
+	private Map<Position, Entity> entityPositions = new HashMap<Position, Entity>();
+	
+	/**
+	 * Updates the position of an entity, to ensure consistency with the actual state of the world when using getInstanceAtPosition()
+	 */
+	private void updatePosition(Entity e) {
+			entityPositions.put(new Position(e.getXCoordinate(), e.getYCoordinate()), e);
+	}
+		
 	/**
 	 * 
 	 * @param 	entity
@@ -146,6 +159,7 @@ public class World {
 			throw new IllegalArgumentException("Already in this world");
 		
 		entities.add(e);
+		updatePosition(e);
 		
 		if (!isEntityWithinBounds(e)) //INVAR: Fully within bounds of world
 			e.finalize();
@@ -194,16 +208,15 @@ public class World {
 	 * 			| 	e.getYCoordinate() == y
 	 * @return	returns null, if there is no entity at position (x,y)
 	 * 			| result == null
-	 * @note	To account for rounding errors, a minimum of 99% correctness is handled in this method.
+	 * @note	To account for rounding errors, a minimum of 99% correctness is handled.
 	 * 			
 	 */
 	public Entity getInstanceAtPosition(double x, double y) {
-		for (Entity e : this.getEntities()) {
-			if (e.getXCoordinate() > 0.99 * x && e.getXCoordinate() < 1.01 * x && e.getYCoordinate() > 0.99 * y && e.getYCoordinate() < 1.01 * y) {
-				return e;
-			}
-		}
-		return null;
+		return entityPositions.getOrDefault(new Position(x,y), null);
+	}
+	
+	public void printMap() {
+		System.out.println(entityPositions);
 	}
 	
 	/**
@@ -376,6 +389,7 @@ public class World {
 	public void advance(double deltaTime) {
 		for (Entity e : getEntities()) {
 			e.advance(deltaTime);
+			updatePosition(e);
 		}
 	}
 	

@@ -5,6 +5,7 @@ import asteroids.model.World;
 import asteroids.model.programs.*;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -413,12 +414,6 @@ public class Facade implements asteroids.part3.facade.IFacade {
 		
 	}
 
-	//@Override
-	///public double[] getPositionCollisionBoundary(Object object) throws ModelException {
-	//	Entity entity = (Entity) object;
-	//	return entity.getCollisionPosition(entity.get());
-	//	
-	//}
 
 	@Override
 	public double getTimeCollisionEntity(Object entity1, Object entity2) throws ModelException {
@@ -491,7 +486,7 @@ public class Facade implements asteroids.part3.facade.IFacade {
 
 	@Override
 	public Set<? extends Asteroid> getWorldAsteroids(World world) throws ModelException {
-		return (Set<? extends Asteroid>) world.getEntitiesOfType(Asteroid.class);
+		return (Set<? extends Asteroid>) world.getEntitiesOfType(Asteroid.class);	
 	}
 
 
