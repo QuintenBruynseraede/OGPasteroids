@@ -28,6 +28,7 @@ public class Program {
 	private SourceLocation sourceLocation = new SourceLocation(0, 0);
 	private ActionStatement lastExecutedStatement = null;
 	private boolean currentlyInWhile = false;
+	private final static boolean assertionChecking = false;
 
 	
 	/**
@@ -187,5 +188,8 @@ public class Program {
 		this.currentlyInWhile = currentlyInWhile;
 	}
 	
+	public boolean getAssertionChecking() {
+		return assertionChecking;
+	}	
 	
 }

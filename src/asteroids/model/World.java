@@ -11,9 +11,7 @@ import asteroids.part2.CollisionListener;
 
 /**
  * A class of worlds with some properties.
- * @version	1.0
- * @author Tom De Backer and Quinten Bruynseraede
- *  
+ * @version	1.0 
  * @author Tom De Backer and Quinten Bruynseraede
  * @invar 	The height of this world is always less than or equal to the maximum value for the height of a world
  * 			| getHeight() <= HEIGTHUPPERBOUND
@@ -109,7 +107,9 @@ public class World {
 	/**
 	 * Returns whether a given entity is fully placed within the boundaries of this world,
 	 * taking rounding errors into account.
-	 * @see	Implementation
+	 * @param	e
+	 * 			The entity to examine.
+	 * @see		Implementation
 	 */
 	private boolean isEntityWithinBounds(Entity e) {
 		return e.getXCoordinate() >= 0.99*e.getRadius() && 
@@ -212,12 +212,13 @@ public class World {
 	 * 			
 	 */
 	public Entity getInstanceAtPosition(double x, double y) {
-		return entityPositions.getOrDefault(new Position(x,y), null);
+		try {
+			return entityPositions.getOrDefault(new Position(x,y), null);
+		} catch (IllegalArgumentException e) {
+			return null;
+		}
 	}
 	
-	public void printMap() {
-		System.out.println(entityPositions);
-	}
 	
 	/**
 	 * 	Returns all entities of a certain class associated with this world, determined in a functional way.
@@ -300,7 +301,6 @@ public class World {
 			}
 		}
 		return entities;
-		
 	}
 	
 	
@@ -323,7 +323,6 @@ public class World {
 			return position;
 		}
 			
-		
 		if (nextCollisionEntities[1] == null) { //Boundary collision
 			Entity e = nextCollisionEntities[0];
 			double entityXCollision = e.getXCoordinate() + e.getXVelocity() * nextCollisionTime;

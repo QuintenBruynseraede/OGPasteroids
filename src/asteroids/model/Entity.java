@@ -658,7 +658,13 @@ public abstract class Entity {
 		if (getYCoordinate() > getWorld().getHeight()-1.01*getRadius())
 			setYVelocity(-getYVelocity());
 	}
-
+	
+	/**
+	 * Resolves a collision between this entity and another.
+	 * See implementation in subclass for details.
+	 * @param 	entity
+	 * 			The entity this entity collides with.
+	 */
 	public abstract void collideWith(Entity entity);
 	
 	/**
@@ -669,6 +675,7 @@ public abstract class Entity {
 	 * 		   |		or abs(y) = getRadius()
 	 * @return | if (getWorld() == null || getTotalVelocity() == 0)
 	 * 		   | 	return null;
+	 * @note   This method utilizes the notion of significant overlap, and as such an overlap smaller than 1% of this enitity's radius will be tolerated.
 	 */
 	public double[] getCollisionPositionFirstBoundary() {
 		if (getWorld() == null)
@@ -684,11 +691,11 @@ public abstract class Entity {
 		
 		if (xCenter < 1.01*getRadius()) //LEFT
 			return new double[] {xCenter - getRadius(), yCenter};
-		else if (xCenter > getWorld().getWidth()-1.01*getRadius()) //RIGHT
+		else if (xCenter > getWorld().getWidth()- 1.01 * getRadius()) //RIGHT
 			return new double[] {xCenter + getRadius(), yCenter};
 		else if (yCenter < 1.01 * getRadius()) //TOP
 			return new double[] {xCenter, yCenter - getRadius()};
-		else if (yCenter > getWorld().getHeight()-1.01*getRadius()) //BOTTOM
+		else if (yCenter > getWorld().getHeight()- 1.01 * getRadius()) //BOTTOM
 			return new double[] {xCenter, yCenter + getRadius()};
 		else
 			return null;

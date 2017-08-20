@@ -19,8 +19,7 @@ public abstract class Expression<T> {
 	}
 	
 	private void setSourceLocation(SourceLocation sourceLocation) {
-		this.sourceLocation = sourceLocation;
-		
+		this.sourceLocation = sourceLocation;	
 	}
 	
 	public SourceLocation getSourceLocation() {

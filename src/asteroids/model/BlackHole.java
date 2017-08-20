@@ -59,12 +59,12 @@ public class BlackHole extends Entity {
 	 * @param 	radius
 	 * 			The given radius to check.
 	 * @return	True if and only if the velocity is greater than the minimum value specified for a black hole's radius.
-	 * 			| result == radius > getRadiusLowerBound()
+	 * 			| result == radius > getRadiusLowerBound() && Double.isFinite(radius) && !Double.isNaN(radius)
 	 */
 	@Override
 	@Raw
 	public boolean isValidRadius(double radius) {
-		return (radius > getRadiusLowerBound());
+		return (radius > getRadiusLowerBound() && Double.isFinite(radius) && !Double.isNaN(radius));
 	}
 
 	/**
@@ -87,7 +87,7 @@ public class BlackHole extends Entity {
 
 	/**
 	 * Updates the position of the black hole according to its velocity.
-	 * As black holes cannot have a velocity, the state of the game doesn't change
+	 * As black holes cannot have a velocity, the state of the game doesn't change.
 	 */
 	@Override
 	public void advance(double deltaTime) {
@@ -114,19 +114,20 @@ public class BlackHole extends Entity {
 	 * 	@see 	implementation
 	 * 	@throws	IllegalArgumentException
 	 * 			If the black hole does not overlap with a ship, minorplanet or another blackhole and the black hole can be positioned in the given world.
+	 *  @note	This method utilizes the notion of significant overlap, and as such an overlap smaller than 1% of this enitity's radius will be tolerated.
 	 */
 	@Raw
 	@Override
 	public boolean canHaveAsWorld(World world) throws IllegalArgumentException {
-		for (Entity e : world.getEntities()) {
+		for (Entity e : world.getEntities()) { //Overlap
 			if (overlap(e) && e != this)
 				return false;
 		}
 		
-		return ( this.getXCoordinate() - this.radius >= 0 
-				&& this.getXCoordinate() + this.radius < world.getWidth() 
-				&& this.getYCoordinate() - this.radius >= 0 
-				&& this.getYCoordinate() + this.radius < world.getHeight());		
+		return ( getXCoordinate()  >= 0.99*getRadius()  //Within bounds
+				&& getXCoordinate() <= world.getWidth() - 0.99*getRadius() 
+				&& getYCoordinate() >= 0.99 * getRadius()
+				&& getYCoordinate() < world.getHeight() - 0.99 * getRadius());	
 	}
 
 

@@ -29,6 +29,8 @@ public class AssertStatement extends Statement {
 	public void eval() {
 		if (getProgram().getLastExecutedStatement() != null)
 			return;
+		if (getProgram().getAssertionChecking() == false)
+			return;
 		
 		if (predicate.eval() == false)
 			throw new AssertionError("[Assert] Predicate not true");
