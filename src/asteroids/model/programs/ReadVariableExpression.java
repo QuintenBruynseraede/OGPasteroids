@@ -14,7 +14,6 @@ public class ReadVariableExpression extends Expression<Object> {
 	public Object eval() {
 		Program p = getStatement().getProgram();
 		if (p.getCurrentFunction() == null) { //GLOBAL VARIABLE
-			//System.out.println("Looking for variable in global variables");
 			if (p.getVariableValue(varName) != null) {
 				return p.getVariableValue(varName);
 			}	

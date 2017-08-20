@@ -66,7 +66,6 @@ public class Program {
 		
 		try { main.eval(); }
 		catch (OutOfTimeException e) {
-			System.out.println("Stopped execution because " + getTimeLeft());
 			return null;
 		}
 		
@@ -121,10 +120,8 @@ public class Program {
 		List<Variable<?>> result = getVariables().stream().filter(f -> f.getName().equals(name)).collect(Collectors.toList());
 		
 		if (result.isEmpty()) {
-			//System.out.println("No such variable found: " + name);
 			return null;
 		}
-		//System.out.println("Correct variable found: " + name);
 		return result.get(0);	
 		//The collected list will always contain just one element, thus taking the first element yields the correct result.
 	}
@@ -151,8 +148,6 @@ public class Program {
 				return v.eval();
 		}
 		throw new IllegalArgumentException("Non-existent global variable " + varName);
-		
-		//TODO: functional programming
 	}
 	
 	public List<Variable<?>> getVariables() {

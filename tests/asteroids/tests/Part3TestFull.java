@@ -835,7 +835,6 @@ public class Part3TestFull {
         usedBullet = bullet2;
       else
         usedBullet = bullet1;
-    System.out.println(facade.getWorldBullets(world));
     assertTrue(facade.getWorldBullets(world).isEmpty());
     assertEquals(1, facade.getNbBulletsOnShip(ship));
     assertTrue(nbStudentsInTeam <= 1 || facade.isTerminatedBullet(usedBullet));
@@ -872,7 +871,6 @@ public class Part3TestFull {
     double expectedTime = (5000.0 - 600.0) / 100.0;
     assertEquals(expectedTime, timeToCollision, EPSILON);
     double[] collisionPosition = facade.getPositionCollisionBoundary(ship);
-    System.out.println(collisionPosition);
     assertEquals(5000, collisionPosition[0], EPSILON);
     assertEquals(300, collisionPosition[1], EPSILON);
     score += 6;
@@ -1331,7 +1329,6 @@ public class Part3TestFull {
     facade.loadBulletOnShip(ship, bullet);
     facade.terminateBullet(bullet);
     assertTrue(facade.isTerminatedBullet(bullet));
-    System.out.println(bullet + ", " + bullet.getParent());
     assertNull(facade.getBulletShip(bullet));
     if (nbStudentsInTeam > 1)
       assertTrue(facade.getBulletsOnShip(ship).isEmpty());
@@ -1914,19 +1911,20 @@ public class Part3TestFull {
     score += 20;
   }
 
-//  @Test
-//  public void testWhileStatement_InsideRecursiveFunction() throws ModelException {
-//    max_score += 20;
-//    String code = "def sumfac { " + "  a := $1; " + "  t := 1.0; " + "  while 1.5 < a { "
-//        + "    t := t + (a*sumfac(a + -1.0));" + "    a := a + -1.0; " + "  }" + "  return t; " + "} "
-//        + "print sumfac(4.0); ";
-//    Program program = ProgramParser.parseProgramFromString(code, programFactory);
-//    facade.loadProgramOnShip(ship1, program);
-//    List<Object> results = facade.executeProgram(ship1, 0.3);
-//    Object[] expecteds = { 60.0 };
-//    assertArrayEquals(expecteds, results.toArray());
-//    score += 20;
-//  }
+  @Test
+  public void testWhileStatement_InsideRecursiveFunction() throws ModelException {
+    max_score += 20;
+    fail();
+    String code = "def sumfac { " + "  a := $1; " + "  t := 1.0; " + "  while 1.5 < a { "
+        + "    t := t + (a*sumfac(a + -1.0));" + "    a := a + -1.0; " + "  }" + "  return t; " + "} "
+        + "print sumfac(4.0); ";
+    Program program = ProgramParser.parseProgramFromString(code, programFactory);
+    facade.loadProgramOnShip(ship1, program);
+    List<Object> results = facade.executeProgram(ship1, 0.3);
+    Object[] expecteds = { 60.0 };
+    assertArrayEquals(expecteds, results.toArray());
+    score += 20;
+  }
 
   @Test
   public void testWhileStatement_NonBooleanControllingExpression() throws ModelException {

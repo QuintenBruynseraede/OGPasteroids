@@ -23,7 +23,6 @@ public class TurnStatement extends ActionStatement {
 		if (getProgram().getLastExecutedStatement() != null) {
 			if (getProgram().getLastExecutedStatement() == this) {
 				getProgram().setLastExecutedStatement(null);
-				System.out.println("Resuming execution after " + this);
 				return;
 			}
 			else

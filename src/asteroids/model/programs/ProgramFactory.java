@@ -18,7 +18,6 @@ public class ProgramFactory implements IProgramFactory<Expression, Statement, Fu
 			try {
 				return new Function(body, functionName, sourceLocation);
 			} catch (Exception e) {
-				System.out.println(e.getMessage());
 				return null;
 			}
 	}

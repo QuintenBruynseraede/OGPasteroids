@@ -24,7 +24,6 @@ public class FunctionExpression extends Expression {
 		if (getStatement().getProgram().getFunctionByName(name) == null) 
 			throw new IllegalArgumentException();
 		try {
-			System.out.println("Executing function");
 			return this.getStatement().getProgram().getFunctionByName(name).execute(arguments);
 		} catch (OutOfTimeException e1) {
 			return null; //Will never happen, as the time left for a program won't be changed when executing a function.

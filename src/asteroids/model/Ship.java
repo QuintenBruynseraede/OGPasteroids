@@ -373,7 +373,7 @@ public class Ship extends Entity {
 		Bullet bullet = this.bulletsLoaded.iterator().next();
 
 		if (bulletsLoaded.contains(bullet) == false)
-			{ System.out.println("Probleem"); throw new IllegalArgumentException("Firing bullet that is not loaded."); }
+			{ throw new IllegalArgumentException("Firing bullet that is not loaded."); }
 		
 		
 		removeBullet(bullet);
@@ -528,7 +528,6 @@ public class Ship extends Entity {
 	 * @post	| new.finalized == true
 	 */
 	@Override
-	@Raw
 	public void finalize() {
 		if (! bulletsLoaded.isEmpty()) {
 			for (Bullet b : bulletsLoaded) {
@@ -544,8 +543,7 @@ public class Ship extends Entity {
 	 * 
 	 * @return	A string representation of a ship.
 	 */
-	@Override
-	@Raw
+	@Override @Raw
 	public String toString() {
 		return "[Ship] " + this.hashCode();
 	}
@@ -568,8 +566,7 @@ public class Ship extends Entity {
 		if (entity instanceof Ship) {
 			Ship ship1 = this;
 			Ship ship2 = (Ship) entity;
-			
-			 
+				 
 			double deltaVX = ship2.getXVelocity() - ship1.getXVelocity();
 			double deltaVY = ship2.getYVelocity() - ship1.getYVelocity();
 			double deltaRX = ship2.getXCoordinate() - ship1.getXCoordinate();

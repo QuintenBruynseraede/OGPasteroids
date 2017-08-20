@@ -9,7 +9,7 @@ public class IfThenElseStatement extends Statement{
 	private Statement ifBody;
 	private Statement elseBody;
 	
-	public IfThenElseStatement(Expression condition, Statement ifBody, Statement elseBody, SourceLocation sourceLocation) {
+	public IfThenElseStatement(Expression<Boolean> condition, Statement ifBody, Statement elseBody, SourceLocation sourceLocation) {
 		super(sourceLocation);
 		setCondition(condition);
 		setIfBody(ifBody);
@@ -17,11 +17,11 @@ public class IfThenElseStatement extends Statement{
 		condition.setStatement(this);
 	}
 
-	public Expression getCondition() {
+	public Expression<Boolean> getCondition() {
 		return condition;
 	}
 
-	public void setCondition(Expression condition) {
+	public void setCondition(Expression<Boolean> condition) {
 		this.condition = condition;
 	}
 

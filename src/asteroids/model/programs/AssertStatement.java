@@ -7,7 +7,6 @@ public class AssertStatement extends Statement {
 	
 	public AssertStatement(Expression<Boolean> predicate, SourceLocation sourceLocation) {
 		super(sourceLocation);
-		//System.out.println("Value set for " + v);
 		setPredicate(predicate);
 		predicate.setStatement(this);
 	}

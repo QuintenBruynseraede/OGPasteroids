@@ -16,8 +16,6 @@ public class AnyEntityExpression extends Expression<Entity> {
 	@Override
 	public Entity eval() {
 		Random r = new Random();
-		
-		//System.out.println(getStatement());
 		Set<Entity> entities = new HashSet<Entity>(getStatement().getProgram().getShip().getWorld().getEntities());
 		int i = r.nextInt(entities.size());
 		return (Entity) entities.toArray()[i];

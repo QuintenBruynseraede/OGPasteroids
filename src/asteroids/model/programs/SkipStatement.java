@@ -13,14 +13,12 @@ public class SkipStatement extends ActionStatement {
 		if (getProgram().getLastExecutedStatement() != null) {
 			if (getProgram().getLastExecutedStatement() == this) {
 				getProgram().setLastExecutedStatement(null);
-				System.out.println("Resuming execution after " + this);
 				return;
 			}
 			else
 				return;
 		}
 		//Do nothing
-		System.out.println("SKIP " + this);
 		advanceTime();	
 	}
 

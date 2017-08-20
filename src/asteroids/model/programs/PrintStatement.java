@@ -7,7 +7,6 @@ public class PrintStatement extends Statement {
 	
 	public PrintStatement(Expression v, SourceLocation sourceLocation) {
 		super(sourceLocation);
-		//System.out.println("Value set for " + v);
 		this.value = v;
 		v.setStatement(this);
 	}
