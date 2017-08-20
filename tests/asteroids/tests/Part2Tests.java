@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import asteroids.facade.Facade;
 import asteroids.model.Bullet;
-import asteroids.model.Constants;
 import asteroids.model.Entity;
 import asteroids.model.Ship;
 import asteroids.model.World;

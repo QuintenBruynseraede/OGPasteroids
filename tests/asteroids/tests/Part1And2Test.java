@@ -1,6 +1,5 @@
 package asteroids.tests;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -9,20 +8,16 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
-import asteroids.facade.Facade;
 import asteroids.model.Bullet;
 import asteroids.model.Ship;
 import asteroids.model.World;
 import asteroids.part2.facade.IFacade;
-import asteroids.part3.programs.IProgramFactory;
-import asteroids.part3.programs.internal.ProgramParser;
 import asteroids.util.ModelException;
 
 public class Part1And2Test {
