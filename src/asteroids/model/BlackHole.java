@@ -120,7 +120,7 @@ public class BlackHole extends Entity {
 	@Override
 	public boolean canHaveAsWorld(World world) throws IllegalArgumentException {
 		for (Entity e : world.getEntities()) { //Overlap
-			if (overlap(e) && e != this)
+			if (overlap(e) && e != this && !(e instanceof Bullet))
 				return false;
 		}
 		
@@ -137,7 +137,7 @@ public class BlackHole extends Entity {
 	 * 			The entity that will collide with this black hole.
 	 * 	@post	If the given entity is instance of a Minorplanet, the minorplanet will be finalized.
 	 * 			| if(entity instanceof MinorPlanet)
-				| 		entity.isFinalized() == true
+	 *			| 		entity.isFinalized() == true
 	 *	@post	If the given entity is instance of a Ship, the ship will be finalized.
 	 * 			| if(entity instanceof Ship)
 	 *			| 		entity.isFinalized() == true;
@@ -145,16 +145,16 @@ public class BlackHole extends Entity {
 	 *			| if (entity instanceof Bullet)
 	 *			|		return;
 	 * 	@post	If the given entity is instance of a BlackHole, both holes are destroyed and replaced with a new black hole whose
-				center is at the point of collision and whose radius is equal to the sum of the radii of both
-				colliding black holes. Say B is the newly created black hole
-				| if (entity instanceof BlackHole)
-				|		(new.getWorld()).getEntities() = getWorld().getEntities() + 1
-				| 		B.getXCoordinate() == getCollisionPosition(entity)[0]
-				|		B.getYCoordinate() == getCollisionPosition(entity)[1]
-				|		B.getRadius() == this.getRadius() + entity.getRadius()
-				|		B.getWorld() == getWorld()
-				|		entity.isFinalized() == true
-				|		this.isFinalized() == true
+	 *			center is at the point of collision and whose radius is equal to the sum of the radii of both
+	 *			colliding black holes. Say B is the newly created black hole
+	 *			| if (entity instanceof BlackHole)
+	 *			|		(new.getWorld()).getEntities() = getWorld().getEntities() + 1
+	 *			| 		B.getXCoordinate() == getCollisionPosition(entity)[0]
+	 *			|		B.getYCoordinate() == getCollisionPosition(entity)[1]
+	 *			|		B.getRadius() == this.getRadius() + entity.getRadius()
+	 *			|		B.getWorld() == getWorld()
+	 *			|		entity.isFinalized() == true
+	 *			|		this.isFinalized() == true
 	 */
 	@Override
 	public void collideWith(Entity entity) {
